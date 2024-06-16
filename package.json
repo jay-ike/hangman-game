@@ -1,0 +1,20 @@
+{
+  "name": "hangman-game",
+  "version": "1.0.0",
+  "description": "An implementation of the hangman game in the web",
+  "scripts": {
+      "build": "eleventy",
+      "dev": "eleventy --serve --port 8088"
+  },
+  "keywords": [
+      "progressive enhancement",
+      "accessibility",
+      "css",
+      "vanilla-javascript"
+  ],
+  "author": "Ndimah Tchougoua",
+  "license": "ISC",
+  "dependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  }
+}
