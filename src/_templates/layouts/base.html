@@ -5,10 +5,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
+    <link rel="preload" href="/assets/mouse-memoirs.regular.woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="/assets/images/sprites.svg" as="image" crossorigin="anonymous">
+    <style>{%cssmin "includes/foundations.css" %}</style>
 </head>
 
-<body>
-    {{content | safe}}
+<body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
+    {{content}}
+    <svg width="0" height="0" class="visually-hidden" aria-hidden="true">
+        <defs>
+            <filter id="outline">
+                <femorphology radius="1" id="femorphology220" operator="dilate" result="result1" in="sourcegraphic" />
+                <feflood style="flood-color: var(--f-color, rgb(237, 204, 48));" result="result2" in="sourcegraphic" />
+                <fecomposite operator="in" result="result3" in2="result1" in="result2" />
+                <fecomposite operator="over" in2="result3" in="backgroundimage" result="result4" />
+                <feflood style="flood-color: var(--s-color, rgb(105, 105, 218));" in="sourcegraphic" result="result5" />
+                <fegaussianblur stddeviation="0" in="result4" />
+                <feoffset dx="0" dy="6" />
+                <fecomposite in="result5" result="result6" operator="in" />
+                <feComposite id="feComposite247" in2="result6" in="result4" />
+            </filter>
+
+        </defs>
+    </svg>
 </body>
 
 </html>

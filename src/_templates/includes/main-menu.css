@@ -1,0 +1,60 @@
+.menu {
+    --direction: column;
+    --min-padding: min(5vmin, 1.5em);
+
+    border-radius: min(2.5em, 72px);
+    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265 / 83%));
+    container: menu / inline-size;
+    min-inline-size: min(90vi, 592px);
+
+    &>h1 {
+        --g-template: ". area1 ."
+            "area2 area2 area2"
+            ". . area3" / 2.2ch minmax(3ch, 1fr) 1fr;
+        --g-gap: 0 .2em;
+
+        margin-block-start: -1.3em;
+        text-align: center;
+        color: transparent;
+        background: linear-gradient(in oklch to bottom, oklch(75% 0.132 248), var(--system-color-white)) text;
+        filter: url(/assets/images/sprites.svg#outline);
+        margin-block-start: max(-6vb, -2em);
+
+        &>span:nth-of-type(2) {
+            font-size: 1.5em;
+            margin-block-start: -.45em;
+
+            &::first-letter {
+                text-transform: uppercase;
+                font-size: 1.5em;
+            }
+        }
+
+        &>span:not(:nth-of-type(2)) {
+            text-transform: uppercase;
+            font-size: .7em;
+            text-align: start;
+            background: linear-gradient(var(--system-color-white), var(--system-color-white)) text;
+        }
+        &>span:first-of-type {
+            margin-block-end: -0.5em;
+        }
+        & > span:last-of-type {
+            margin-block-start: -0.5em;
+        }
+    }
+}
+
+.btn-help {
+    --i-padding: min(10vi, 3em);
+    --min-padding: 0.75em var(--i-padding);
+    border-radius: calc(var(--i-padding) / 2);
+}
+
+.btn-play {
+    --min-padding: min(10vi, 3em);
+    --shadow: inset 0 -4px 0 5px var(--system-color-black),
+        inset 0 -8px 0 10px oklch(57% 0.27 304);
+
+    min-inline-size: min(30vi, 5em);
+}

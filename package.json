@@ -3,18 +3,25 @@
   "version": "1.0.0",
   "description": "An implementation of the hangman game in the web",
   "scripts": {
-      "build": "eleventy",
-      "dev": "eleventy --serve --port 8088"
+    "build": "eleventy",
+    "dev": "eleventy --serve --port 8088",
+    "lint": "stylelint **/*.css",
+    "lint:fix": "stylelint **/*.css --fix"
   },
   "keywords": [
-      "progressive enhancement",
-      "accessibility",
-      "css",
-      "vanilla-javascript"
+    "progressive enhancement",
+    "accessibility",
+    "css",
+    "vanilla-javascript"
   ],
   "author": "Ndimah Tchougoua",
   "license": "ISC",
   "dependencies": {
-    "@11ty/eleventy": "^2.0.1"
+    "@11ty/eleventy": "^2.0.1",
+    "lightningcss": "^1.25.1"
+  },
+  "devDependencies": {
+    "stylelint": "^16.7.0",
+    "stylelint-config-standard": "^36.0.1"
   }
 }

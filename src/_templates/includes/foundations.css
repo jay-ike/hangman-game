@@ -1,0 +1,505 @@
+@layer resets, layout, typography, utilities, theme;
+
+
+@font-face {
+    font-family: "Mouse Memoirs Regular";
+    src: url("/assets/mouse-memoirs.regular.woff2") format("woff2");
+    unicode-range: U+000D, U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153,
+        U+0178, U+02C6, U+02DA, U+02DC, U+2000-200A, U+2010-2014, U+2018-201A,
+        U+201C-201E, U+2022, U+2026, U+202F, U+2039-203A, U+205F, U+20AC,
+        U+2122, U+25FC, U+FB01-FB02;
+}
+
+body {
+    font-family: "Mouse Memoirs Regular", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    line-height: 1.5;
+    letter-spacing: .035em;
+    word-spacing: 0.05em;
+    accent-color: var(--system-color-dark-navy);
+    caret-color: var(--system-color-deep-blue, currentcolor);
+    color: var(--system-color-black);
+    font-size: 100%;
+    min-inline-size: 100vi;
+    min-block-size: 100lvb;
+    background: url("/assets/images/sprites.svg#game-bg") 50% / cover no-repeat;
+}
+
+@layer utilities {
+    .capitalize {
+        text-transform: capitalize;
+    }
+
+    .ml-max {
+        margin-inline-start: auto;
+    }
+
+    .place-end {
+        place-self: end;
+    }
+
+    .no-padding {
+        padding: 0;
+    }
+
+    :is(.relative) {
+        position: relative;
+    }
+
+    .rounded {
+        aspect-ratio: 1;
+        border-radius: 50%;
+    }
+
+    :is(.extend-zone-start)::before,
+    .extend-zone-end::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+    }
+
+    :where(header, .contain) {
+        container: var(--container-name, section) / inline-size;
+    }
+
+    :where(h1, h2):where(:is(header, .contact-grid) *) {
+        color: var(--system-color-dark-navy);
+    }
+
+    :is(.contact-grid, main:not(.main-content):where(body > *)) {
+        max-inline-size: min(90vi, 1110px);
+        margin-inline: auto;
+    }
+
+    header.decorated {
+        --p-width: 30em;
+
+        background-color: var(--system-color-peach);
+        max-block-size: var(--m-height, 768px);
+        clip-path: var(--b-clip, inset(0 round .5rem));
+    }
+
+    header,
+    .contact-grid {
+        text-align: center;
+    }
+
+    .box-pink {
+        --color-text: var(--system-color-white);
+        background-image: var(--pinky-gradient);
+
+        &:where(:focus-visible, :hover) {
+            --color-text: var(--system-color-black);
+            background-image: var(--light-pinky-gradient);
+        }
+    }
+
+    .shadowed {
+        box-shadow: var(--shadow,
+                inset 0 -2px 0 4px oklch(26% 0.143 273),
+                inset 0 4px 0 8px var(--system-color-deep-blue));
+    }
+
+    a:where(:is(nav, footer) *),
+    .links {
+        --f-size-fluid: 2.5cqi;
+
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--i-gap, 16px);
+    }
+
+    .links a {
+        font-weight: 400;
+    }
+
+    :where(.visually-hidden, .md-show) {
+        max-inline-size: 1px;
+        position: absolute;
+        clip-path: inset(50%);
+    }
+
+
+    .md-show {
+        overflow: hidden;
+        visibility: hidden;
+    }
+
+    [popover] {
+        border: none;
+        isolation: isolate;
+
+        &::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+        }
+
+        &,
+        &::backdrop {
+            transition: display .35s allow-discrete,
+                overlay .35s allow-discrete,
+                transform .35s ease-in,
+                opacity .35s;
+            opacity: 0;
+
+        }
+
+        &:popover-open,
+        &:popover-open::backdrop {
+            opacity: 1;
+            transform: none;
+
+            @starting-style {
+                opacity: 0;
+                transform: translateX(50vmax);
+            }
+        }
+    }
+
+    .block-box {
+        block-size: var(--block-size);
+    }
+
+    button:not(:enabled) {
+        color: hsl(0deg 0% 75%);
+    }
+
+    [role="dialog"] {
+        --outline-clr: var(--system-color-black);
+
+        inset-block-start: var(--y, auto);
+        inset-inline-end: var(--right-x, auto);
+    }
+
+    .no-gap {
+        --r-space: 0;
+        --c-space: 0;
+    }
+
+    @media screen and (width >=480px) {
+        header {
+            --x: var(--b-md-x, right calc(-1 * (var(--s) / 4)));
+            --y: var(--b-md-y, top 2rem);
+            --bg: var(--b-md-bg, linear-gradient(15deg, #0000, var(--c1)) var(--x) var(--y) / var(--s) no-repeat);
+            --mask: var(--rounding) var(--x) var(--y) / var(--s) no-repeat;
+        }
+
+        .md-show {
+            max-inline-size: max-content;
+            position: static;
+            clip-path: none;
+            visibility: visible;
+        }
+    }
+
+    @media screen and (width >=768px) {
+
+        header,
+        .contact-grid {
+            text-align: start;
+        }
+    }
+}
+
+@layer layout {
+
+    :where(.stack, .xl-stack)>*+*,
+    .mt-xl {
+        margin-block-start: var(--s-space, 1.5em);
+    }
+
+    .mt-xl,
+    .xl-stack {
+        --s-space: 8rem;
+    }
+
+    :is(.row, .column, .segragator, .cart-modal) {
+        display: flex;
+        align-items: var(--alignment, center);
+        gap: var(--spacing, 1.5em);
+        justify-content: var(--i-alignment, start);
+    }
+
+    .segragator {
+        --i-alignment: space-between;
+
+        flex-flow: var(--direction, row) var(--wrap, nowrap);
+    }
+
+    .row {
+        --alignment: var(--row-align, center);
+        --spacing: var(--r-space);
+
+        flex-flow: var(--row-dir, row) var(--wrap, nowrap);
+    }
+
+    .column {
+        --alignment: var(--col-align, stretch);
+        --spacing: var(--c-space);
+
+        flex-flow: var(--col-dir, column) var(--wrap, nowrap);
+    }
+
+    :is(.center, .img-box) {
+        display: grid;
+        place-items: center;
+        place-content: center;
+        gap: var(--c-gap, 1.5em);
+    }
+
+    :where(header, footer, [class*="box-"], .box, button, .btn) {
+        padding: var(--min-padding, 1.5em);
+        background-color: var(--color-fill, transparent);
+        color: var(--color-text, currentColor);
+        border-radius: var(--radius, 0);
+    }
+
+    .box-blue {
+        --color-fill: var(--system-color-deep-blue);
+        --color-text: var(--system-color-white);
+        --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273),
+            inset 0 1px 0 6px oklch(60.26% 0.215 264);
+
+        &:is(:focus-visible, :hover) {
+            --color-fill: oklch(65.83% 0.18 265);
+        }
+    }
+
+    :is([class$="grid"]) {
+        --col-align: center;
+
+        display: grid;
+        grid-template: var(--g-template);
+        gap: var(--g-gap, 1rem);
+        place-items: var(--p-items, initial);
+
+        &> :first-child {
+            grid-area: area1;
+        }
+
+        &> :nth-child(2) {
+            grid-area: area2;
+        }
+
+        &> :nth-child(3) {
+            grid-area: area3;
+        }
+
+        &> :nth-child(4) {
+            grid-area: area4;
+        }
+
+        &> :nth-child(5) {
+            grid-area: area5;
+        }
+    }
+
+    .responsive-grid:not([class$="grid"]) {
+        --max-col-width: var(--m-col-w, 12rem);
+        --min-row-height: var(--m-row-h, 15rem);
+        --max-cols: var(--m-col-s, 3);
+        --gap: var(--c-gap, 1rem);
+
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, max(var(--max-col-width), (100% / var(--max-cols)) - var(--gap))),
+                    1fr));
+        grid-auto-rows: minmax(var(--min-row-height), auto);
+        gap: var(--gap);
+    }
+}
+
+
+@layer resets {
+    :is(*, ::before, ::after) {
+        box-sizing: border-box;
+    }
+
+    :is(h2, h3, h4, h5) {
+        line-height: 1.2;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        letter-spacing: -0.01em;
+    }
+
+    h1 {
+        line-height: 1.1;
+        letter-spacing: 0.04em;
+    }
+
+    :is(body, h1, h2, h3, h4, h5, dl, dt, dd, p) {
+        margin: 0;
+    }
+
+    :is(img, svg) {
+        max-inline-size: 100%;
+        display: block;
+    }
+
+    :is(ul, ol, fieldset, legend, menu, [popover]) {
+        margin: 0;
+        padding: 0;
+    }
+
+    :is(summary, ul):where([class]) {
+        list-style: none;
+    }
+
+    :is(button, fieldset) {
+        border: none;
+    }
+
+    :is(dialog, [popover])::backdrop {
+        background-color: hsl(0deg 0% 0% / 80%);
+    }
+
+    a {
+        --outline-style: dashed;
+
+        display: inline-block;
+
+        &:where([class]) {
+            text-decoration: none;
+            color: var(--link-clr, var(--icon-fill, inherit));
+        }
+
+        &:not([class]) {
+            --outline-style: dashed;
+
+            text-decoration-thickness: max(0.08em, 1px);
+            text-underline-offset: 0.15em;
+            color: var(--link-clr, inherit);
+
+            &:not(:disabled):where(:focus-visible, :hover) {
+                --icon-fill: oklch(92% 48% 35deg);
+
+                color: var(--fill-hover, var(--icon-fill));
+                text-decoration: currentcolor wavy underline;
+            }
+        }
+    }
+
+
+    button,
+    a,
+    dt {
+        font-weight: 700;
+    }
+
+    button,
+    a {
+        text-transform: uppercase;
+    }
+
+    button {
+        --min-padding: .75em;
+
+        min-inline-size: 3rem;
+        min-block-size: 3rem;
+        letter-spacing: 1px;
+        touch-action: manipulation;
+        user-select: none;
+    }
+
+    button:not([data-icon]) {
+        min-block-size: 2rem;
+        min-inline-size: 2rem;
+    }
+
+    :focus-visible {
+        --outline-size: max(2px, .3em);
+
+        outline: var(--outline-width, var(--outline-size)) var(--outline-style, solid) var(--outline-clr, currentColor);
+        outline-offset: var(--outline-offset, var(--outline-size));
+    }
+
+    :target {
+        scroll-margin-block-start: 2rem;
+    }
+
+    :focus {
+        scroll-margin-block-end: 8vh;
+    }
+
+    :is(a, button, input):focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    p:where(:not([class])) {
+        text-wrap: balance;
+        max-inline-size: var(--p-width, 50em);
+    }
+
+    main:where(body > *) {
+        min-block-size: min(481px, 71lvb);
+    }
+}
+
+@layer theme {
+    :root {
+        --system-color-black: oklch(8% 6% 10deg);
+        --system-color-white: oklch(98.5% 0% 0deg);
+        --system-color-dark-navy: oklch(35% 0.2 280deg);
+        --system-color-deep-blue: oklch(56% 0.24 264deg);
+        --system-color-light-blue: oklch(63.58% 0.1817 270deg);
+        --system-color-dark-blue: oklch(26% 0.116 267deg);
+        --pinky-gradient: linear-gradient(in oklch to bottom, oklch(75% 0.213 321deg), oklch(70% 0.158 278deg));
+        --light-pinky-gradient: linear-gradient(in oklch to bottom, oklch(81.3% 0.178 326deg), oklch(77% 0.116 275deg));
+    }
+}
+
+@layer typography {
+    :is(a, p, dt, dd, legend, .fluid-type) {
+        font-size: clamp(var(--f-size, 1.25rem) * clamp(0.5, 1 - var(--f-size-diff, 0.2), 0.9),
+                var(--f-size-fluid, 0.94rem + (0.4 * var(--font-unit, 1vw))),
+                var(--f-size, 1.25rem));
+    }
+
+    :is(h2, h3, h4, h5) {
+        text-transform: var(--t-transform, uppercase);
+        color: var(--heading-clr, currentColor);
+    }
+
+    h1 {
+        font-size: clamp(2.0736rem, 1.8388rem + 1.5651 * var(--font-unit, 1vw), 3.0518rem);
+    }
+
+    h2 {
+        font-size: clamp(1.728rem, 1.5568rem + 1.1415 * var(--font-unit, 1vw), 2.4414rem);
+    }
+
+    h3 {
+        font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
+    }
+
+    h4 {
+        font-size: clamp(1.2rem, 1.113rem + 0.58 * var(--font-unit, 1vw), 1.5625rem);
+    }
+
+    h5 {
+        font-size: clamp(0.8333rem, 0.7933rem + 0.2667 * var(--font-unit, 1vw), 1rem);
+    }
+
+    @supports (font-size: 1cqi) {
+        :is(h1, h2, h3, h4, p, dt, dd, .fluid-type, footer a) {
+            --font-unit: 1cqi;
+        }
+    }
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+
+    :is(a, img, .transition-all, [popover]),
+    [data-icon-position="start"]::before,
+    [data-icon-position="end"]::after {
+        transition: all .35s ease-out;
+    }
+
+    nav {
+        --h-transition: stroke-dasharray .6s cubic-bezier(.25, .1, .3, 1.5),
+            stroke-dashoffset .6s cubic-bezier(.25, .1, .3, 1.5);
+    }
+}
