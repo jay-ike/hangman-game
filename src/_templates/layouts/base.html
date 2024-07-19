@@ -12,22 +12,38 @@
 
 <body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
     {{content}}
-    <svg width="0" height="0" class="visually-hidden" aria-hidden="true">
-        <defs>
-            <filter id="outline">
-                <femorphology radius="1" id="femorphology220" operator="dilate" result="result1" in="sourcegraphic" />
-                <feflood style="flood-color: var(--f-color, rgb(237, 204, 48));" result="result2" in="sourcegraphic" />
-                <fecomposite operator="in" result="result3" in2="result1" in="result2" />
-                <fecomposite operator="over" in2="result3" in="backgroundimage" result="result4" />
-                <feflood style="flood-color: var(--s-color, rgb(105, 105, 218));" in="sourcegraphic" result="result5" />
-                <fegaussianblur stddeviation="0" in="result4" />
-                <feoffset dx="0" dy="6" />
-                <fecomposite in="result5" result="result6" operator="in" />
-                <feComposite id="feComposite247" in2="result6" in="result4" />
-            </filter>
-
-        </defs>
-    </svg>
 </body>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
+    <defs>
+        <filter id="_a" width="52.8" height="49.8" x=".3" y=".8" color-interpolation-filters="sRGB"
+            filterUnits="userSpaceOnUse">
+            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+            <feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+            <feOffset dy="-6" />
+            <feComposite in2="hardAlpha" k2="-1" k3="1" operator="arithmetic" />
+            <feColorMatrix values="0 0 0 0 0.141176 0 0 0 0 0.188235 0 0 0 0 0.254902 0 0 0 1 0" />
+            <feBlend in2="shape" result="effect1_innerShadow_51_169" />
+        </filter>
+        <filter id="dilated-shadow" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse"
+            color-interpolation-filters="sRGB">
+            <feMorphology operator="dilate" radius="4 4" in="SourceGraphic" result="morphology" />
+            <feFlood flood-color="#243041" flood-opacity="1" result="flood1" />
+            <feComposite in="flood1" in2="morphology" operator="in" result="composite" />
+            <feComposite in="SourceGraphic" in2="composite" operator="over" result="composite1" />
+            <feFlood flood-color="#0B1524" flood-opacity="1" result="flood3" />
+            <feComposite in="flood3" in2="composite1" operator="in" result="composite5" />
+            <feOffset dx="0" dy="6" in="composite5" result="offset2" />
+            <feComposite in="composite1" in2="offset2" operator="over" result="composite6" />
+        </filter>
+        <filter id="dilated" x="-20%" y="-20%" width="140%" height="140%" filterUnits="objectBoundingBox"
+            primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feMorphology operator="dilate" radius="4 4" in="SourceGraphic" result="morphology" />
+            <feFlood flood-color="#243041" flood-opacity="1" result="flood1" />
+            <feComposite in="flood1" in2="morphology" operator="in" result="composite" />
+            <feComposite in="SourceGraphic" in2="composite" operator="over" result="composite1" />
+        </filter>
 
+    </defs>
+</svg>
 </html>

@@ -80,9 +80,16 @@ body {
         clip-path: var(--b-clip, inset(0 round .5rem));
     }
 
-    header,
-    .contact-grid {
-        text-align: center;
+    .dilated-effect {
+        filter: url("/assets/images/sprites.svg#dilated");
+    }
+    .dilated-shadow-effect {
+        filter: url(#dilated-shadow);
+    }
+    .sky-text-bg {
+        color: transparent;
+        background: linear-gradient(in oklch to bottom, oklch(75% 0.132 248), var(--system-color-white)) text;
+
     }
 
     .box-pink {
@@ -117,6 +124,9 @@ body {
 
     :where(.visually-hidden, .md-show) {
         max-inline-size: 1px;
+        max-block-size: 1px;
+        overflow: clip;
+        text-wrap: nowrap;
         position: absolute;
         clip-path: inset(50%);
     }

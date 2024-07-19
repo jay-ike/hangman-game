@@ -10,14 +10,11 @@
     &>h1 {
         --g-template: ". area1 ."
             "area2 area2 area2"
-            ". . area3" / 2.2ch minmax(3ch, 1fr) 1fr;
-        --g-gap: 0 .2em;
+            ". . area3" / 1em minmax(3ch, 1fr) 1fr;
+        --g-gap: 0;
 
         margin-block-start: -1.3em;
         text-align: center;
-        color: transparent;
-        background: linear-gradient(in oklch to bottom, oklch(75% 0.132 248), var(--system-color-white)) text;
-        filter: url(/assets/images/sprites.svg#outline);
         margin-block-start: max(-6vb, -2em);
 
         &>span:nth-of-type(2) {
@@ -26,7 +23,7 @@
 
             &::first-letter {
                 text-transform: uppercase;
-                font-size: 1.5em;
+                font-size: 1.2em;
             }
         }
 
@@ -36,11 +33,9 @@
             text-align: start;
             background: linear-gradient(var(--system-color-white), var(--system-color-white)) text;
         }
-        &>span:first-of-type {
-            margin-block-end: -0.5em;
-        }
+
         & > span:last-of-type {
-            margin-block-start: -0.5em;
+            margin-block-start: -0.4em;
         }
     }
 }
