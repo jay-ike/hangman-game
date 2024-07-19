@@ -81,7 +81,7 @@ body {
     }
 
     .dilated-effect {
-        filter: url("/assets/images/sprites.svg#dilated");
+        filter: url(#dilated);
     }
     .dilated-shadow-effect {
         filter: url(#dilated-shadow);
@@ -93,7 +93,9 @@ body {
     }
 
     .box-pink {
+        --outline-clr: var(--system-color-white);
         --color-text: var(--system-color-white);
+
         background-image: var(--pinky-gradient);
 
         &:where(:focus-visible, :hover) {
@@ -439,7 +441,7 @@ body {
     }
 
     p:where(:not([class])) {
-        text-wrap: balance;
+        white-space: var(--p-space, collapse balance);
         max-inline-size: var(--p-width, 50em);
     }
 

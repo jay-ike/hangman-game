@@ -2,11 +2,16 @@
 layout: "layouts/base.html"
 title: "The hangman game rules"
 ---
-
-<main aria-labelledby="main-title" class="main-box">
+<style>{%cssmin "includes/rules.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-box">
     <div class="row heading-box">
-        <a href="#" class="box-pink shadowed rounded"></a>
-        <h1 id="main-title">how to play</h1>
+        <a href="/" class="box-pink shadowed rounded back-btn" aria-labelledby="return">
+            <svg width="25" height="24">
+                <title id="return">return to the main menu</title>
+                <use href="/assets/images/sprites.svg#back"/>
+            </svg>
+        </a>
+        <h1 class="dilated-effect sky-text-bg" id="main-title">how to play</h1>
     </div>
     <div class="column contain rules-wrapper">
         {%for rule in site.rules %}

@@ -1,0 +1,85 @@
+article {
+    --color-fill: var(--system-color-white);
+    --radius: 1.25rem;
+    --g-template: "area2 area1" "area3 area3" / max-content 1fr;
+    --g-gap: 1rem;
+    --p-space: collapse pretty;
+    --continer-name: article;
+
+    color: oklch(45% 0.14 287);
+}
+
+span:where(.rule-grid > *) {
+    font-size: 1.5em;
+    color: var(--system-color-deep-blue);
+}
+
+h2:where(.rule-grid > *) {
+    color: var(--system-color-dark-navy);
+}
+
+.main-box {
+    --s-space: 2.5rem;
+
+    padding-block: 32px 48px;
+    border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
+}
+
+.back-btn {
+    --min-padding: 1em;
+    --shadow: inset 0 -3px 0 4px oklch(57% 0.269 304deg / 35%);
+}
+
+.heading-box {
+    --r-space: 0;
+
+    &>h1 {
+        text-transform: uppercase;
+        text-align: end;
+        flex: 2 1 auto;
+    }
+}
+
+.rules-wrapper {
+    --container-name: rules;
+}
+
+@container rules (inline-size > 24rem) {
+    article {
+        --g-template: "area2 area1" "area2 area3" / max-content 1fr;
+        --g-gap: .75rem 2rem;
+    }
+}
+
+@container rules (inline-size > 43rem) {
+    article {
+        --g-template: "area2 " "area1" " area3";
+        place-items: center;
+    }
+}
+
+@media screen and (min-width: 26.7em) {
+    span {
+        font-size: 3rem;
+        align-self: center;
+    }
+
+    .heading-box>h1 {
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 48em) {
+    .rules-wrapper {
+        --col-dir: row;
+
+        &>* {
+            flex: 2 1 auto;
+        }
+    }
+
+    .main-box {
+        --s-space: 4rem;
+    }
+
+}
