@@ -25,6 +25,10 @@ h2:where(.rule-grid > *) {
     border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
 }
 
+nav:where(.main-box > *) {
+    --s-space: min(13lvb, 6.25rem);
+}
+
 .back-btn {
     --min-padding: 1em;
     --shadow: inset 0 -3px 0 4px oklch(57% 0.269 304deg / 35%);
@@ -34,7 +38,7 @@ h2:where(.rule-grid > *) {
     --r-space: 0;
 
     &>h1 {
-        text-transform: uppercase;
+        text-transform: capitalize;
         text-align: end;
         flex: 2 1 auto;
     }
@@ -42,6 +46,17 @@ h2:where(.rule-grid > *) {
 
 .rules-wrapper {
     --container-name: rules;
+}
+
+.categories {
+    --m-row-h: 4.5rem;
+    --radius: 1.25rem;
+
+    & a {
+        font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
+        letter-spacing: .1em;
+        min-block-size: 100%;
+    }
 }
 
 @container rules (inline-size > 24rem) {
@@ -66,6 +81,11 @@ h2:where(.rule-grid > *) {
 
     .heading-box>h1 {
         text-align: center;
+    }
+
+    .categories {
+        --m-row-h: 11.875rem;
+        --radius: 2.5rem;
     }
 }
 

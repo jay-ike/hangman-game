@@ -1,0 +1,25 @@
+---
+layout: "layouts/base.html"
+title: "Explore the available categories of word"
+---
+
+<style>{%cssmin "includes/rules.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-box">
+    <div class="row heading-box">
+        <a class="box-pink shadowed rounded back-btn" href="/">
+            <svg width="25" height="24">
+                <title id="return">return to the main menu</title>
+                <use href="/assets/images/sprites.svg#back" />
+            </svg>
+        </a>
+        <h1 class="dilated-effect sky-text-bg" id="main-title">pick a category</h1>
+    </div>
+    <nav aria-labelledby="categories-list">
+        <h2 aria-hidden="true" class="visually-hidden" id="categories-list">available categories</h2>
+        <ul class="responsive-grid categories">
+            {%for category in site.categories%}
+            <li class="contain"><a href="#" class="center box-blue shadowed">{{category}}</a></li>
+            {%endfor%}
+        </ul>
+    </nav>
+</main>

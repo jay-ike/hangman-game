@@ -110,20 +110,6 @@ body {
                 inset 0 4px 0 8px var(--system-color-deep-blue));
     }
 
-    a:where(:is(nav, footer) *),
-    .links {
-        --f-size-fluid: 2.5cqi;
-
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: var(--i-gap, 16px);
-    }
-
-    .links a {
-        font-weight: 400;
-    }
-
     :where(.visually-hidden, .md-show) {
         max-inline-size: 1px;
         max-block-size: 1px;
@@ -131,12 +117,6 @@ body {
         text-wrap: nowrap;
         position: absolute;
         clip-path: inset(50%);
-    }
-
-
-    .md-show {
-        overflow: hidden;
-        visibility: hidden;
     }
 
     [popover] {
@@ -357,7 +337,7 @@ body {
     }
 
     :is(summary, ul):where([class]) {
-        list-style: none;
+        list-style-type: "";
     }
 
     :is(button, fieldset) {

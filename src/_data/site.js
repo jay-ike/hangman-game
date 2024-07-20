@@ -1,5 +1,7 @@
 /*jslint node*/
+const {categories} = require("../../assets/data.json");
 module.exports = Object.freeze({
+    categories: Object.keys(categories),
     rules: [
         {
             description: "First, choose a word category, like animals or " +
