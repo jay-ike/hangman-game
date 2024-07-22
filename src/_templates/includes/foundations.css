@@ -44,10 +44,6 @@ body {
         padding: 0;
     }
 
-    :is(.relative) {
-        position: relative;
-    }
-
     .rounded {
         aspect-ratio: 1;
         border-radius: 50%;
@@ -385,14 +381,12 @@ body {
     button,
     a {
         text-transform: uppercase;
+        font: inherit;
     }
 
     button {
-        --min-padding: .75em;
-
         min-inline-size: 3rem;
         min-block-size: 3rem;
-        letter-spacing: 1px;
         touch-action: manipulation;
         user-select: none;
     }

@@ -26,7 +26,7 @@ title: "Play the Hangman game"
             <div class="heart"></div>
         </div>
     </div>
-    <div class="segragator guess contain">
+    <div class="segragator content-center letter-wrapper">
         {%for word in placeholder%}
             <div class="i-flex">
                 {%assign dots = word | split: ''%}
@@ -37,9 +37,12 @@ title: "Play the Hangman game"
         {%endfor%}
     </div>
     <div class="visually-hidden" id="keyboard-title" aria-hidden="true">available letters</div>
-    <section class="responsive-grid keyboard" aria-labelledby="keyboard-title">
+    <section class="responsive-grid letter-wrapper keyboard" aria-labelledby="keyboard-title">
         {%for letter in letters%}
-        <button class="letter">{{letter}}</button>
+        <div class="relative">
+            <button class="center letter">{{letter}}</button>
+            <span class="box tooltip visually-hidden" id="{{letter}}" aria-hidden="true">you have already selected the letter {{letter}}</span>
+        </div>
         {%endfor%}
     </section>
 </main>
