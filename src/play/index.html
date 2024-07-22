@@ -1,0 +1,27 @@
+---
+layout: "layouts/base.html"
+title: "Play the Hangman game"
+---
+
+
+<style>{%cssmin "includes/in-game.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-box">
+    <div class="segragator heading-box">
+        <div class="i-flex">
+            <button aria-labelledby="menu-title" class="center box-pink rounded shadowed">
+                <svg width="24" height="24">
+                    <title id="menu-title">Menu</title>
+                    <use href="/assets/images/sprites.svg#hamburger">
+                </svg>
+            </button>
+            <h1 id="main-title">Countries</h1>
+        </div>
+        <div class="i-flex">
+            <div>
+                <label for="time-progress" class="visually-hidden">time</label>
+                <progress id="time-progress" max="100" value="60">60%</progress>
+            </div>
+            <div class="heart"></div>
+        </div>
+    </div>
+</main>

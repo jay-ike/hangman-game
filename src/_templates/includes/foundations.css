@@ -8,6 +8,7 @@
         U+0178, U+02C6, U+02DA, U+02DC, U+2000-200A, U+2010-2014, U+2018-201A,
         U+201C-201E, U+2022, U+2026, U+202F, U+2039-203A, U+205F, U+20AC,
         U+2122, U+25FC, U+FB01-FB02;
+    font-display: swap;
 }
 
 body {
@@ -394,11 +395,6 @@ body {
         letter-spacing: 1px;
         touch-action: manipulation;
         user-select: none;
-    }
-
-    button:not([data-icon]) {
-        min-block-size: 2rem;
-        min-inline-size: 2rem;
     }
 
     :focus-visible {
