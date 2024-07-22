@@ -5,6 +5,8 @@ title: "Play the Hangman game"
 
 
 <style>{%cssmin "includes/in-game.css"%}</style>
+{%assign placeholder = ".....|......" | split: '|'%}
+{%assign letters = "abcdefghijklmnopqrstuvwxyz" | split: ''%}
 <main aria-labelledby="main-title" class="stack main-box">
     <div class="segragator heading-box">
         <div class="i-flex">
@@ -24,4 +26,20 @@ title: "Play the Hangman game"
             <div class="heart"></div>
         </div>
     </div>
+    <div class="segragator guess contain">
+        {%for word in placeholder%}
+            <div class="i-flex">
+                {%assign dots = word | split: ''%}
+                {%for dot in dots%}
+                <span class="box-letter-load center letter"></span>
+                {%endfor%}
+            </div>
+        {%endfor%}
+    </div>
+    <div class="visually-hidden" id="keyboard-title" aria-hidden="true">available letters</div>
+    <section class="responsive-grid keyboard" aria-labelledby="keyboard-title">
+        {%for letter in letters%}
+        <button class="letter">{{letter}}</button>
+        {%endfor%}
+    </section>
 </main>
