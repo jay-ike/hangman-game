@@ -16,7 +16,7 @@ title: "Play the Hangman game"
                     <use href="/assets/images/sprites.svg#hamburger">
                 </svg>
             </button>
-            <h1 id="main-title">Countries</h1>
+            <h1 id="main-title" class="box-letter-load box-placeholder"><span class="visually-hidden" aria-hidden="true">loading subject</span></h1>
         </div>
         <div class="i-flex">
             <div>
@@ -41,7 +41,7 @@ title: "Play the Hangman game"
         {%for letter in letters%}
         <div class="relative">
             <button class="center letter">{{letter}}</button>
-            <span class="box tooltip visually-hidden" id="{{letter}}" aria-hidden="true">you have already selected the letter {{letter}}</span>
+            <span class="tooltip visually-hidden" id="{{letter}}" aria-hidden="true">you have already selected the letter {{letter}}</span>
         </div>
         {%endfor%}
     </section>
