@@ -10,7 +10,7 @@ title: "Play the Hangman game"
 <main aria-labelledby="main-title" class="stack main-box">
     <div class="segragator heading-box">
         <div class="i-flex">
-            <button aria-labelledby="menu-title" class="center box-pink rounded shadowed">
+            <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog" popovertarget="menu-dialog">
                 <svg width="24" height="24">
                     <title id="menu-title">Menu</title>
                     <use href="/assets/images/sprites.svg#hamburger">
@@ -21,7 +21,7 @@ title: "Play the Hangman game"
         <div class="i-flex">
             <div>
                 <label for="time-progress" class="visually-hidden">time</label>
-                <progress id="time-progress" max="100" value="60">60%</progress>
+                <progress id="time-progress" max="100" value="100">60%</progress>
             </div>
             <div class="heart"></div>
         </div>
@@ -46,3 +46,9 @@ title: "Play the Hangman game"
         {%endfor%}
     </section>
 </main>
+<div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" role="dialog" popover>
+    <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">paused</h2>
+    <button class="box-blue shadowed">continue</button>
+    <a class="box-blue shadowed" href="">new category</a>
+    <a class="box-pink shadowed pink-shadow" href="">quit game</a>
+</div>

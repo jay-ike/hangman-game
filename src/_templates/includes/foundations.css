@@ -131,7 +131,7 @@ body {
         &::backdrop {
             transition: display .35s allow-discrete,
                 overlay .35s allow-discrete,
-                transform .35s ease-in,
+                transform 0.35s .35s ease-in,
                 opacity .35s;
             opacity: 0;
 
@@ -144,7 +144,7 @@ body {
 
             @starting-style {
                 opacity: 0;
-                transform: translateX(50vmax);
+                transform: scale(2);
             }
         }
     }
@@ -477,11 +477,10 @@ body {
     :is(a, img, .transition-all, [popover]),
     [data-icon-position="start"]::before,
     [data-icon-position="end"]::after {
-        transition: all .35s ease-out;
+        transition: all .35s var(--easing, ease-out);
     }
 
-    nav {
-        --h-transition: stroke-dasharray .6s cubic-bezier(.25, .1, .3, 1.5),
-            stroke-dashoffset .6s cubic-bezier(.25, .1, .3, 1.5);
+    [popover] {
+        --easing: cubic-bezier(.25, .1, .3, 1.5);
     }
 }

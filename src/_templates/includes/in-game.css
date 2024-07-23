@@ -97,6 +97,47 @@ button[aria-disabled="true"] {
     --color-fill: oklch(98.5% 0% 0deg / 25%);
 }
 
+.menu {
+    --s: min(592px, 95vi);
+    --alignment: center;
+    --min-padding: .75rem min(15vi, 4rem);
+    --radius: calc(min(15vi, 4rem) / 2);
+    --c-space: 2rem;
+
+    inline-size: var(--s);
+    inset-block-start: var(--y, min(47lvb, 210px));
+    inset-inline-start: calc(50vi - (var(--s) / 2));
+    container: menu / inline-size;
+    padding: 2em 1.5rem min(11lvb, 87px);
+    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270), oklch(29% 0.166 264 / 83%));
+    overflow: clip visible;
+
+    &::backdrop {
+        background: linear-gradient(oklch(20% 0.1 295deg / 85%), oklch(28% 0.17 271deg / 85%) 70%, oklch(31% 0.152 283deg / 85%));
+    }
+
+    &:popover-open {
+        transform: scale(1.1);
+    }
+
+    & > :is(a, button) {
+        font-size: clamp(1.2rem, 1.113rem + 0.58 * var(--font-unit, 1vw), 1.5625rem);
+    }
+
+    & > h2 {
+        letter-spacing: 0.01em;
+        font-size: clamp(3.7994rem, 2.5557rem + 1.6245 * var(--font-unit, 1vw), 4.8147rem);
+        text-transform: capitalize;
+        margin-block-start: -4rem;
+    }
+}
+
+.pink-shadow {
+    --shadow: inset 0 -2px 0 3px oklch(26% .143 273),
+              inset 0 2px 0 4px oklch(57% .269 304);
+;
+}
+
 [aria-disabled="true"]:focus ~ .tooltip {
     font-size: 0.9em;
     text-wrap: wrap;
