@@ -18,7 +18,7 @@ title: "Explore the available categories of word"
         <h2 aria-hidden="true" class="visually-hidden" id="categories-list">available categories</h2>
         <ul class="responsive-grid categories">
             {%for category in site.categories%}
-            <li class="contain"><a href="#" class="center box-blue shadowed">{{category}}</a></li>
+            <li class="contain"><a href="/play#{{category}}" class="center box-blue shadowed">{{category}}</a></li>
             {%endfor%}
         </ul>
     </nav>

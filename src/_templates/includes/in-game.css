@@ -34,7 +34,7 @@ progress {
 
 .heading-box {
     --shadow: inset 0 -3px 0 4px oklch(57% 0.269 304deg / 35%);
-    --r-space: 1rem;
+    --r-space: min(2vi, 1rem);
     --wrap: wrap;
     --min-padding: min(10vi, .5em);
 
@@ -42,6 +42,9 @@ progress {
 }
 
 .heart{
+    font-weight: bold;
+    font-size: 1.4em;
+    color: var(--system-color-dark-blue);
     aspect-ratio: 1.08;
     inline-size: min(15vi, 2.5rem);
     clip-path: url(#heart);
@@ -98,14 +101,14 @@ button[aria-disabled="true"] {
 }
 
 .menu {
-    --s: min(592px, 95vi);
+    --s: min(592px, 85vi);
     --alignment: center;
     --min-padding: .75rem min(15vi, 4rem);
     --radius: calc(min(15vi, 4rem) / 2);
     --c-space: 2rem;
 
     inline-size: var(--s);
-    inset-block-start: var(--y, min(47lvb, 210px));
+    inset-block-start: var(--y, min(25lvb, 210px));
     inset-inline-start: calc(50vi - (var(--s) / 2));
     container: menu / inline-size;
     padding: 2em 1.5rem min(11lvb, 87px);

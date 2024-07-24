@@ -8,7 +8,7 @@ title: "Play the Hangman game"
 {%assign placeholder = ".....|......" | split: '|'%}
 {%assign letters = "abcdefghijklmnopqrstuvwxyz" | split: ''%}
 <main aria-labelledby="main-title" class="stack main-box">
-    <div class="segragator heading-box">
+    <div class="segragator heading-box" data-emit="heading-change">
         <div class="i-flex">
             <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog" popovertarget="menu-dialog">
                 <svg width="24" height="24">
@@ -16,14 +16,16 @@ title: "Play the Hangman game"
                     <use href="/assets/images/sprites.svg#hamburger">
                 </svg>
             </button>
-            <h1 id="main-title" class="box-letter-load box-placeholder"><span class="visually-hidden" aria-hidden="true">loading subject</span></h1>
+            <h1 id="main-title" class="box-letter-load box-placeholder" data-listen data-attributes="class:titleClass" data-property="title">
+                <span class="visually-hidden" aria-hidden="true">loading the category</span>
+            </h1>
         </div>
         <div class="i-flex">
             <div>
-                <label for="time-progress" class="visually-hidden">time</label>
-                <progress id="time-progress" max="100" value="100">60%</progress>
+                <label for="time-progress" class="visually-hidden">remaining hearts</label>
+                <progress id="time-progress" max="8" value="8" data-listen data-attributes="value:hearts" data-property="percentage">100%</progress>
             </div>
-            <div class="heart"></div>
+            <div class="center heart" data-listen data-property="hearts"></div>
         </div>
     </div>
     <div class="segragator content-center letter-wrapper">
@@ -49,6 +51,7 @@ title: "Play the Hangman game"
 <div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" role="dialog" popover>
     <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">paused</h2>
     <button class="box-blue shadowed">continue</button>
-    <a class="box-blue shadowed" href="">new category</a>
-    <a class="box-pink shadowed pink-shadow" href="">quit game</a>
+    <a class="box-blue shadowed" href="/categories">new category</a>
+    <a class="box-pink shadowed pink-shadow" href="/">quit game</a>
 </div>
+<script type="module" src="/assets/scripts/game.js" defer></script>
