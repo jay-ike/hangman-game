@@ -85,7 +85,7 @@ progress {
                 box-shadow 0.35s ease;
 }
 
-.dimmed {
+[data-dimmed] {
     opacity: 0.4;
 }
 

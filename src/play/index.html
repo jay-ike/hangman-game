@@ -7,6 +7,13 @@ title: "Play the Hangman game"
 <style>{%cssmin "includes/in-game.css"%}</style>
 {%assign placeholder = ".....|......" | split: '|'%}
 {%assign letters = "abcdefghijklmnopqrstuvwxyz" | split: ''%}
+
+<div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" role="dialog" popover>
+    <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">paused</h2>
+    <button class="box-blue shadowed">continue</button>
+    <a class="box-blue shadowed" href="/categories">new category</a>
+    <a class="box-pink shadowed pink-shadow" href="/">quit game</a>
+</div>
 <main aria-labelledby="main-title" class="stack main-box">
     <div class="segragator heading-box" data-emit="heading-change">
         <div class="i-flex">
@@ -16,19 +23,19 @@ title: "Play the Hangman game"
                     <use href="/assets/images/sprites.svg#hamburger">
                 </svg>
             </button>
-            <h1 id="main-title" class="box-letter-load box-placeholder" data-listen data-attributes="class:titleClass" data-property="title">
+            <h1 id="main-title" class="box-letter-load box-placeholder" data-listen data-attributes="class:{titleClass}" data-property="{title}">
                 <span class="visually-hidden" aria-hidden="true">loading the category</span>
             </h1>
         </div>
         <div class="i-flex">
             <div>
                 <label for="time-progress" class="visually-hidden">remaining hearts</label>
-                <progress id="time-progress" max="8" value="8" data-listen data-attributes="value:hearts" data-property="percentage">100%</progress>
+                <progress id="time-progress" max="8" value="2" data-listen data-attributes="value:{hearts}" data-property="{percentage}">00%</progress>
             </div>
-            <div class="center heart" data-listen data-property="hearts"></div>
+            <div class="center heart" data-listen data-property="{hearts}"></div>
         </div>
     </div>
-    <div class="segragator content-center letter-wrapper">
+    <div class="segragator content-center letter-wrapper" data-emit="letter-found">
         {%for word in placeholder%}
             <div class="i-flex">
                 {%assign dots = word | split: ''%}
@@ -48,10 +55,4 @@ title: "Play the Hangman game"
         {%endfor%}
     </section>
 </main>
-<div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" role="dialog" popover>
-    <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">paused</h2>
-    <button class="box-blue shadowed">continue</button>
-    <a class="box-blue shadowed" href="/categories">new category</a>
-    <a class="box-pink shadowed pink-shadow" href="/">quit game</a>
-</div>
 <script type="module" src="/assets/scripts/game.js" defer></script>
