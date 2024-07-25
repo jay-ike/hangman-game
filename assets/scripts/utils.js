@@ -190,7 +190,35 @@ function createCrypto() {
     });
 }
 
-async function questionStorage(dbName = "jay-ike_hangman", stores = [], version = 1) {
+async function fetchData(url, options, timeout) {
+    let controller = new AbortController();
+    let response;
+    let success;
+    const defaultOptions = {
+        headers: { "content-type": "application/json" },
+        method: "GET",
+        signal: controller.signal
+    };
+    if (Number.isFinite(timeout)) {
+        setTimeout(() => controller.abort(), timeout);
+    }
+    try {
+        response = await fetch(
+            url,
+            Object.assign(defaultOptions, options ?? {})
+        );
+        success = response.ok;
+        response = await response.json();
+        return Object.assign({ success }, response);
+    } catch (error) {
+        return Object.assign({ success: false }, { message: error.message });
+    }
+}
+async function questionStorage({
+    dbName = "jay-ike_hangman",
+    stores = [],
+    version = 1
+}) {
     let result = Object.create(null);
     let cipher = createCrypto();
     const db = await openDB(dbName, version, {
@@ -205,14 +233,14 @@ async function questionStorage(dbName = "jay-ike_hangman", stores = [], version 
         }
     });
     function encryptEntry(entry) {
-        let result = clone(entry);
-        result.name = cipher.encrypt(result.name);
-        return result;
+        let res = clone(entry);
+        res.name = cipher.encrypt(res.name);
+        return res;
     }
     function decryptEntry(entry) {
-        let result = clone(entry);
-        result.name = cipher.decrypt(result.name);
-        return result;
+        let res = clone(entry);
+        res.name = cipher.decrypt(res.name);
+        return res;
     }
     result.addMany = async function insertMany(storeName, questions) {
         let tx = db.transaction(storeName, "readwrite");
@@ -224,28 +252,29 @@ async function questionStorage(dbName = "jay-ike_hangman", stores = [], version 
         let tx;
         let actions = [];
         let questions = await db.getAllFromIndex(category, "status");
-        let result = questions.find((el) => el.status === "not-selected");
-        if (result === undefined) {
+        let res = questions.find((el) => el.status === "not-selected");
+        if (res === undefined) {
             tx = db.transaction(category, "readwrite");
             actions = await tx.store.getAll();
-            result = await tx.store.openCursor();
+            res = await tx.store.openCursor();
             actions.map((value) => tx.store.put(
                 clone(value, {status: "not-selected"})
             ));
             actions[actions.length] = tx.done;
             await Promise.all(actions);
-            result = result.value;
+            res = res.value;
         } else {
-            await db.put(category, clone(result, {status: "selected"}));
+            await db.put(category, clone(res, {status: "selected"}));
         }
-        return decryptEntry(result).name;
+        return decryptEntry(res).name;
     };
     return result;
 }
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
-    questionStorage,
+    fetchData,
     getIndexes,
-    getWords
+    getWords,
+    questionStorage
 });
