@@ -140,7 +140,7 @@ function getWords(sentence) {
     return sentence.split(" ").map((word) => word.trim());
 }
 function getIndexes(word, letter) {
-    if (typeof word !== "string" || letter !== "string") {
+    if (typeof word !== "string" || typeof letter !== "string") {
         return [];
     }
     return Array.from(word.matchAll(new RegExp(letter, "gi"))).map(
@@ -175,5 +175,6 @@ function createDOMSentence(sentence) {
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
+    getIndexes,
     getWords
 });

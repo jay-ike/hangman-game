@@ -14,7 +14,7 @@ title: "Play the Hangman game"
     <a class="box-blue shadowed" href="/categories">new category</a>
     <a class="box-pink shadowed pink-shadow" href="/">quit game</a>
 </div>
-<main aria-labelledby="main-title" class="stack main-box">
+<main aria-labelledby="main-title" class="contain stack main-box">
     <div class="segragator heading-box" data-emit="heading-change">
         <div class="i-flex">
             <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog" popovertarget="menu-dialog">
@@ -48,8 +48,8 @@ title: "Play the Hangman game"
     <div class="visually-hidden" id="keyboard-title" aria-hidden="true">available letters</div>
     <section class="responsive-grid letter-wrapper keyboard" aria-labelledby="keyboard-title">
         {%for letter in letters%}
-        <div class="relative">
-            <button class="center letter">{{letter}}</button>
+        <div class="center relative">
+            <button class="letter">{{letter}}</button>
             <span class="tooltip visually-hidden" id="{{letter}}" aria-hidden="true">you have already selected the letter {{letter}}</span>
         </div>
         {%endfor%}

@@ -1,15 +1,35 @@
 import utils from "./utils.js";
 
 const dispatcher = new utils.EventDispatcher();
-const emiter = dispatcher.emitterOf("letter-found");
+const emitters = {
+    header: dispatcher.emitterOf("heading-change"),
+    letters: dispatcher.emitterOf("letter-found")
+}
 const word = "omari hardwick";
-emiter.target.textContent = "";
-dispatcher.emitterOf("heading-change").dispatch("title-updated", {
+emitters.letters.target.textContent = "";
+emitters.header.dispatch("title-updated", {
     titleClass: "nil",
     title: new URL(document.URL).hash.replace(/(?:%20|#)/gi, " ").trim()
 });
-emiter.target.insertAdjacentHTML(
+emitters.letters.target.insertAdjacentHTML(
     "beforeend",
     utils.createDOMSentence(word).join("")
 );
-window.fakeDispatcher = emiter;
+
+document.body.addEventListener("click", function (event) {
+    const {target} = event;
+    let indexes;
+    let letter;
+    if (
+        HTMLButtonElement.prototype.isPrototypeOf(target) &&
+        target.classList.contains("letter")
+    ) {
+        letter = target.textContent.trim();
+        indexes = utils.getIndexes(utils.getWords(word).join(""), letter);
+        console.log(indexes, letter);
+        indexes.forEach((index) => emitters.letters.dispatch(
+            "letter" + (index + 1) + "-changed",
+            {dimmed: "nil", letter}
+        ));
+    }
+});

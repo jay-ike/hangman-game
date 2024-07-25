@@ -55,6 +55,12 @@ progress {
     display: inline-flex;
     align-items: center;
     gap: var(--r-space, .5rem);
+    flex-flow: row wrap;
+    place-content: center;
+
+    & > * {
+        flex-shrink: 2;
+    }
 }
 
 .letter-wrapper {
@@ -63,7 +69,7 @@ progress {
     --radius: min(25%, .75rem);
 
     text-transform: uppercase;
-    letter-spacing: 1em;
+    letter-spacing: .1em;
     container: letters / inline-size;
 }
 
@@ -94,6 +100,20 @@ progress {
     --m-col-w: min(10vi, 109px);
     --m-row-h: 3.25rem;
     --color-fill: var(--system-color-white);
+    --c-gap: min(2vi, 1rem);
+}
+
+@container (inline-size <= 13.5rem) {
+    .heading-box {
+        place-content: center;
+        --r-space: 8cqi;
+    }
+}
+
+@container (inline-size < 18.5rem) {
+    .keyboard {
+        --m-col-w: max(13cqi, 2.5rem);
+    }
 }
 
 button[aria-disabled="true"] {
