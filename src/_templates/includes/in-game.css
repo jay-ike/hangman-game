@@ -130,7 +130,6 @@ button[aria-disabled="true"] {
     inline-size: var(--s);
     inset-block-start: var(--y, min(25lvb, 210px));
     inset-inline-start: calc(50vi - (var(--s) / 2));
-    container: menu / inline-size;
     padding: 2em 1.5rem min(11lvb, 87px);
     background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270), oklch(29% 0.166 264 / 83%));
     overflow: clip visible;

@@ -1,6 +1,9 @@
 /*jslint browser, this*/
-const {Element} = window;
+import {openDB} from "./idb-min.js";
+
+const {Element, structuredClone} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
+
 function parsedTemplate(data, string) {
     let result = string.replace(
         syntax,
@@ -172,9 +175,77 @@ function createDOMSentence(sentence) {
     });
     return list;
 }
+
+function clone(object, data) {
+    return Object.assign(structuredClone(object), data ?? {});
+}
+function createCrypto() {
+    return Object.freeze({
+        decrypt(data) {
+            return window.atob(data).toString();
+        },
+        encrypt(data) {
+            return window.btoa(data).toString();
+        }
+    });
+}
+
+async function questionStorage(dbName = "jay-ike_hangman", stores = [], version = 1) {
+    let result = Object.create(null);
+    let cipher = createCrypto();
+    const db = await openDB(dbName, version, {
+        upgrade: function upgrade(db) {
+            stores.forEach(function (storeName) {
+                const store = db.createObjectStore(
+                    storeName,
+                    {keyPath: "name"}
+                );
+                store.createIndex("status", "status", {unique: false});
+            });
+        }
+    });
+    function encryptEntry(entry) {
+        let result = clone(entry);
+        result.name = cipher.encrypt(result.name);
+        return result;
+    }
+    function decryptEntry(entry) {
+        let result = clone(entry);
+        result.name = cipher.decrypt(result.name);
+        return result;
+    }
+    result.addMany = async function insertMany(storeName, questions) {
+        let tx = db.transaction(storeName, "readwrite");
+        let actions = questions.map((elt) => tx.store.put(encryptEntry(elt)));
+        actions[actions.length] = tx.done;
+        await Promise.all(actions);
+    };
+    result.getRandomQuestion = async function (category) {
+        let tx;
+        let actions = [];
+        let questions = await db.getAllFromIndex(category, "status");
+        let result = questions.find((el) => el.status === "not-selected");
+        if (result === undefined) {
+            tx = db.transaction(category, "readwrite");
+            actions = await tx.store.getAll();
+            result = await tx.store.openCursor();
+            actions.map((value) => tx.store.put(
+                clone(value, {status: "not-selected"})
+            ));
+            actions[actions.length] = tx.done;
+            await Promise.all(actions);
+            result = result.value;
+        } else {
+            await db.put(category, clone(result, {status: "selected"}));
+        }
+        return decryptEntry(result).name;
+    };
+    return result;
+}
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
+    questionStorage,
     getIndexes,
     getWords
 });

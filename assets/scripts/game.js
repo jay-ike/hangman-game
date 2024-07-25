@@ -26,7 +26,6 @@ document.body.addEventListener("click", function (event) {
     ) {
         letter = target.textContent.trim();
         indexes = utils.getIndexes(utils.getWords(word).join(""), letter);
-        console.log(indexes, letter);
         indexes.forEach((index) => emitters.letters.dispatch(
             "letter" + (index + 1) + "-changed",
             {dimmed: "nil", letter}
