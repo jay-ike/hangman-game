@@ -7,16 +7,15 @@ function parsedTemplate(data, string) {
         function replacer(original, path) {
             let value;
             try {
-               value = path.split(".").reduce(
-                   (acc, val) => acc[val] ?? original,
-                   data
-               );
-            return (
-                typeof value === "function"
-                ? value(data)
-                : value
-            );
-
+                value = path.split(".").reduce(
+                    (acc, val) => acc[val] ?? original,
+                    data
+                );
+                return (
+                    typeof value === "function"
+                    ? value(data)
+                    : value
+                );
             } catch (ignore) {
                 return original;
             }
@@ -28,17 +27,29 @@ function parsedTemplate(data, string) {
         : result
     );
 }
-function getListeners(target) {
+function getListeners(target, fn) {
     if (!Element.prototype.isPrototypeOf(target)) {
-        return [];
+        return {};
+    }
+    if (typeof fn !== "function") {
+        throw new Error("you should pass a callback function !!!");
     }
     return Array.from(
         target.querySelectorAll("[data-listen]:not([data-emit] [data-emit] *)")
-    );
+    ).reduce(function (acc, element) {
+        const {listen} = element.dataset;
+        if (acc[listen] === undefined) {
+            acc[listen] = [fn(element)];
+        } else {
+            acc[listen][acc[listen].length] = fn(element);
+        }
+        return acc;
+    }, Object.create(null));
 }
 function updateContent(element) {
     const {property} = element.dataset;
     return function (data) {
+
         element.textContent = parsedTemplate(data, property);
     };
 }
@@ -75,19 +86,21 @@ function parseElement(element) {
 }
 function contentDispatcher(target) {
     let mutation;
-    let listeners = getListeners(target).map(parseElement);
+    let listeners = getListeners(target, parseElement);
     function listenDOMUpdate(records) {
         records.forEach(function (record) {
             if (record.type === "childList") {
-                listeners = getListeners(target).map(parseElement);
+                listeners = getListeners(target, parseElement);
             }
         });
     }
     mutation = new MutationObserver(listenDOMUpdate);
     mutation.observe(target, {childList: true, subtree: true});
     return Object.freeze({
-        emit(data) {
-            listeners.forEach((fn) => fn(data));
+        emit(event, data) {
+            if (Array.isArray(listeners[event])) {
+                listeners[event].forEach((fn) => fn(data));
+            }
         },
         removeObserver() {
             mutation.disconnect();
@@ -104,13 +117,15 @@ function EventDispatcher() {
         },
         Object.create(null)
     );
-    self.dispatch = function (event, data) {
-        if (typeof emitters[event]?.emit === "function") {
-            emitters[event].emit(data);
-        }
-    };
     self.emitterOf = function (eventName) {
-        return emitters[eventName]?.target;
+        return Object.freeze({
+            dispatch(event, data) {
+                if (typeof emitters[eventName]?.emit === "function") {
+                    emitters[eventName].emit(event, data);
+                }
+            },
+            target: emitters[eventName]?.target
+        });
     };
     self.unregister = function (eventName) {
         if (typeof emitters[eventName]?.removeObserver === "function") {
@@ -124,6 +139,21 @@ function EventDispatcher() {
 function getWords(sentence) {
     return sentence.split(" ").map((word) => word.trim());
 }
+function getIndexes(word, letter) {
+    if (typeof word !== "string" || letter !== "string") {
+        return [];
+    }
+    return Array.from(word.matchAll(new RegExp(letter, "gi"))).map(
+        (match) => match.index
+    );
+
+}
+function letterTemplate(index) {
+    return "<span class='center letter box-blue shadowed' data-listen=" +
+    "'letter" + (index + 1) + "-changed' data-attributes=" +
+    "'data-dimmed:{dimmed}' data-property='{letter}' data-dimmed></span>";
+
+}
 function createDOMSentence(sentence) {
     let list;
     let currentIndex = 0;
@@ -134,9 +164,7 @@ function createDOMSentence(sentence) {
         let markup = "<div class='i-flex'>";
         markup += word.split("").map(function (ignore, index) {
             let i = currentIndex + index;
-            return "<span class='center letter box-blue shadowed' " +
-            `data-listen data-dimmed data-attributes='data-dimmed:{${i}.dimmed}' ` +
-            `data-property="{${i}.letter}"></span>`;
+            return letterTemplate(i);
         }).join("");
         currentIndex += word.length;
         markup += "</div>";

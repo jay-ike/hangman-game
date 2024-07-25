@@ -1,17 +1,15 @@
 import utils from "./utils.js";
 
 const dispatcher = new utils.EventDispatcher();
-const container = dispatcher.emitterOf("letter-found");
-container.textContent = "";
-dispatcher.dispatch("heading-change", {
+const emiter = dispatcher.emitterOf("letter-found");
+const word = "omari hardwick";
+emiter.target.textContent = "";
+dispatcher.emitterOf("heading-change").dispatch("title-updated", {
     titleClass: "nil",
-    title: new URL(document.URL).hash.replace(/(?:%20|#)/gi, " ").trim(),
-    hearts: 8,
-    percentage: "100%"
+    title: new URL(document.URL).hash.replace(/(?:%20|#)/gi, " ").trim()
 });
-
-container.insertAdjacentHTML(
+emiter.target.insertAdjacentHTML(
     "beforeend",
-    utils.createDOMSentence("omari hardwick").join("")
+    utils.createDOMSentence(word).join("")
 );
-window.fakeDispatcher = dispatcher;
+window.fakeDispatcher = emiter;
