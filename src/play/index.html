@@ -33,6 +33,7 @@ title: "Play the Hangman game"
                 <progress id="time-progress" max="8" value="8" data-listen="heart-updated" data-attributes="value:{hearts}" data-property="{percentage}">100%</progress>
             </div>
             <div class="center heart" data-listen="heart-updated" data-property="{hearts}"></div>
+            <div class="visually-hidden" data-listen="heart-updated" data-property="you have {hearts} hearts remaining" aria-live="polite"></div>
         </div>
     </div>
     <div class="segragator content-center letter-wrapper" data-emit="letter-found">

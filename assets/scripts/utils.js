@@ -305,13 +305,45 @@ async function fetchQuestions() {
     }
     return result;
 }
+function getFocusableChildren(element) {
+    return element.querySelectorAll(
+        ":is(a:any-link, button, input[type='checkbox'], " +
+        "input[type='radio'], input[type='text'], input[type='password'], " +
+        "input[type='email'], textarea, select):not([disabled])"
+    );
 
+}
+function trapFocus(element) {
+    const focusables = getFocusableChildren(element);
+    const firstFocusable = focusables[0];
+    const lastFocusable = focusables[focusables.length - 1];
+
+    element.addEventListener("keydown", function (event) {
+        let tabbed = (event.key === "Tab" || event.keyCode === 9);
+        if (!tabbed) {
+            return;
+        }
+        if (event.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+                lastFocusable.focus();
+                event.preventDefault();
+            }
+        } else {
+            if (document.activeElement === lastFocusable) {
+                firstFocusable.focus();
+                event.preventDefault();
+            }
+        }
+    });
+}
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
     fetchData,
     fetchQuestions,
+    getFocusableChildren,
     getIndexes,
     getWords,
-    questionStorage
+    questionStorage,
+    trapFocus
 });

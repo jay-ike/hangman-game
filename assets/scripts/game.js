@@ -10,6 +10,18 @@ function getGameData(url) {
         word: "omari hardwick"
     };
 }
+function focusHandler(popover) {
+    let active;
+    popover.addEventListener("beforetoggle", function (event) {
+        if (event.oldState === "closed") {
+            active = document.activeElement;
+            utils.getFocusableChildren(popover)[0].focus();
+        }
+        if (event.oldState === "open") {
+            active.focus();
+        }
+    });
+}
 
 function Engine(rootElement, dispatcher, maxHearts = 8) {
     const self = Object.create(this);
@@ -135,6 +147,8 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             target
         )
     );
+    utils.trapFocus(components.dialogEmitter.target);
+    focusHandler(components.dialogEmitter.target);
     document.querySelector(
         "button[aria-controls='menu-dialog']"
     ).addEventListener("click", function (event) {
