@@ -87,12 +87,20 @@ function parseElement(element) {
     }
     return (data) => chain.forEach((fn) => fn(data));
 }
+function getAllElements(nodeList) {
+    return Array.from(nodeList).filter((node) => node.nodeType === 1);
+}
 function contentDispatcher(target) {
     let mutation;
     let listeners = getListeners(target, parseElement);
     function listenDOMUpdate(records) {
         records.forEach(function (record) {
-            if (record.type === "childList") {
+            const addedElts = getAllElements(record.addedNodes);
+            const removedElts = getAllElements(record.removedNodes);
+            if (
+                record.type === "childList" &&
+                (addedElts.length > 0 || removedElts.length > 0)
+            ) {
                 listeners = getListeners(target, parseElement);
             }
         });

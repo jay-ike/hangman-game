@@ -8,9 +8,9 @@ title: "Play the Hangman game"
 {%assign placeholder = ".....|......" | split: '|'%}
 {%assign letters = "abcdefghijklmnopqrstuvwxyz" | split: ''%}
 
-<div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" role="dialog" popover>
-    <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">paused</h2>
-    <button class="box-blue shadowed">continue</button>
+<div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" data-emit="dialog-updated" role="dialog" popover="manual">
+    <h2 class="capitalized dilated-effect sky-text-bg" data-listen="title-changed" data-property="{title}" id="dialog-title">paused</h2>
+    <button class="box-blue shadowed continue-btn" data-listen="continuation-changed" data-property="{text}">continue</button>
     <a class="box-blue shadowed" href="/categories">new category</a>
     <a class="box-pink shadowed pink-shadow" href="/">quit game</a>
 </div>
