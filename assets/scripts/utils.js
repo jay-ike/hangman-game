@@ -195,7 +195,7 @@ async function fetchData(url, options, timeout) {
     let response;
     let success;
     const defaultOptions = {
-        headers: { "content-type": "application/json" },
+        headers: {"content-type": "application/json"},
         method: "GET",
         signal: controller.signal
     };
@@ -209,9 +209,9 @@ async function fetchData(url, options, timeout) {
         );
         success = response.ok;
         response = await response.json();
-        return Object.assign({ success }, response);
+        return Object.assign({success}, response);
     } catch (error) {
-        return Object.assign({ success: false }, { message: error.message });
+        return Object.assign({success: false}, {message: error.message});
     }
 }
 async function questionStorage({
@@ -270,10 +270,39 @@ async function questionStorage({
     };
     return result;
 }
+async function fetchQuestions() {
+    let result = [];
+    const datas = await fetchData(window.origin + "/assets/data.json");
+
+    if (datas.success) {
+        result = Object.entries(datas.categories).reduce(
+            function (acc, [store, val]) {
+                let tmp = {store};
+                if (Array.isArray(val)) {
+                    tmp.datas = val.map(function (question) {
+                        const res = Object.assign({}, question);
+                        res.selected = (
+                            res.selected
+                            ? "selected"
+                            : "not-selected"
+                        );
+                        return res;
+                    });
+                    acc[acc.length] = tmp;
+                }
+                return acc;
+            },
+            []
+        );
+    }
+    return result;
+}
+
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
     fetchData,
+    fetchQuestions,
     getIndexes,
     getWords,
     questionStorage
