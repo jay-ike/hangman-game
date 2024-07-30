@@ -18,6 +18,8 @@ async function parseCss({dir}, src) {
 }
 module.exports = function (config) {
     config.addPassthroughCopy("assets");
+    config.addPassthroughCopy("sw.js");
+    config.addPassthroughCopy("sw-registration.js");
     config.addShortcode("cssmin", function (src) {
         return parseCss(config, src);
     });

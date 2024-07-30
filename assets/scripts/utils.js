@@ -1,7 +1,5 @@
 /*jslint browser, this*/
-import {openDB} from "./idb-min.js";
-
-const {Element, structuredClone} = window;
+const {Element} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
 
 function parsedTemplate(data, string) {
@@ -183,128 +181,6 @@ function createDOMSentence(sentence) {
     });
     return list;
 }
-
-function clone(object, data) {
-    return Object.assign(structuredClone(object), data ?? {});
-}
-function createCrypto() {
-    return Object.freeze({
-        decrypt(data) {
-            return window.atob(data).toString();
-        },
-        encrypt(data) {
-            return window.btoa(data).toString();
-        }
-    });
-}
-
-async function fetchData(url, options, timeout) {
-    let controller = new AbortController();
-    let response;
-    let success;
-    const defaultOptions = {
-        headers: {"content-type": "application/json"},
-        method: "GET",
-        signal: controller.signal
-    };
-    if (Number.isFinite(timeout)) {
-        setTimeout(() => controller.abort(), timeout);
-    }
-    try {
-        response = await fetch(
-            url,
-            Object.assign(defaultOptions, options ?? {})
-        );
-        success = response.ok;
-        response = await response.json();
-        return Object.assign({success}, response);
-    } catch (error) {
-        return Object.assign({success: false}, {message: error.message});
-    }
-}
-async function questionStorage({
-    dbName = "jay-ike_hangman",
-    stores = [],
-    version = 1
-}) {
-    let result = Object.create(null);
-    let cipher = createCrypto();
-    const db = await openDB(dbName, version, {
-        upgrade: function upgrade(db) {
-            stores.forEach(function (storeName) {
-                const store = db.createObjectStore(
-                    storeName,
-                    {keyPath: "name"}
-                );
-                store.createIndex("status", "status", {unique: false});
-            });
-        }
-    });
-    function encryptEntry(entry) {
-        let res = clone(entry);
-        res.name = cipher.encrypt(res.name);
-        return res;
-    }
-    function decryptEntry(entry) {
-        let res = clone(entry);
-        res.name = cipher.decrypt(res.name);
-        return res;
-    }
-    result.addMany = async function insertMany(storeName, questions) {
-        let tx = db.transaction(storeName, "readwrite");
-        let actions = questions.map((elt) => tx.store.put(encryptEntry(elt)));
-        actions[actions.length] = tx.done;
-        await Promise.all(actions);
-    };
-    result.getRandomQuestion = async function (category) {
-        let tx;
-        let actions = [];
-        let questions = await db.getAllFromIndex(category, "status");
-        let res = questions.find((el) => el.status === "not-selected");
-        if (res === undefined) {
-            tx = db.transaction(category, "readwrite");
-            actions = await tx.store.getAll();
-            res = await tx.store.openCursor();
-            actions.map((value) => tx.store.put(
-                clone(value, {status: "not-selected"})
-            ));
-            actions[actions.length] = tx.done;
-            await Promise.all(actions);
-            res = res.value;
-        } else {
-            await db.put(category, clone(res, {status: "selected"}));
-        }
-        return decryptEntry(res).name;
-    };
-    return result;
-}
-async function fetchQuestions() {
-    let result = [];
-    const datas = await fetchData(window.origin + "/assets/data.json");
-
-    if (datas.success) {
-        result = Object.entries(datas.categories).reduce(
-            function (acc, [store, val]) {
-                let tmp = {store};
-                if (Array.isArray(val)) {
-                    tmp.datas = val.map(function (question) {
-                        const res = Object.assign({}, question);
-                        res.selected = (
-                            res.selected
-                            ? "selected"
-                            : "not-selected"
-                        );
-                        return res;
-                    });
-                    acc[acc.length] = tmp;
-                }
-                return acc;
-            },
-            []
-        );
-    }
-    return result;
-}
 function getFocusableChildren(element) {
     return element.querySelectorAll(
         ":is(a:any-link, button, input[type='checkbox'], " +
@@ -339,11 +215,8 @@ function trapFocus(element) {
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
-    fetchData,
-    fetchQuestions,
     getFocusableChildren,
     getIndexes,
     getWords,
-    questionStorage,
     trapFocus
 });
