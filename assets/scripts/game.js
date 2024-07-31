@@ -1,14 +1,58 @@
 /*jslint browser, this*/
 import utils from "./utils.js";
 
-const {DOMException, HTMLButtonElement, URL, document} = window;
+const {DOMException, HTMLButtonElement, URL, document, navigator} = window;
 const isButton = (target) => HTMLButtonElement.prototype.isPrototypeOf(target);
 let engine;
+let workerPort;
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.register("/sw.js", {
+        type: "module",
+        updateViaCache: "imports"
+    });
+    navigator.serviceWorker.onmessage = handleMessage;
+}
+function notifyWorker(data) {
+    if (typeof workerPort.postMessage === "function") {
+        workerPort.postMessage(data);
+    }
+}
+function handleMessage({data, ports}) {
+    if (data.statusUpdateRequest) {
+        workerPort = ports[0];
+        notifyWorker({statusUpdate: {isOnline: navigator.onLine}});
+        engine.init();
+    }
+}
+window.addEventListener("online", function () {
+    notifyWorker({statusUpdate: {isOnline: true}});
+});
+window.addEventListener("offline", function () {
+    notifyWorker({statusUpdate: {isOnline: false}});
+});
 function getGameData(url) {
-    return {
-        title: new URL(url).hash.replace(/(?:%20|#)/gi, " ").trim(),
-        word: "omari hardwick"
-    };
+    let category = new URL(url).hash.replace(/(?:%20|#)/gi, " ").trim();
+    category = (
+        category.length < 1
+        ? null
+        : category
+    );
+    const fallback = {title: category ?? "Actor", word: "omari hardwick"};
+    return new Promise(function (res) {
+        const chan = new MessageChannel();
+        workerPort.postMessage(
+            {randomWordRequest: {category}},
+            [chan.port2]
+        );
+        chan.port1.onmessage = function ({data}) {
+            const {randomWordResponse} = data;
+            if (randomWordResponse.title && randomWordResponse.word) {
+                res(data.randomWordResponse);
+            } else {
+                res(fallback);
+            }
+        };
+    });
 }
 function focusHandler(popover) {
     let active;
@@ -33,10 +77,10 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         );
     }
     function showDialog(title, status) {
-        const {target, dispatch} = components.dialogEmitter;
+        const {dispatch, target} = components.dialogEmitter;
         let text;
         if (status) {
-            target.dataset.status = status
+            target.dataset.status = status;
             text = "play again!";
         } else {
             delete target.dataset.status;
@@ -47,7 +91,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         target.showPopover();
     }
 
-    function verifyGameEnd({hearts, word, lettersFound}) {
+    function verifyGameEnd({hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         if (hearts < 1) {
             showDialog("you lose", "lost");
@@ -56,8 +100,8 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             showDialog("you win", "won");
         }
     }
-    function initialize() {
-        const data = getGameData(document.URL);
+    async function initialize() {
+        const data = await getGameData(document.URL);
         components.lettersFound = 0;
         components.word = data.word;
         components.hearts = (components.hearts ?? 0) + maxHearts;
@@ -82,7 +126,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         );
     }
 
-    function listenRestartClick(parent, target) {
+    async function listenRestartClick(parent, target) {
         let status = parent?.dataset?.status;
         if (typeof parent.hidePopover !== "function") {
             throw new DOMException(
@@ -94,7 +138,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             target.classList.contains("continue-btn")
         ) {
             if (status) {
-                initialize();
+                await initialize();
             }
             parent.hidePopover();
         }
@@ -142,9 +186,9 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     rootElement.addEventListener("click", listenLetterClick);
     components.dialogEmitter.target.addEventListener(
         "click",
-        ({target}) => listenRestartClick(
+        (event) => listenRestartClick(
             components.dialogEmitter.target,
-            target
+            event.target
         )
     );
     utils.trapFocus(components.dialogEmitter.target);
@@ -153,11 +197,10 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         "button[aria-controls='menu-dialog']"
     ).addEventListener("click", function (event) {
         event.preventDefault();
-       showDialog("paused");
+        showDialog("paused");
     });
     return self;
 }
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", async function () {
     engine = new Engine(document.body, new utils.EventDispatcher());
-    engine.init();
 });

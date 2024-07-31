@@ -2,7 +2,7 @@
 /*global self*/
 import {openDB} from "./assets/scripts/idb-min.js";
 
-const {Headers, Response, caches, console} = self;
+const {Headers, Response, caches, clients, console} = self;
 const config = {
     isOnline: true,
     version: 1
@@ -165,7 +165,10 @@ async function fetchQuestions({url}) {
 }
 
 
-function onInstall() {
+async function onInstall() {
+    await cacheStaticFiles();
+    await setupQuestions();
+    await sendMessage({statusUpdateRequest: true});
     self.skipWaiting();
 }
 function onActivate(event) {
@@ -173,10 +176,6 @@ function onActivate(event) {
 }
 function onFetch(event) {
     event.respondWith(handleFetch(event));
-}
-async function main() {
-    await cacheStaticFiles();
-    await setupQuestions();
 }
 async function handleActivation() {
     await clearOldCache();
@@ -225,31 +224,17 @@ async function handleFetch(event) {
     if (url.origin !== location.origin) {
         return fetch(request);
     }
-    if (/^\/api\/.+$/.test(path)) {
-        response = await getWord(
-            url.searchParams.get("category")
-        );
-        return new Response(
-            JSON.stringify(response),
-            {
-                headers: new Headers([
-                    ["Content-Type", "application/json"]
-                ]),
-                status: 200,
-                statusText: "Ok"
-            }
-        );
+    response = await cache.match(cachableUrls.pages[path] ?? path);
+    if (response) {
+        return response;
     } else {
-        response = await cache.match(cachableUrls.pages[path] ?? path);
-        if (response) {
-            return response;
-        } else {
-            response = await fetch(request);
+        response = await fetch(request);
+        if (response.ok) {
             event.waitUntil(
                 cache.put(request.url, response.clone())
             );
-            return response;
         }
+        return response;
     }
 }
 async function getWord(category) {
@@ -287,8 +272,25 @@ async function setupQuestions() {
         })
     );
 }
+async function sendMessage(msg) {
+    const allClients = await clients.matchAll({includeUncontrolled: true});
+    return Promise.all(allClients.map(function (client) {
+        const channel = new MessageChannel();
+        channel.port1.onmessage = handleMessage;
+        return client.postMessage(msg, [channel.port2]);
+    }));
+}
+async function handleMessage({data, ports}) {
+    let response;
+    if (data.statusUpdate) {
+        config.isOnline = data.statusUpdate.isOnline;
+    }
+    if(data.randomWordRequest && ports[0]) {
+        response = await getWord(data.randomWordRequest.category);
+        ports[0].postMessage({randomWordResponse: response});
+    }
+}
 
 self.addEventListener("install", onInstall);
 self.addEventListener("activate", onActivate);
 self.addEventListener("fetch", onFetch);
-main().catch(console.error);

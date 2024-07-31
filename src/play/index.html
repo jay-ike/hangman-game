@@ -1,13 +1,11 @@
 ---
 layout: "layouts/base.html"
 title: "Play the Hangman game"
+pageRole: "play"
 ---
-
-
-<style>{%cssmin "includes/in-game.css"%}</style>
 {%assign placeholder = ".....|......" | split: '|'%}
 {%assign letters = "abcdefghijklmnopqrstuvwxyz" | split: ''%}
-
+<style>{%cssmin "includes/in-game.css"%}</style>
 <div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" data-emit="dialog-updated" role="dialog" popover="manual">
     <h2 class="capitalized dilated-effect sky-text-bg" data-listen="title-changed" data-property="{title}" id="dialog-title">paused</h2>
     <button class="box-blue shadowed continue-btn" data-listen="continuation-changed" data-property="{text}">continue</button>
