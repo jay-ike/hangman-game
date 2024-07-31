@@ -20,7 +20,7 @@ function notifyWorker(data) {
 function handleMessage({data, ports}) {
     if (data.statusUpdateRequest) {
         workerPort = ports[0];
-        notifyWorker({statusUpdate: {isOnline: navigator.onLine}});
+        ports[0].postMessage({statusUpdate: {isOnline: navigator.onLine}});
         engine.init();
     }
 }
@@ -40,18 +40,22 @@ function getGameData(url) {
     const fallback = {title: category ?? "Actor", word: "omari hardwick"};
     return new Promise(function (res) {
         const chan = new MessageChannel();
-        workerPort.postMessage(
-            {randomWordRequest: {category}},
-            [chan.port2]
-        );
-        chan.port1.onmessage = function ({data}) {
-            const {randomWordResponse} = data;
-            if (randomWordResponse.title && randomWordResponse.word) {
-                res(data.randomWordResponse);
-            } else {
-                res(fallback);
-            }
-        };
+        if (workerPort) {
+            workerPort.postMessage(
+                {randomWordRequest: {category}},
+                [chan.port2]
+            );
+            chan.port1.onmessage = function ({data}) {
+                const {randomWordResponse} = data;
+                if (randomWordResponse.title && randomWordResponse.word) {
+                    res(data.randomWordResponse);
+                } else {
+                    res(fallback);
+                }
+            };
+        } else {
+            res(fallback);
+        }
     });
 }
 function focusHandler(popover) {
@@ -91,19 +95,21 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         target.showPopover();
     }
 
-    function verifyGameEnd({hearts, lettersFound, word}) {
+    function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         if (hearts < 1) {
-            showDialog("you lose", "lost");
+            setTimeout(() => showDialog("you lose", "lost"), 3000);
         }
         if (wordLetters === lettersFound) {
-            showDialog("you win", "won");
+            notifyWorker({wordFound: {category, word}});
+            setTimeout(() => showDialog("you win", "won"), 3000);
         }
     }
     async function initialize() {
         const data = await getGameData(document.URL);
         components.lettersFound = 0;
         components.word = data.word;
+        components.category = data.title;
         components.hearts = (components.hearts ?? 0) + maxHearts;
         components.headerEmitter.dispatch("title-updated", {
             title: data.title,
@@ -202,5 +208,17 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     return self;
 }
 window.addEventListener("DOMContentLoaded", async function () {
+    let channel = new MessageChannel();
     engine = new Engine(document.body, new utils.EventDispatcher());
+    if (!navigator.serviceWorker) {
+        engine.init();
+    }
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        workerPort = channel.port1;
+        navigator.serviceWorker.controller.postMessage(
+            {connectionRequest: {isOnline: navigator.onLine}},
+            [channel.port2]
+        );
+        engine.init();
+    }
 });

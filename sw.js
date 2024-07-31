@@ -2,7 +2,7 @@
 /*global self*/
 import {openDB} from "./assets/scripts/idb-min.js";
 
-const {Headers, Response, caches, clients, console} = self;
+const {caches, clients} = self;
 const config = {
     isOnline: true,
     version: 1
@@ -113,9 +113,11 @@ async function questionStorage({
     result.getStores = () => stores;
     result.getRandomQuestion = async function (category) {
         let tx;
+        let res;
         let actions = [];
         let questions = await db.getAllFromIndex(category, "status");
-        let res = questions.find((el) => el.status === "not-selected");
+        questions = questions.filter((el) => el.status === "not-selected");
+        res = questions[Math.floor(Math.random() * questions.length)];
         if (res === undefined) {
             tx = db.transaction(category, "readwrite");
             actions = await tx.store.getAll();
@@ -126,10 +128,14 @@ async function questionStorage({
             actions[actions.length] = tx.done;
             await Promise.all(actions);
             res = res.value;
-        } else {
-            await db.put(category, clone(res, {status: "selected"}));
         }
         return decryptEntry(res).name;
+    };
+    result.markFound = async function ({category, word}) {
+        let res = await db.get(category, cipher.encrypt(word));
+        if (res) {
+            await db.put(category, {name: res.name, status: "selected"});
+        }
     };
     return result;
 }
@@ -167,18 +173,18 @@ async function fetchQuestions({url}) {
 
 async function onInstall() {
     await cacheStaticFiles();
-    await setupQuestions();
-    await sendMessage({statusUpdateRequest: true});
     self.skipWaiting();
 }
 function onActivate(event) {
-    event.waitUntil(handleActivation);
+    event.waitUntil(handleActivation());
 }
 function onFetch(event) {
     event.respondWith(handleFetch(event));
 }
 async function handleActivation() {
     await clearOldCache();
+    await setupQuestions();
+    await sendMessage({statusUpdateRequest: true});
     await self.clients.claim();
 }
 
@@ -285,12 +291,19 @@ async function handleMessage({data, ports}) {
     if (data.statusUpdate) {
         config.isOnline = data.statusUpdate.isOnline;
     }
-    if(data.randomWordRequest && ports[0]) {
+    if (data.connectionRequest && ports[0]) {
+        config.isOnline = data.connectionRequest.isOnline;
+        ports[0].onmessage = handleMessage;
+    }
+    if (data.randomWordRequest && ports[0]) {
         response = await getWord(data.randomWordRequest.category);
         ports[0].postMessage({randomWordResponse: response});
     }
+    if (data.wordFound) {
+        await config.db.markFound(data.wordFound);
+    }
 }
-
 self.addEventListener("install", onInstall);
 self.addEventListener("activate", onActivate);
 self.addEventListener("fetch", onFetch);
+self.addEventListener("message", handleMessage);
