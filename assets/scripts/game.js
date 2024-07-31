@@ -98,11 +98,11 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         if (hearts < 1) {
-            setTimeout(() => showDialog("you lose", "lost"), 3000);
+            setTimeout(() => showDialog("you lose", "lost"), 2000);
         }
         if (wordLetters === lettersFound) {
             notifyWorker({wordFound: {category, word}});
-            setTimeout(() => showDialog("you win", "won"), 3000);
+            setTimeout(() => showDialog("you win", "won"), 2000);
         }
     }
     async function initialize() {
@@ -149,6 +149,22 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             parent.hidePopover();
         }
     }
+    function listenKeyboard(event) {
+        let isLetter = (
+            event.key.match(/[a-z]/i) ||
+            event.code.match(/key[a-z]/i)
+        );
+        let btn;
+        if (!isLetter) {
+            return;
+        }
+        btn = rootElement.querySelector(
+            `[aria-keyshortcuts="${event.key} Shift+${event.key}" i]`
+        );
+        if (isButton(btn)) {
+            btn.click();
+        }
+    }
     function listenLetterClick({target}) {
         let indexes;
         let letter;
@@ -190,6 +206,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     components.headerEmitter = dispatcher.emitterOf("heading-change");
     components.dialogEmitter = dispatcher.emitterOf("dialog-updated");
     rootElement.addEventListener("click", listenLetterClick);
+    rootElement.addEventListener("keydown", listenKeyboard);
     components.dialogEmitter.target.addEventListener(
         "click",
         (event) => listenRestartClick(

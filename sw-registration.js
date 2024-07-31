@@ -21,8 +21,17 @@ function handleMessage({data, ports}) {
     }
 }
 window.addEventListener("online", function () {
-    notifyWorker({statusUpdate: {isOnline: true}});
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            statusUpdate: {isOnline: true}
+        });
+    }
 });
 window.addEventListener("offline", function () {
-    notifyWorker({statusUpdate: {isOnline: false}});
+     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            statusUpdate: {isOnline: false}
+        });
+    }
+
 });

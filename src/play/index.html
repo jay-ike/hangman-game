@@ -48,7 +48,7 @@ pageRole: "play"
     <section class="responsive-grid letter-wrapper keyboard" aria-labelledby="keyboard-title">
         {%for letter in letters%}
         <div class="center relative">
-            <button class="letter">{{letter}}</button>
+            <button class="letter" aria-keyshortcuts="{{letter | upcase}} Shift+{{letter | upcase}}">{{letter}}</button>
             <span class="tooltip visually-hidden" id="{{letter}}" aria-hidden="true">you have already selected the letter {{letter}}</span>
         </div>
         {%endfor%}
