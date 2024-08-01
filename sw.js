@@ -5,7 +5,7 @@ import {openDB} from "./assets/scripts/idb-min.js";
 const {caches, clients} = self;
 const config = {
     isOnline: true,
-    version: 1
+    version: 2
 };
 const cachableUrls = {
     pages: {
@@ -20,7 +20,12 @@ const cachableUrls = {
         "/assets/scripts/utils.js",
         "/assets/scripts/game.js",
         "/assets/scripts/id-min.js",
-        "/sw-registration.js"
+        "/sw-registration.js",
+        "/assets/scripts/idb-min.js",
+        "/assets/images/icon.svg",
+        "/assets/images/favicon.ico",
+        "/assets/images/apple-touch-icon.png",
+        "assets/images/hangman-icon.png"
     ]
 };
 config.cacheName = `hangman-${config.version}`;
@@ -83,14 +88,41 @@ async function questionStorage({
 }) {
     let result = Object.create(null);
     let cipher = createCrypto();
+    const storeKeys = {
+        indexes: ["status"],
+        keyPath: "name"
+    };
     const db = await openDB(dbName, version, {
-        upgrade: function upgrade(db) {
-            stores.forEach(function (storeName) {
-                const store = db.createObjectStore(
-                    storeName,
-                    {keyPath: "name"}
+        upgrade: function upgrade(database, oldVersion) {
+            let invalidStores = [];
+            let objectStores;
+            let i = 0;
+            let store;
+            objectStores = database.objectStoreNames;
+            if (oldVersion >= 1) {
+                while (i < objectStores.length) {
+                    store = objectStores.item(i);
+                    if (!stores.includes(store)) {
+                        invalidStores.push(objectStores.item(i));
+                    }
+                    i += 1;
+                }
+                invalidStores.forEach(
+                    (name) => database.deleteObjectStore(name)
                 );
-                store.createIndex("status", "status", {unique: false});
+            }
+            stores.forEach(function (storeName) {
+                let store;
+                if (objectStores.contains(storeName)) {
+                    database.deleteObjectStore(storeName);
+                }
+                store = database.createObjectStore(
+                    storeName,
+                    {keyPath: storeKeys.keyPath}
+                );
+                storeKeys.indexes.forEach(function (index) {
+                    store.createIndex(index, index, {unique: false});
+                });
             });
         }
     });
@@ -256,7 +288,7 @@ async function getWord(category) {
 }
 async function clearOldCache() {
     let oldCacheNames = await caches.keys();
-    oldCacheNames = oldCacheNames.map(function (cacheName) {
+    oldCacheNames = oldCacheNames.filter(function (cacheName) {
         let version = cacheName.match(/^hangman-(\d+)$/i) ?? [];
         version = Number.parseInt(version[1], 10);
         return (
@@ -264,7 +296,8 @@ async function clearOldCache() {
             version > 0 &&
             version !== config.version
         );
-    });
+    }).map((name) => caches.delete(name));
+    return Promise.all(oldCacheNames);
 }
 async function setupQuestions() {
     let questions = await fetchQuestions({url: "/assets/data.json"});

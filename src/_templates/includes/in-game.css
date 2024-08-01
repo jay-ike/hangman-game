@@ -139,6 +139,10 @@ button[aria-disabled="true"] {
         backdrop-filter: blur(4px);
     }
 
+    &:not(:popover-open) {
+        display: none;
+    }
+
     &:popover-open {
         transform: scale(1.1);
     }

@@ -163,6 +163,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         );
         if (isButton(btn)) {
             btn.click();
+            btn.focus();
         }
     }
     function listenLetterClick({target}) {
@@ -171,7 +172,8 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         if (
             isButton(target) &&
             target.classList.contains("letter") &&
-            target.getAttribute("aria-disabled") === null
+            target.getAttribute("aria-disabled") === null &&
+            components.hearts > 0
 
         ) {
             letter = target.textContent.trim();
