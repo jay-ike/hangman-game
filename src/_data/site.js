@@ -2,6 +2,16 @@
 const {categories} = require("../../assets/data.json");
 module.exports = Object.freeze({
     categories: Object.keys(categories),
+    image: {
+        alt: "a screenshot of the hagman game home page showing how to play",
+        description: "Try to guess the hidden item untill you run out of " +
+        "hearts. Don't be scared I know you can do it",
+        height: 728,
+        name: "The hangman game. will you guess it right ?",
+        src: "https://ike-hangman-game.vercel.app/assets/images/" +
+        "main-view-screenshot.webp",
+        width: 1024
+    },
     rules: [
         {
             description: "First, choose a word category, like animals or " +
