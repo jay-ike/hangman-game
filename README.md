@@ -14,7 +14,6 @@ This is a solution to the [Hangman game challenge on Frontend Mentor](https://ww
   - [Continued development](#continued-development)
   - [Useful resources](#useful-resources)
 - [Author](#author)
-- [Acknowledgments](#acknowledgments)
 
 
 ## Overview
@@ -39,8 +38,8 @@ Users should be able to:
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+- Solution URL: [github repo](https://github.com/jay-ike/hangman-game)
+- Live Site URL: [the PWA](https://ike-hangman-game.vercel.app/)
 
 ## My process
 
@@ -51,44 +50,78 @@ Users should be able to:
 - Flexbox
 - CSS Grid
 - Mobile-first workflow
+- Service workers
 
-**Note: These are just examples. Delete this note and replace the list above with your own choices**
 
 ### What I learned
 
-Use this section to recap over some of your major learnings while working through this project. Writing these out and providing code samples of areas you want to highlight is a great way to reinforce your own knowledge.
+I've learned so much throughout this project these are the most significant
 
-To see how you can add code snippets, see below:
+In html I learn how to define the name of a section or any element you want to be announced by screenreaders
 
 ```html
-<h1>Some HTML code I'm proud of</h1>
+<main aria-labelledby="main-title">
+    <h1 id="main-title">Some HTML code I'm proud of</h1>
+    <!-- other elements -->
+</main>
 ```
+
+In CSS I've learned how to animate popovers and how to use svg filters
+
 ```css
-.proud-of-this-css {
-  color: papayawhip;
-}
+    .text-effect {
+        filter: url(#svg-effect);
+    }
+
+
+    [popover] {
+        &,
+        &::backdrop {
+            transition: display .35s allow-discrete,
+                overlay .35s allow-discrete,
+                transform 0.35s .35s ease-in,
+                opacity .35s;
+            opacity: 0;
+
+        }
+
+        &:popover-open,
+        &:popover-open::backdrop {
+            opacity: 1;
+            transform: none;
+
+            @starting-style {
+                opacity: 0;
+                transform: scale(2);
+            }
+        }
+    }
 ```
+
+In term of javascript I've learned how to register a service worker which is an ES6 module
+
 ```js
-const proudOfThisFunc = () => {
-  console.log('🎉')
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.register("/sw.js", {
+        type: "module",
+        updateViaCache: "imports"
+    });
 }
 ```
 
 ### Continued development
 
+In a near future I may try to organise the questions by level to improve the user experience
 
 ### Useful resources
 
-- [this video](https://www.youtube.com/watch?v=kfOhlU_iRVU) from [sara soueidan](https://www.sarasoueidan.com) help me a lot to understand how to compose svg filters
+- [this video](https://www.youtube.com/watch?v=kfOhlU_iRVU) from [sara soueidan](https://www.sarasoueidan.com) helped me a lot to understand how to compose svg filters
 - [this article](https://jakearchibald.com/2014/offline-cookbook) from jake archibald is maybe old but has helped me to understand how to manage offline status of my web app
+- [this article](https://nerdy.dev/steal-this-popover-starter-kit) from adam argyle helped me to animate the dialog on the in game view
 
-**Note: Delete this note and replace the list above with resources that helped you during the challenge. These could come in handy for anyone viewing your solution or for yourself when you look back on this project in the future.**
 
 ## Author
 
 - Frontend Mentor - [@jay-ike](https://www.frontendmentor.io/profile/jay-ike)
 - Mastodon - [@ndimah22](https://mastodon.social/@ndimah22)
-
-
-## Acknowledgments
 
