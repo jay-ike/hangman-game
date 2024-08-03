@@ -1,0 +1,51 @@
+.letter {
+    font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
+    min-inline-size: min(10vi, 10cqi, 88px);
+    aspect-ratio: var(--letter-ratio, 112 / 128);
+}
+.i-flex {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--r-space, .5rem);
+    flex-flow: row wrap;
+    place-content: center;
+
+    &>* {
+        flex-shrink: 2;
+    }
+}
+
+.letter-wrapper {
+    --min-padding: min(5vi, .5rem);
+    --wrap: wrap;
+    --radius: min(25%, .75rem);
+    --direction: row;
+
+    gap: min(5vi, .5rem);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    container: letters / inline-size;
+    place-content: center;
+    min-inline-size: 100%;
+}
+.btn-primary {
+    --i-padding: min(10vi, 3em);
+    --min-padding: 0.75em var(--i-padding);
+    border-radius: calc(var(--i-padding) / 2);
+}
+.menu {
+    --direction: column;
+    --min-padding: min(5vmin, 1.5em);
+    --i-alignment: space-evenly;
+
+    color: var(--system-color-white);
+    border-radius: min(2.5em, 72px);
+    text-align: center;
+    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265 / 83%));
+    container: menu / inline-size;
+    min-inline-size: min(90vi, 592px);
+}
+[data-dimmed] {
+    opacity: 0.4;
+    color: transparent;
+}

@@ -13,14 +13,13 @@
     <link rel="preload" href="/assets/images/sprites.svg" as="image" crossorigin="anonymous">
     <link rel="icon" sizes="32x32" href="/assets/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/images/icon.svg">
-    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
 
     <style>{%cssmin "includes/foundations.css" %}</style>
 </head>
 
 <body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
     {{content}}
-    {% if pageRole != "play" %}<script src="/sw-registration.js" defer></script>{% endif %}
 </body>
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
     <defs>

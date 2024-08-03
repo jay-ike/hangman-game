@@ -1,0 +1,24 @@
+---
+title: "Unavailable page"
+layout: "layouts/base.html"
+bodyClass: "center"
+permalink: 404.html
+---
+{%assign words = "oh no! page not found" | split: ' '%}
+<style>{%cssmin "includes/404.css"%}</style>
+<main aria-labelledby="main-title" class="box segragator shadowed menu">
+    <p class="visually-hidden" id="main-title">oh no! page not found</p>
+    <h1 aria-labelledby="main-title" class="segragator letter-wrapper">
+        {%for word in words%}
+        <span class="i-flex">
+            {%assign dots = word | split: ''%}
+            {%for dot in dots%}
+            <span class="letter center box-blue shadowed" {%if dot == 'o'%}data-dimmed{%endif%}>{{dot}}</span>
+            {%endfor%}
+        </span>
+        {%endfor%}
+    </h1>
+    <p>The page you are looking for does not exists at the moment.<br>
+    The good news is that you can still visit the home page</p>
+    <a href="/" class="btn-primary box-blue shadowed">go to home page</a>
+</main>
