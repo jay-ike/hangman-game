@@ -1,0 +1,53 @@
+{
+    "background_color": "#2463ff",
+    "id": "/",
+    "icons": [
+        {
+            "purpose": "maskable",
+            "src": "/assets/images/hangman-icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/images/hangman-icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "display": "standalone",
+    "name": "The hangman game. try to guess it right",
+    "short_name": "hangman",
+    "scope": "/",
+    "screenshots": [
+        {
+            "form_factor": "wide",
+            "label": "select the category of the item to guess",
+            "src": "/assets/images/category-pick-screenshot.webp",
+            "sizes": "1024x728",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "play the hangman game",
+            "src": "/assets/images/in-game-screenshot.webp",
+            "sizes": "1024x728",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "select the category of the item to guess",
+            "src": "/assets/images/category-pick-mobile-screenshot.webp",
+            "sizes": "375x655",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "play the hangman game",
+            "src": "/assets/images/in-game-mobile-screenshot.webp",
+            "sizes": "375x655",
+            "type": "image/webp"
+        }
+    ],
+    "start_url": "/",
+    "theme_color": "#2463ff"
+}

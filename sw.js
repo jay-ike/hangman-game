@@ -5,14 +5,15 @@ import {openDB} from "./assets/scripts/idb-min.js";
 const {caches, clients} = self;
 const config = {
     isOnline: true,
-    version: 2
+    version: 1
 };
 const cachableUrls = {
     pages: {
         "/": "/index.html",
         "/categories": "/categories/index.html",
         "/play": "/play/index.html",
-        "/rules": "/rules/index.html"
+        "/rules": "/rules/index.html",
+        "/404": "/404.html"
     },
     static: [
         "/assets/mouse-memoirs.regular.woff2",
@@ -24,8 +25,8 @@ const cachableUrls = {
         "/assets/scripts/idb-min.js",
         "/assets/images/icon.svg",
         "/assets/images/favicon.ico",
-        "/assets/images/apple-touch-icon.png",
-        "assets/images/hangman-icon.png"
+        "assets/images/hangman-icon.png",
+        "assets/scripts/pwacompat.min.js"
     ]
 };
 config.cacheName = `hangman-${config.version}`;
@@ -266,6 +267,12 @@ async function handleFetch(event) {
     if (response) {
         return response;
     } else {
+        if (
+            request.method === "GET" &&
+            /text\/html/i.test(request.headers.get("accept"))
+        ) {
+            return cache.match("/404.html");
+        }
         response = await fetch(request);
         if (response.ok) {
             event.waitUntil(
