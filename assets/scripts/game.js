@@ -7,7 +7,7 @@ let engine;
 let workerPort;
 if (navigator.serviceWorker) {
     navigator.serviceWorker.register("/sw.js", {
-        type: "module",
+        scope: "/",
         updateViaCache: "imports"
     });
     navigator.serviceWorker.onmessage = handleMessage;
@@ -21,6 +21,9 @@ function handleMessage({data, ports}) {
     if (data.statusUpdateRequest) {
         workerPort = ports[0];
         ports[0].postMessage({statusUpdate: {isOnline: navigator.onLine}});
+        engine.init();
+    }
+    if (data.connectionAcknowledged) {
         engine.init();
     }
 }
@@ -132,7 +135,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         );
     }
 
-    async function listenRestartClick(parent, target) {
+    function listenRestartClick(parent, target) {
         let status = parent?.dataset?.status;
         if (typeof parent.hidePopover !== "function") {
             throw new DOMException(
@@ -144,7 +147,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             target.classList.contains("continue-btn")
         ) {
             if (status) {
-                await initialize();
+                wakeUpWorker();
             }
             parent.hidePopover();
         }
@@ -226,18 +229,22 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     });
     return self;
 }
-window.addEventListener("DOMContentLoaded", async function () {
-    let channel = new MessageChannel();
-    engine = new Engine(document.body, new utils.EventDispatcher());
-    if (!navigator.serviceWorker) {
-        engine.init();
-    }
+function wakeUpWorker() {
+    let channel;
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        channel = new MessageChannel();
         workerPort = channel.port1;
         navigator.serviceWorker.controller.postMessage(
             {connectionRequest: {isOnline: navigator.onLine}},
             [channel.port2]
         );
+        workerPort.onmessage = handleMessage;
+    }
+}
+window.addEventListener("DOMContentLoaded", function () {
+    engine = new Engine(document.body, new utils.EventDispatcher());
+    if (!navigator.serviceWorker) {
         engine.init();
     }
+    wakeUpWorker();
 });

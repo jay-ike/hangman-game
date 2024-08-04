@@ -1,19 +1,19 @@
 /*jslint browser*/
-/*global self*/
-import {openDB} from "./assets/scripts/idb-min.js";
+/*global self, idb*/
+importScripts("./assets/scripts/idb-min.js");
 
 const {caches, clients} = self;
 const config = {
     isOnline: true,
-    version: 1
+    version: 2
 };
 const cachableUrls = {
     pages: {
         "/": "/index.html",
+        "/404": "/404.html",
         "/categories": "/categories/index.html",
         "/play": "/play/index.html",
-        "/rules": "/rules/index.html",
-        "/404": "/404.html"
+        "/rules": "/rules/index.html"
     },
     static: [
         "/assets/mouse-memoirs.regular.woff2",
@@ -93,14 +93,14 @@ async function questionStorage({
         indexes: ["status"],
         keyPath: "name"
     };
-    const db = await openDB(dbName, version, {
+    const db = await idb.openDB(dbName, version, {
         upgrade: function upgrade(database, oldVersion) {
             let invalidStores = [];
             let objectStores;
             let i = 0;
             let store;
             objectStores = database.objectStoreNames;
-            if (oldVersion >= 1) {
+            if (oldVersion >= 1 && stores.length > 0) {
                 while (i < objectStores.length) {
                     store = objectStores.item(i);
                     if (!stores.includes(store)) {
@@ -113,16 +113,16 @@ async function questionStorage({
                 );
             }
             stores.forEach(function (storeName) {
-                let store;
+                let objectStore;
                 if (objectStores.contains(storeName)) {
                     database.deleteObjectStore(storeName);
                 }
-                store = database.createObjectStore(
+                objectStore = database.createObjectStore(
                     storeName,
                     {keyPath: storeKeys.keyPath}
                 );
                 storeKeys.indexes.forEach(function (index) {
-                    store.createIndex(index, index, {unique: false});
+                    objectStore.createIndex(index, index, {unique: false});
                 });
             });
         }
@@ -143,7 +143,16 @@ async function questionStorage({
         actions[actions.length] = tx.done;
         await Promise.all(actions);
     };
-    result.getStores = () => stores;
+    result.getStores = function () {
+        let i = 0;
+        let objectStores = db.objectStoreNames;
+        let result = [];
+        while (i < objectStores.length) {
+            result.push(objectStores.item(i));
+            i += 1;
+        }
+        return result;
+    };
     result.getRandomQuestion = async function (category) {
         let tx;
         let res;
@@ -173,8 +182,15 @@ async function questionStorage({
     return result;
 }
 async function fetchQuestions({url}) {
+    const cache = await caches.open(config.cacheName);
     let result = [];
-    const datas = await fetchData({timeout: 2000, url});
+    let datas = await cache.match(url);
+
+    if (!datas) {
+        datas = await fetchData({timeout: 2000, url});
+    } else {
+        datas = await consume(datas);
+    }
 
     if (datas.success) {
         result = Object.entries(datas.categories).reduce(
@@ -204,8 +220,8 @@ async function fetchQuestions({url}) {
 }
 
 
-async function onInstall() {
-    await cacheStaticFiles();
+function onInstall(event) {
+    event.waitUntil(cacheStaticFiles());
     self.skipWaiting();
 }
 function onActivate(event) {
@@ -244,7 +260,7 @@ async function cacheStaticFiles(reload = false) {
                         return cache.put(url, res);
                     }
                 } catch (err) {
-                    self.console.log("A Fetch error occured: ", err);
+                    console.log("A Fetch error occured: ", err);
                 }
             }
         )
@@ -269,7 +285,7 @@ async function handleFetch(event) {
     } else {
         if (
             request.method === "GET" &&
-            /text\/html/i.test(request.headers.get("accept"))
+            (/text\/html/i).test(request.headers.get("accept"))
         ) {
             return cache.match("/404.html");
         }
@@ -334,6 +350,8 @@ async function handleMessage({data, ports}) {
     if (data.connectionRequest && ports[0]) {
         config.isOnline = data.connectionRequest.isOnline;
         ports[0].onmessage = handleMessage;
+        config.db = await questionStorage({version: config.version});
+        ports[0].postMessage({connectionAcknowledged: true});
     }
     if (data.randomWordRequest && ports[0]) {
         response = await getWord(data.randomWordRequest.category);

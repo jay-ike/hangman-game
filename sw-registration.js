@@ -3,7 +3,7 @@ const {navigator} = window;
 let workerPort;
 if (navigator.serviceWorker) {
     navigator.serviceWorker.register("/sw.js", {
-        type: "module",
+        scope: "/",
         updateViaCache: "imports"
     });
     navigator.serviceWorker.addEventListener("message", handleMessage);
