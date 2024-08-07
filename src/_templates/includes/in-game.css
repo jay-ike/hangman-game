@@ -26,7 +26,7 @@ progress {
 }
 
 .main-box {
-    --s-space: 2.5rem;
+    --c-space: min(8lvb, 4.5rem);
 
     padding-block: 32px 48px;
     border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
@@ -64,6 +64,7 @@ progress {
 }
 
 .letter-wrapper {
+    --spacing: 1em;
     --min-padding: min(5vi, .5rem);
     --wrap: wrap;
     --radius: min(25%, .75rem);

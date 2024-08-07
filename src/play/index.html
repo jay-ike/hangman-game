@@ -11,15 +11,15 @@ og_imageH: 728
 og_imageAlt: "A screenshot of the game play of the hangman game having a keyboard and the letters O, I and L revealed"
 ---
 {%assign placeholder = ".....|......" | split: '|'%}
-{%assign letters = "abcdefghijklmnopqrstuvwxyz" | split: ''%}
+{%assign letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" | split: ''%}
 <style>{%cssmin "includes/in-game.css"%}</style>
 <div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" data-emit="dialog-updated" role="dialog" popover="manual">
     <h2 class="capitalized dilated-effect sky-text-bg" data-listen="title-changed" data-property="{title}" id="dialog-title">paused</h2>
     <button class="box-blue shadowed continue-btn" data-listen="continuation-changed" data-property="{text}">continue</button>
     <a class="box-blue shadowed" href="/categories">new category</a>
-    <a class="box-pink shadowed pink-shadow" href="/">quit game</a>
+    <a class="box-pink shadowed pink-shadow" href="/" style="view-transition-name: play-button;">quit game</a>
 </div>
-<main aria-labelledby="main-title" class="contain stack main-box">
+<main aria-labelledby="main-title" class="contain column main-box">
     <div class="segragator heading-box" data-emit="heading-change">
         <div class="i-flex">
             <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog" popovertarget="menu-dialog">

@@ -483,4 +483,7 @@ body {
     [popover] {
         --easing: cubic-bezier(.25, .1, .3, 1.5);
     }
+    @view-transition {
+        navigation: auto;
+    }
 }

@@ -13,7 +13,7 @@ title: "The hangman game rules"
         </a>
         <h1 class="dilated-effect sky-text-bg" id="main-title">how to play</h1>
     </div>
-    <div class="column contain rules-wrapper">
+    <div class="column contain rules-wrapper" style="view-transition-name: play;">
         {%for rule in site.rules %}
         <article aria-labelledby="rule-{{rule.number}}" class="box contain rule-grid">
             <h2 id="rule-{{rule.number}}">{{rule.title}}</h2>
