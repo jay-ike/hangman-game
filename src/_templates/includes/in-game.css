@@ -97,7 +97,7 @@ progress {
 
 .keyboard {
     --m-col-s: 9;
-    --m-col-w: min(10vi, 109px);
+    --m-col-w: min(10vi, 84px);
     --m-row-h: 3.25rem;
     --color-fill: var(--system-color-white);
     --c-gap: min(2vi, 1rem);

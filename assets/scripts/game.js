@@ -166,7 +166,9 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         );
         if (isButton(btn)) {
             btn.click();
-            btn.focus();
+            if (btn.getAttribute("aria-disabled") === "true") {
+                btn.focus();
+            }
         }
     }
     function listenLetterClick({target}) {

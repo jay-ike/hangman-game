@@ -2,7 +2,7 @@
 /*global self, idb*/
 importScripts("./assets/scripts/idb-min.js");
 
-const {caches, clients} = self;
+const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
     version: 2
@@ -38,6 +38,13 @@ async function consume(response, cached) {
         result.cached = cached;
     }
     return Object.assign(result, res);
+}
+function getRandomIndex(length) {
+    let array = new Uint8Array(length);
+    let result;
+    crypto.getRandomValues(array);
+    result = array[Math.floor(Math.random() * length)];
+    return result % length;
 }
 async function fetchData({options, timeout, url}) {
     const cache = await self.caches.open(config.cacheName);
@@ -138,20 +145,26 @@ async function questionStorage({
         return res;
     }
     result.addMany = async function insertMany(storeName, questions) {
+        const encrypted = questions.map(encryptEntry);
         let tx = db.transaction(storeName, "readwrite");
-        let actions = questions.map((elt) => tx.store.put(encryptEntry(elt)));
+        let actions = encrypted.map(async function insertionHandler(entry) {
+            let existing = await tx.store.get(entry.name);
+            if (!existing) {
+                return tx.store.add(entry);
+            }
+        });
         actions[actions.length] = tx.done;
         await Promise.all(actions);
     };
     result.getStores = function () {
         let i = 0;
         let objectStores = db.objectStoreNames;
-        let result = [];
+        let res = [];
         while (i < objectStores.length) {
-            result.push(objectStores.item(i));
+            res.push(objectStores.item(i));
             i += 1;
         }
-        return result;
+        return res;
     };
     result.getRandomQuestion = async function (category) {
         let tx;
@@ -159,7 +172,7 @@ async function questionStorage({
         let actions = [];
         let questions = await db.getAllFromIndex(category, "status");
         questions = questions.filter((el) => el.status === "not-selected");
-        res = questions[Math.floor(Math.random() * questions.length)];
+        res = questions[getRandomIndex(questions.length)];
         if (res === undefined) {
             tx = db.transaction(category, "readwrite");
             actions = await tx.store.getAll();
@@ -221,7 +234,7 @@ async function fetchQuestions({url}) {
 
 
 function onInstall(event) {
-    event.waitUntil(cacheStaticFiles());
+    event.waitUntil(handleInstallation());
     self.skipWaiting();
 }
 function onActivate(event) {
@@ -232,9 +245,13 @@ function onFetch(event) {
 }
 async function handleActivation() {
     await clearOldCache();
-    await setupQuestions();
     await sendMessage({statusUpdateRequest: true});
     await self.clients.claim();
+}
+
+async function handleInstallation() {
+    await setupQuestions();
+    await cacheStaticFiles();
 }
 
 async function cacheStaticFiles(reload = false) {
@@ -260,7 +277,7 @@ async function cacheStaticFiles(reload = false) {
                         return cache.put(url, res);
                     }
                 } catch (err) {
-                    console.log("A Fetch error occured: ", err);
+                    self.console.log("A Fetch error occured: ", err);
                 }
             }
         )
