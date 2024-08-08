@@ -1,20 +1,19 @@
 ---
 layout: "layouts/base.html"
-title: "The hangman game rules"
 ---
 <style>{%cssmin "includes/rules.css"%}</style>
 <main aria-labelledby="main-title" class="stack main-box">
     <div class="row heading-box">
-        <a href="/" class="box-pink shadowed rounded back-btn" aria-labelledby="return">
+        <a href="/{{locale}}" class="box-pink shadowed rounded back-btn" aria-labelledby="return">
             <svg width="25" height="24">
-                <title id="return">return to the main menu</title>
+                <title id="return">{{ "return_home" | i18n }}</title>
                 <use href="/assets/images/sprites.svg#back"/>
             </svg>
         </a>
-        <h1 class="dilated-effect sky-text-bg" id="main-title">how to play</h1>
+        <h1 class="dilated-effect sky-text-bg" id="main-title">{{ "how_to_play" | i18n }}</h1>
     </div>
     <div class="column contain rules-wrapper" style="view-transition-name: play;">
-        {%for rule in site.rules %}
+        {%for rule in rules %}
         <article aria-labelledby="rule-{{rule.number}}" class="box contain rule-grid">
             <h2 id="rule-{{rule.number}}">{{rule.title}}</h2>
             <span>{{rule.number}}</span>

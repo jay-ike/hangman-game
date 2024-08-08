@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{locale}}">
 
 <head>
     <meta charset="utf-8">
@@ -7,6 +7,7 @@
     <meta name="author" content="Ndimah Tchougoua">
     <meta name="description" content="an implementation of the hangman game with the web standards">
     <meta name="color-scheme" content="only dark">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>{{title}}</title>
     <!-- Preloads -->
     <link rel="preload" href="/assets/mouse-memoirs.regular.woff2" as="font" crossorigin="anonymous">
@@ -32,7 +33,6 @@
 
 <body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
     {{content}}
-    {% if pageRole != "play" %}<script src="/sw-registration.js" defer></script>{% endif %}
 </body>
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
     <defs>
