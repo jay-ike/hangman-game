@@ -1,7 +1,19 @@
 module.exports = Object.freeze({
+    available_categories: {
+        en: "available categories",
+        fr: "catégories disponibles"
+    },
+    lang_switch: {
+        en: "change the language",
+        fr: "changer de langue"
+    },
     how_to_play: {
         en: "how to play",
         fr: "comment jouer"
+    },
+    pick_category: {
+        en: "pick a category",
+        fr: "choisissez une catégorie"
     },
     play_now: {
         en: "play {{name}} now",
@@ -9,6 +21,6 @@ module.exports = Object.freeze({
     },
     return_home: {
         en: "return to main menu",
-        fr: "return au menu principal"
-    },
+        fr: "retourner au menu principal"
+    }
 });

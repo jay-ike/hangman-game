@@ -20,14 +20,14 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ike-hangman-game.vercel.app/{{path}}">
-    <meta property="og:site_name" content="hangman game {{path}}">
+    <meta property="og:site_name" content="{%if site_name%}{{site_name}}{%else%}{{site_image.name}}{%endif%}">
     <meta property="og:locale" content="en_US">
-    <meta property="og:title" content="{%if site_name%}{{site_name}}{%else%}{{site.image.name}}{%endif%}">
-    <meta property="og:description" content="{%if og_description%}{{og_description}}{%else%}{{site.image.description}}{%endif%}">
-    <meta property="og:image" content="{%if og_image%}{{og_image}}{%else%}{{site.image.src}}{%endif%}">
-    <meta property="og:image:width" content="{%if og_imageW%}{{og_imageW}}{%else%}{{site.image.width}}{%endif%}">
-    <meta property="og:image:height" content="{%if og_imageH%}{{og_imageH}}{%else%}{{site.image.height}}{%endif%}">
-    <meta property="og:image:alt" content="{%if og_imageAlt%}{{og_imageAlt}}{%else%}{{site.image.alt}}{%endif%}">
+    <meta property="og:title" content="{%if site_title%}{{site_title}}{%else%}{{site_image.title}}{%endif%}">
+    <meta property="og:description" content="{%if og_description%}{{og_description}}{%else%}{{site_image.description}}{%endif%}">
+    <meta property="og:image" content="{%if og_image%}{{og_image}}{%else%}{{site_image.src}}{%endif%}">
+    <meta property="og:image:width" content="{%if og_imageW%}{{og_imageW}}{%else%}{{site_image.width}}{%endif%}">
+    <meta property="og:image:height" content="{%if og_imageH%}{{og_imageH}}{%else%}{{site_image.height}}{%endif%}">
+    <meta property="og:image:alt" content="{%if og_imageAlt%}{{og_imageAlt}}{%else%}{{site_image.alt}}{%endif%}">
     <script src="/assets/scripts/pwacompat.min.js"></script>
 </head>
 

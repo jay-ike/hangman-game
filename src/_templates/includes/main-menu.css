@@ -40,11 +40,22 @@
     }
 }
 
-.btn-help {
+.btn-help, .box-quit {
     --i-padding: min(10vi, 3em);
     --min-padding: 0.75em var(--i-padding);
     border-radius: calc(var(--i-padding) / 2);
 }
+.box-quit {
+    --color-fill: var(--system-color-dark-navy);
+    --color-text: var(--system-color-white);
+    --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273),
+    inset 0 1px 0 6px oklch(60.26% 0.215 264);
+
+    &:is(:focus-visible, :hover) {
+        --color-fill: oklch(43% 0.18 265);
+    }
+}
+
 
 .btn-play {
     --min-padding: min(10vi, 3em);

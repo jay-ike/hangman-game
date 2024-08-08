@@ -1,8 +1,9 @@
 ---
 layout: "layouts/base.html"
 title: "Explore the available categories of word"
-path: "category"
-site_name: "Select hidden item's category"
+path: "en/category"
+site_name: "Hangman game, categories"
+site_title: "Select hidden item's category"
 og_description: "Choose the category you are most comfortable with, guess the item and enjoy the game."
 og_image: "https://ike-hangman-game.vercel.app/assets/images/category-pick-screenshot.webp"
 og_imageW: 1024
@@ -14,19 +15,19 @@ og_imageAlt: "A screenshot of the category selection where you can choose betwee
 <style>{%cssmin "includes/rules.css"%}</style>
 <main aria-labelledby="main-title" class="stack main-box">
     <div class="row heading-box">
-        <a class="box-pink shadowed rounded back-btn" href="/" style="view-transition-name: play-button;">
+        <a class="box-pink shadowed rounded back-btn" href="/{{locale}}" style="view-transition-name: play-button;">
             <svg width="25" height="24">
-                <title id="return">return to the main menu</title>
+                <title id="return">{{ "return_home" | i18n }}</title>
                 <use href="/assets/images/sprites.svg#back" />
             </svg>
         </a>
-        <h1 class="dilated-effect sky-text-bg" id="main-title">pick a category</h1>
+        <h1 class="dilated-effect sky-text-bg" id="main-title">{{ "pick_category" | i18n }}</h1>
     </div>
     <nav aria-labelledby="categories-list">
-        <h2 aria-hidden="true" class="visually-hidden" id="categories-list">available categories</h2>
+        <h2 aria-hidden="true" class="visually-hidden" id="categories-list">{{ "available_categories" | i18n }}</h2>
         <ul class="responsive-grid categories">
             {%for category in site.categories%}
-            <li class="contain"><a href="/play#{{category}}" class="center box-blue shadowed">{{category}}</a></li>
+            <li class="contain"><a href="/{{locale}}/play#{{category}}" class="center box-blue shadowed">{{category}}</a></li>
             {%endfor%}
         </ul>
     </nav>
