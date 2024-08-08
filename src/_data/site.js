@@ -2,6 +2,7 @@
 const {categories} = require("../../assets/data.json");
 module.exports = Object.freeze({
     categories: Object.keys(categories),
+    gameName: {name: "hangman"},
     image: {
         alt: "a screenshot of the hagman game home page showing how to play",
         description: "Try to guess the hidden item untill you run out of " +
