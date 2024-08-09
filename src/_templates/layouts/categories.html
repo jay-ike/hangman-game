@@ -26,7 +26,7 @@ og_imageAlt: "A screenshot of the category selection where you can choose betwee
     <nav aria-labelledby="categories-list">
         <h2 aria-hidden="true" class="visually-hidden" id="categories-list">{{ "available_categories" | i18n }}</h2>
         <ul class="responsive-grid categories">
-            {%for category in site.categories%}
+            {%for category in categories%}
             <li class="contain"><a href="/{{locale}}/play#{{category}}" class="center box-blue shadowed">{{category}}</a></li>
             {%endfor%}
         </ul>

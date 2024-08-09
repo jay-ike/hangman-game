@@ -1,17 +1,27 @@
 ---
 layout: "layouts/base.html"
-title: "The hangman game Main menu"
+title: "Language selection"
 bodyClass: "center"
+locale: "en"
 ---
 
 <style>{%cssmin "includes/main-menu.css"%}</style>
-<main aria-labelledby="main-title" class="box segragator shadowed menu">
-    <h1 id="main-title" class="sky-text-bg dilated-shadow-effect grid"><span>the</span> <span class="h-content">Hangman</span> <span>game</span></h1>
-    <a aria-labelledby="play-btn" class="box-pink shadowed rounded btn-play" href="/categories" style="view-transition-name: play-button;">
-        <svg width="54" height="51">
-            <title id="play-btn">Play now</title>
-            <use href="/assets/images/sprites.svg#play-button">
-        </svg>
-    </a>
-    <a class="box-blue shadowed btn-help" href="/rules" style="view-transition-name: play;">how to play</a>
+<main aria-labelledby="main-title" class="box shadowed menu-wrapper">
+    <h1 id="main-title" class="sky-text-bg brand grid" translate="no"><span>the</span> <span class="h-content">Hangman</span> <span>game</span></h1>
+    <ul class="lang-wrapper menu">
+        <li class="box">
+            <svg aria-labelledby="en-flag" width="90" height="80">
+                <title id="en-flag">England's flag</title>
+                <use href="/assets/images/sprites.svg#england-flag">
+            </svg>
+            <a class="box-blue shadowed" href="/en">continue in english</a>
+        </li>
+        <li class="box" lang="fr">
+            <svg aria-labelledby="fr-flag" width="90" height="80">
+                <title id="fr-flag">drapeau de la France</title>
+                <use href="/assets/images/sprites.svg#france-flag">
+            </svg>
+            <a class="box-blue shadowed" href="/fr">continuer en français</a>
+        </li>
+    </ul>
 </main>

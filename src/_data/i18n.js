@@ -13,7 +13,7 @@ module.exports = Object.freeze({
     },
     pick_category: {
         en: "pick a category",
-        fr: "choisissez une catégorie"
+        fr: "choisir une catégorie"
     },
     play_now: {
         en: "play {{name}} now",

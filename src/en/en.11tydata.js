@@ -1,6 +1,8 @@
-{
-    "locale": "en",
-    "rules": [
+const {categoryList} = require("../../assets/data.json");
+module.exports = Object.freeze({
+    categories: categoryList.en,
+    locale: "en",
+    rules: [
         {
             "description": "First, choose a word category, like animals or movies. The computer then randomly selects a secret word from that topic and shows you blanks for each letter of the word.",
             "number": "01",
@@ -17,7 +19,7 @@
             "title": "win or lose"
         }
     ],
-    "site_image": {
+    site_image: {
         "alt": "a screenshot of the hangman game home page showing how to play",
         "description": "Try to guess the hidden item until you run out of hearts. Don't be scared I know you can do it",
         "height": 728,
@@ -26,4 +28,4 @@
         "title": "The hangman game. will you guess it right ?",
         "width": 1024
     }
-}
+});

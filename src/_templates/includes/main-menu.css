@@ -1,46 +1,90 @@
 .menu {
     --direction: column;
-    --min-padding: min(5vmin, 1.5em);
+    --i-alignment: space-evenly;
 
-    border-radius: min(2.5em, 72px);
-    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265 / 83%));
     container: menu / inline-size;
+}
+
+.menu-wrapper {
+    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265 / 83%));
     min-inline-size: min(90vi, 592px);
+    border-radius: min(2.5em, 72px);
+    padding: 5em min(5vmin, 1.5em) min(5vmin, 1.5em);
+    position: relative;
+    display: flex;
 
-    &>h1 {
-        --g-template: ". area1 ."
-            "area2 area2 area2"
-            ". . area3" / 1em minmax(3ch, 1fr) 1fr;
-        --g-gap: 0;
-
-        margin-block-start: -1.3em;
-        text-align: center;
-        margin-block-start: max(-6vb, -2em);
-
-        &>span:nth-of-type(2) {
-            font-size: 1.5em;
-            margin-block-start: -.45em;
-
-            &::first-letter {
-                text-transform: uppercase;
-                font-size: 1.2em;
-            }
-        }
-
-        &>span:not(:nth-of-type(2)) {
-            text-transform: uppercase;
-            font-size: .7em;
-            text-align: start;
-            background: linear-gradient(var(--system-color-white), var(--system-color-white)) text;
-        }
-
-        & > span:last-of-type {
-            margin-block-start: -0.4em;
-        }
+    & > .menu {
+        flex-grow: 2;
     }
 }
 
-.btn-help, .box-quit {
+.brand:where(.grid) {
+    --g-template: ". area1 ."
+    "area2 area2 area2"
+    ". . area3" / 1em minmax(3ch, 1fr) 1fr;
+    --g-gap: 0;
+
+    text-align: center;
+    position: absolute;
+    inset: -3.5rem 1em auto;
+    margin-inline: auto;
+    inline-size: max-content;
+    filter: url(#dilated-shadow);
+
+    &>span:nth-of-type(2) {
+        font-size: 1.5em;
+        margin-block-start: -.45em;
+        letter-spacing: 1px;
+
+        &::first-letter {
+            text-transform: uppercase;
+            font-size: 1.2em;
+        }
+    }
+
+    &>span:not(:nth-of-type(2)) {
+        text-transform: uppercase;
+        font-size: .7em;
+        text-align: start;
+        background: linear-gradient(var(--system-color-white), var(--system-color-white)) text;
+    }
+
+    & > span:last-of-type {
+        margin-block-start: -0.4em;
+    }
+}
+
+:is(.lang-wrapper, .lang-wrapper > li) {
+    display: flex;
+    gap: 1.5em;
+}
+.lang-wrapper {
+    flex-flow: row wrap;
+    place-content: center;
+
+    & > * {
+        --radius: .5rem;
+        flex-flow: column nowrap;
+        place-items: center;
+        background: linear-gradient(in oklch 135deg, var(--system-color-dark-navy), var(--system-color-white));
+    }
+
+    a {
+        --min-padding: .75em;
+        --radius:var(--min-padding);
+    }
+}
+
+@container (inline-size >= 30rem) {
+    .lang-wrapper {
+        flex-flow: row nowrap;
+         & > * {
+             flex: 2 1 auto;
+         }
+    }
+}
+
+:is(.btn-help, .box-quit) {
     --i-padding: min(10vi, 3em);
     --min-padding: 0.75em var(--i-padding);
     border-radius: calc(var(--i-padding) / 2);
@@ -63,4 +107,10 @@
         inset 0 -8px 0 10px oklch(57% 0.27 304);
 
     min-inline-size: min(30vi, 5em);
+}
+.wrap {
+    display: flex;
+    flex-flow: row wrap;
+    place-content: center;
+    gap: var(--spacing, 1.5em);
 }

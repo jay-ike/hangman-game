@@ -1,4 +1,8 @@
 {
+    "categoryList": {
+        "en": ["Countries", "Capital Cities", "Animals", "Anatomy", "Music Instruments", "Movies", "TV Shows"],
+        "fr": ["Pays", "Animaux", "Économie", "Anatomie", "Capitale de Pays", "Instrument Musical", "Mécanique Automobile", "Célébrités"]
+    },
     "categories": {
         "Movies": [
             {"name": "The Godfather", "selected": false},

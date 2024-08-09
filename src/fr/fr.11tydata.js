@@ -1,6 +1,8 @@
-{
-    "locale": "fr",
-    "rules": [
+const {categoryList} = require("../../assets/data.json");
+module.exports = Object.freeze({
+    categories: categoryList.fr,
+    locale: "fr",
+    rules: [
         {
             "description": "Tout d'abord, choisissez une catégorie de mots, comme les animaux ou les films. L'ordinateur sélectionne ensuite au hasard un mot secret dans cette catégorie et vous montre des cases vides pour chaque lettre du mot.",
             "number": "01",
@@ -17,7 +19,7 @@
             "title": "gagner ou perdre"
         }
     ],
-    "site_image": {
+    site_image: {
         "alt": "une capture d'écran de la page d'accueil du jeu du pendu montrant comment jouer",
         "description": "Essayez de deviner ce qui est caché jusqu'à ce que vous n'ayez plus de cœurs. N'ayez pas peur, je sais que vous pouvez y arriver.",
         "height": 728,
@@ -26,4 +28,4 @@
         "title": "Le jeu du pendu. Sauras-tu le deviner ?",
         "width": 1024
     }
-}
+});

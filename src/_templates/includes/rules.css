@@ -55,6 +55,7 @@ nav:where(.main-box > *) {
     & a {
         font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
         letter-spacing: .1em;
+        text-align: center;
         min-block-size: 100%;
     }
 }
@@ -84,7 +85,7 @@ nav:where(.main-box > *) {
     }
 
     .categories {
-        --m-row-h: 11.875rem;
+        --m-row-h: 8.875rem;
         --radius: 2.5rem;
     }
 }

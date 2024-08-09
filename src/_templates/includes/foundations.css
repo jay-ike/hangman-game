@@ -80,9 +80,6 @@ body {
     .dilated-effect {
         filter: url(#dilated);
     }
-    .dilated-shadow-effect {
-        filter: url(#dilated-shadow);
-    }
     .sky-text-bg {
         color: transparent;
         background: linear-gradient(in oklch to bottom, oklch(75% 0.132 248), var(--system-color-white)) text;
@@ -466,7 +463,7 @@ body {
     }
 
     @supports (font-size: 1cqi) {
-        :is(h1, h2, h3, h4, p, dt, dd, .fluid-type, footer a) {
+        :is(h1, h2, h3, h4, p, dt, dd, .fluid-type, a) {
             --font-unit: 1cqi;
         }
     }
