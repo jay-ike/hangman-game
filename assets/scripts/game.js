@@ -95,6 +95,12 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         }
         dispatch("title-changed", data);
         target.showPopover();
+        if (status === "won") {
+            new Audio("/assets/win-sound.wav").play();
+        }
+        if (status === "lost") {
+            new Audio("/assets/lose-sound.wav").play();
+        }
     }
 
     function verifyGameEnd({category, hearts, lettersFound, word}) {
@@ -164,15 +170,18 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             `[aria-keyshortcuts="${event.key} Shift+${event.key}" i]`
         );
         if (isButton(btn)) {
-            btn.click();
             if (btn.getAttribute("aria-disabled") === "true") {
                 btn.focus();
+            } else {
+                document.activeElement.blur();
             }
+            btn.click();
         }
     }
-    function listenLetterClick({target}) {
+    function listenLetterClick(event) {
         let indexes;
         let letter;
+        const {target} = event;
         if (
             isButton(target) &&
             target.classList.contains("letter") &&

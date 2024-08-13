@@ -5,7 +5,7 @@ importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
-    version: 3
+    version: 4
 };
 const cachableUrls = {
     pages: {
@@ -30,6 +30,8 @@ const cachableUrls = {
         "/assets/images/favicon.ico",
         "assets/images/hangman-icon.png",
         "assets/data.json",
+        "assets/lose-sound.wav",
+        "assets/win-sound.wav",
         "assets/scripts/pwacompat.min.js"
     ]
 };

@@ -20,7 +20,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ike-hangman-game.vercel.app/{{path}}">
-    <meta property="og:site_name" content="{%if site_name%}{{site_name}}{%else%}{{site_image.name}}{%endif%}">
+    <meta phangman game {{path}}roperty="og:site_name" content="{%if site_name%}{{site_name}}{%else%}{{site_image.name}}{%endif%}">
     <meta property="og:locale" content="en_US">
     <meta property="og:title" content="{%if site_title%}{{site_title}}{%else%}{{site_image.title}}{%endif%}">
     <meta property="og:description" content="{%if og_description%}{{og_description}}{%else%}{{site_image.description}}{%endif%}">
@@ -33,6 +33,7 @@
 
 <body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
     {{content}}
+    {% if pageRole != "play" %}<script src="/sw-registration.js" defer></script>{% endif %}
 </body>
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
     <defs>
