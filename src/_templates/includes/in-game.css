@@ -173,9 +173,10 @@ button[aria-disabled="true"] {
     color: var(--system-color-white);
     position: absolute;
     inset-block-end: calc(100% + 1em);
-    inset-inline-start: calc(-50% - 1em);
+    inset-inline: auto;
+    margin-inline: auto;
     padding: 0.5rem;
-    min-inline-size: 8em;
+    min-inline-size: 6em;
     max-block-size: 100vb;
     clip-path: polygon(0 100%, 0 0, 100% 0, 100% 100%,
             min(100%, 50% + 1em) 100%, 50% calc(100% + 1em), max(0%, 50% - 1em) 100%);
@@ -185,6 +186,16 @@ button[aria-disabled="true"] {
 .box-placeholder {
     --min-padding: 1rem;
     min-inline-size: var(--holder-width, 30vi);
+}
+
+:is(
+.paused:not([data-status="paused"] > *),
+.won:not([data-status="won"] > *),
+.lost:not([data-status="lost"] > *),
+.action-replay:not([data-action="replay"] > *),
+.action-continue:not([data-action="continue"] > *)
+) {
+    display: none;
 }
 
 @media screen and (prefers-reduced-motion: no-preference) {
