@@ -66,7 +66,7 @@
         --radius: .5rem;
         flex-flow: column nowrap;
         place-items: center;
-        background: linear-gradient(in oklch 135deg, var(--system-color-dark-navy), var(--system-color-white));
+        background: linear-gradient(in oklch 135deg, var(--system-color-light-blue), var(--system-color-white));
     }
 
     a {

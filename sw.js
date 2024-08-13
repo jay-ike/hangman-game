@@ -5,27 +5,31 @@ importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
-    version: 2
+    version: 3
 };
 const cachableUrls = {
     pages: {
         "/": "/index.html",
         "/404": "/404.html",
-        "/categories": "/categories/index.html",
-        "/play": "/play/index.html",
-        "/rules": "/rules/index.html"
+        "/en": "/en/index.html",
+        "/en/categories": "/en/categories/index.html",
+        "/en/play": "/en/play/index.html",
+        "/en/rules": "/en/rules/index.html",
+        "/fr": "/fr/index.html",
+        "/fr/categories": "/fr/categories/index.html",
+        "/fr/play": "/fr/play/index.html",
+        "/fr/rules": "/fr/rules/index.html"
     },
     static: [
         "/assets/mouse-memoirs.regular.woff2",
         "/assets/images/sprites.svg",
         "/assets/scripts/utils.js",
         "/assets/scripts/game.js",
-        "/assets/scripts/id-min.js",
         "/sw-registration.js",
         "/assets/scripts/idb-min.js",
-        "/assets/images/icon.svg",
         "/assets/images/favicon.ico",
         "assets/images/hangman-icon.png",
+        "assets/data.json",
         "assets/scripts/pwacompat.min.js"
     ]
 };
@@ -170,7 +174,11 @@ async function questionStorage({
         let tx;
         let res;
         let actions = [];
-        let questions = await db.getAllFromIndex(category, "status");
+        let questions;
+        if (!db.objectStoreNames.contains(category)) {
+            return;
+        }
+        questions = await db.getAllFromIndex(category, "status");
         questions = questions.filter((el) => el.status === "not-selected");
         res = questions[getRandomIndex(questions.length)];
         if (res === undefined) {
@@ -195,15 +203,8 @@ async function questionStorage({
     return result;
 }
 async function fetchQuestions({url}) {
-    const cache = await caches.open(config.cacheName);
     let result = [];
-    let datas = await cache.match(url);
-
-    if (!datas) {
-        datas = await fetchData({timeout: 2000, url});
-    } else {
-        datas = await consume(datas);
-    }
+    let datas = await fetchData({url});
 
     if (datas.success) {
         result = Object.entries(datas.categories).reduce(
@@ -289,7 +290,6 @@ async function handleFetch(event) {
     const url = new URL(request.url);
     let path = url.pathname.replace(/\/$/, "");
     let response;
-
     if (path.length === 0) {
         path = "/";
     }
@@ -300,20 +300,36 @@ async function handleFetch(event) {
     if (response) {
         return response;
     } else {
-        if (
-            request.method === "GET" &&
-            (/text\/html/i).test(request.headers.get("accept"))
-        ) {
-            return cache.match("/404.html");
-        }
         response = await fetch(request);
         if (response.ok) {
             event.waitUntil(
                 cache.put(request.url, response.clone())
             );
+        } else {
+            return handle404({cache, event, response});
         }
         return response;
     }
+}
+async function handle404({cache, event, response}) {
+    let res;
+    if (
+        req.method === "GET" &&
+        (/text\/html/i).test(req.headers.get("accept"))
+    ) {
+        res = await cache.match("/404.html");
+        if (res) {
+            return res;
+        }
+        res = await fetch("/404.html");
+        if (res.ok) {
+            event.waitUntil(cache.put("/404.html", res));
+        }
+        return res;
+    } else {
+        return response;
+    }
+
 }
 async function getWord(category) {
     let title = String(category ?? "");

@@ -37,16 +37,17 @@ progress {
     --r-space: min(2vi, 1rem);
     --wrap: wrap;
     --min-padding: min(10vi, .5em);
+    --spacing: min(3cqb, 1.5rem);
 
     color: var(--system-color-white);
 }
 
 .heart {
     font-weight: bold;
-    font-size: 1.4em;
+    font-size: 1.15em;
     color: var(--system-color-dark-blue);
     aspect-ratio: 1.08;
-    inline-size: min(15vi, 2.5rem);
+    inline-size: min(10vi, 2.5rem);
     clip-path: url(#heart);
     background: var(--pinky-gradient);
 }
@@ -189,9 +190,9 @@ button[aria-disabled="true"] {
 }
 
 :is(
-.paused:not([data-status="paused"] > *),
-.won:not([data-status="won"] > *),
-.lost:not([data-status="lost"] > *),
+.paused:not([data-status="paused"] *),
+.won:not([data-status="won"] *),
+.lost:not([data-status="lost"] *),
 .action-replay:not([data-action="replay"] > *),
 .action-continue:not([data-action="continue"] > *)
 ) {

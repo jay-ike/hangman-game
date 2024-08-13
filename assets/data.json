@@ -301,9 +301,8 @@
             {"name": "Bahrein", "selected": false},
             {"name": "Eswatini", "selected": false},
             {"name": "Maldives", "selected": false}
-        ]
-    },
-    "Cités Capitales": [
+        ],
+"Cités Capitales": [
             {"name": "Ulan Bator", "selected": false},
             {"name": "Podgorica", "selected": false},
             {"name": "Lilongwe", "selected": false},
@@ -556,4 +555,5 @@
             {"name": "Surplus du Producteur", "selected": false},
             {"name": "Effet de Valorisation", "selected": false}
     ]
+    }
 }

@@ -34,31 +34,28 @@ window.addEventListener("offline", function () {
     notifyWorker({statusUpdate: {isOnline: false}});
 });
 function getGameData(url) {
-    let category = new URL(url).hash.replace(/(?:%20|#)/gi, " ").trim();
+    const route = new URL(url);
+    const lang = decodeURI(route.pathname).split("/")[1];
+    let category = decodeURI(route.hash).replace("#", "");
     category = (
         category.length < 1
-        ? null
+        ? utils.getFallBack(lang).title
         : category
     );
-    const fallback = {title: category ?? "Actor", word: "omari hardwick"};
     return new Promise(function (res) {
         const chan = new MessageChannel();
-        if (workerPort) {
-            workerPort.postMessage(
-                {randomWordRequest: {category}},
-                [chan.port2]
-            );
-            chan.port1.onmessage = function ({data}) {
-                const {randomWordResponse} = data;
-                if (randomWordResponse.title && randomWordResponse.word) {
-                    res(data.randomWordResponse);
-                } else {
-                    res(fallback);
-                }
-            };
-        } else {
-            res(fallback);
-        }
+        workerPort.postMessage(
+            {randomWordRequest: {category}},
+            [chan.port2]
+        );
+        chan.port1.onmessage = function ({data}) {
+            const {randomWordResponse} = data;
+            if (randomWordResponse.title && randomWordResponse.word) {
+                res(data.randomWordResponse);
+            } else {
+                res(utils.getFallBack(lang));
+            }
+        };
     });
 }
 function focusHandler(popover) {
@@ -83,29 +80,31 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             "the dispatcher should implement the emitterOf function !!!"
         );
     }
-    function showDialog(title, status) {
+    function showDialog(status) {
         const {dispatch, target} = components.dialogEmitter;
-        let text;
-        if (status) {
-            target.dataset.status = status;
-            text = "play again!";
-        } else {
-            delete target.dataset.status;
-            text = "continue";
+        const allowedStatus = ["won", "lost", "paused"];
+        let data = {};
+        if (!allowedStatus.includes(status)) {
+            return;
         }
-        dispatch("title-changed", {title});
-        dispatch("continuation-changed", {text});
+        target.dataset.status = status;
+        if (status === "paused") {
+            data.action = "continue";
+        } else {
+            data.action = "replay";
+        }
+        dispatch("title-changed", data);
         target.showPopover();
     }
 
     function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         if (hearts < 1) {
-            setTimeout(() => showDialog("you lose", "lost"), 2000);
+            setTimeout(() => showDialog("lost"), 2000);
         }
         if (wordLetters === lettersFound) {
             notifyWorker({wordFound: {category, word}});
-            setTimeout(() => showDialog("you win", "won"), 2000);
+            setTimeout(() => showDialog("won"), 2000);
         }
     }
     async function initialize() {
@@ -146,7 +145,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             isButton(target) &&
             target.classList.contains("continue-btn")
         ) {
-            if (status) {
+            if (typeof status === "string" && status !== "paused") {
                 wakeUpWorker();
             }
             parent.hidePopover();

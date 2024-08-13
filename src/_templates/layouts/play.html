@@ -2,7 +2,8 @@
 layout: "layouts/base.html"
 pageRole: "play"
 path: "en/play"
-site_name: "Play the hangman game"
+site_name: "Hangman game-play"
+site_title: "Play the hangman game"
 og_description: "Try to guess the hidden world and see how it reveals, otherwise you will loose one heart for each wrong guess"
 og_image: "https://ike-hangman-game.vercel.app/assets/images/in-game-screenshot.webp"
 og_imageW: 1024
@@ -12,7 +13,7 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
 {%assign placeholder = ".....|......" | split: '|'%}
 <style>{%cssmin "includes/in-game.css"%}</style>
 <div aria-labelledby="dialog-title" id="menu-dialog" class="menu shadowed column box" data-emit="dialog-updated" role="dialog" popover="manual">
-    <h2 class="capitalized dilated-effect sky-text-bg" data-listen="title-changed" data-attributes="data-status:{status}" id="dialog-title" data-status="paused">
+    <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">
         <span class="paused">{{ "paused" | i18n }}</span><span class="won">{{ "won" | i18n }}</span><span class="lost">{{ "lost" | i18n }}</span>
     </h2>
     <button class="box-blue shadowed continue-btn" data-listen="title-changed" data-attributes="data-action:{action}" data-action="continue">
@@ -63,6 +64,4 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
         {%endfor%}
     </section>
 </main>
-{%comment%}
 <script type="module" src="/assets/scripts/game.js" defer></script>
-{%endcomment%}

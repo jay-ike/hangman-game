@@ -212,9 +212,17 @@ function trapFocus(element) {
         }
     });
 }
+function getFallBack(lang) {
+    const fallback = {
+        en: {title: "Countries", word: "Azerbaijan"},
+        fr: {title: "Pays", word: "Bangladesh"}
+    };
+    return fallback[lang];
+}
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
+    getFallBack,
     getFocusableChildren,
     getIndexes,
     getWords,
