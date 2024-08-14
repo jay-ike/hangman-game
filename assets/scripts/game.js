@@ -100,6 +100,9 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         }
         if (status === "lost") {
             new Audio("/assets/lose-sound.wav").play();
+            if (typeof navigator.vibrate === "function") {
+                navigator.vibrate([100, 30, 200]);
+            }
         }
     }
 
