@@ -1,14 +1,18 @@
 /*jslint node*/
 const i18n = require("eleventy-plugin-i18n");
 const {transform} = require("lightningcss");
-const {readFile} = require("node:fs");
+const {jsmin} = require("jsmin");
+const {readFile, readdir, writeFile} = require("node:fs");
 const {promisify} = require("node:util");
 const path = require("node:path");
-const translations = require("./src/_data/i18n");
-const fileReader = promisify(readFile);
+const fs = {};
+
+fs.readFile = promisify(readFile);
+fs.readDir = promisify(readdir);
+fs.WriteFile = promisify(writeFile);
 
 async function parseCss({dir}, src) {
-    const blob = await fileReader(path.normalize(
+    const blob = await fs.readFile(path.normalize(
         `${dir.input}/${dir.includes}/${src}`
     ));
     const {code} = transform({
@@ -18,6 +22,26 @@ async function parseCss({dir}, src) {
     });
     return code.toString();
 }
+function isMinifiable(file) {
+    let notMinified = !file.name.match(/min.js$/);
+    return file.isFile() && path.extname(file.name) === ".js" && notMinified;
+}
+async function minifyJs(file) {
+    const path = `${file.path}/${file.name}`;
+    let blob = await fs.readFile(path);
+    blob = jsmin(blob.toString(), 3);
+    await fs.WriteFile(path, blob)
+}
+async function minifyScripts(dir) {
+    const jsDirs = [`${dir.output}/assets/scripts`, `${dir.output}`];
+    let files = await Promise.all(jsDirs.map(
+        (path) => fs.readDir(path, {withFileTypes: true})
+    ));
+    files = files.reduce(function (acc, list) {
+        return acc.concat(list.filter(isMinifiable));
+    }, []);
+    await Promise.all(files.map(minifyJs));
+}
 module.exports = function (config) {
     config.addPassthroughCopy("assets");
     config.addPassthroughCopy("sw.js");
@@ -26,11 +50,15 @@ module.exports = function (config) {
         return parseCss(config, src);
     });
     config.addPlugin(i18n, {
-        translations,
-        fallbackLocales: {
-            "fr": "en"
+        translations: require("./src/_data/i18n"),
+        fallbackLocales: {"fr": "en"}
+    });
+    config.on("eleventy.after", async function ({dir, runMode}) {
+        if (runMode === "build") {
+            await minifyScripts(dir);
         }
     });
+
     return {
         dir: {
             includes: "_templates",
