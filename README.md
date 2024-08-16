@@ -35,7 +35,7 @@ Users should be able to:
 
 ### Screenshot
 
-![A screenshot of the mobile view of the project](./mobile-view.png) &nbsp; ![A screenshot of the desktop view of the project](./desktop view of the project)
+![A screenshot of the mobile view of the project](./mobile-view.png) &nbsp; ![A screenshot of the desktop view of the project](./desktop-view.png)
 
 
 ### Links
