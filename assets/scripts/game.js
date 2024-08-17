@@ -5,13 +5,6 @@ const {DOMException, HTMLButtonElement, URL, document, navigator} = window;
 const isButton = (target) => HTMLButtonElement.prototype.isPrototypeOf(target);
 let engine;
 let workerPort;
-if (navigator.serviceWorker) {
-    navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-        updateViaCache: "imports"
-    });
-    navigator.serviceWorker.onmessage = handleMessage;
-}
 function notifyWorker(data) {
     if (typeof workerPort.postMessage === "function") {
         workerPort.postMessage(data);
@@ -94,7 +87,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             data.action = "replay";
         }
         dispatch("title-changed", data);
-        target.showPopover();
+        target.showModal();
         if (status === "won") {
             new Audio("/assets/win-sound.wav").play();
         }
@@ -116,8 +109,13 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             setTimeout(() => showDialog("won"), 2000);
         }
     }
-    async function initialize() {
-        const data = await getGameData(document.URL);
+    async function initialize(gameData) {
+        let data;
+        if (gameData) {
+            data = gameData;
+        } else {
+            data = await getGameData(document.URL);
+        }
         components.lettersFound = 0;
         components.word = data.word;
         components.category = data.title;
@@ -145,9 +143,9 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
 
     function listenRestartClick(parent, target) {
         let status = parent?.dataset?.status;
-        if (typeof parent.hidePopover !== "function") {
+        if (typeof parent.close !== "function") {
             throw new DOMException(
-                "The parent should implement the Popover API !!!"
+                "The parent should be a dialog !!!"
             );
         }
         if (
@@ -155,9 +153,9 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             target.classList.contains("continue-btn")
         ) {
             if (typeof status === "string" && status !== "paused") {
-                wakeUpWorker();
+                wakeupWorker();
             }
-            parent.hidePopover();
+            parent.close();
         }
     }
     function listenKeyboard(event) {
@@ -242,7 +240,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     });
     return self;
 }
-function wakeUpWorker() {
+function wakeupWorker() {
     let channel;
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {
         channel = new MessageChannel();
@@ -257,7 +255,9 @@ function wakeUpWorker() {
 window.addEventListener("DOMContentLoaded", function () {
     engine = new Engine(document.body, new utils.EventDispatcher());
     if (!navigator.serviceWorker) {
-        engine.init();
+        engine.init(utils.getFallBack(
+            new URL(document.URL).pathname.split("/")[1]
+        ));
     }
-    wakeUpWorker();
+    wakeupWorker();
 });

@@ -104,7 +104,7 @@ body {
                 inset 0 4px 0 8px var(--system-color-deep-blue));
     }
 
-    :where(.visually-hidden, .md-show) {
+    :where(.visually-hidden) {
         max-inline-size: 1px;
         max-block-size: 1px;
         overflow: clip;
@@ -134,14 +134,21 @@ body {
 
         }
 
-        &:popover-open,
-        &:popover-open::backdrop {
+        &:popover-open {
             opacity: 1;
             transform: none;
+            &:popover-open::backdrop {
+                opacity: 0.5;
+            }
+        }
 
-            @starting-style {
+        @starting-style {
+            &:popover-open,
+            &:popover-open::backdrop {
                 opacity: 0;
-                transform: scale(2);
+            }
+            &:popover-open {
+                transform: var(--initial-transform, scale(2));
             }
         }
     }
@@ -154,45 +161,13 @@ body {
         color: hsl(0deg 0% 75%);
     }
 
-    [role="dialog"] {
-        --outline-clr: var(--system-color-black);
-
-        inset-block-start: var(--y, auto);
-        inset-inline-end: var(--right-x, auto);
-    }
-
     .no-gap {
         --r-space: 0;
         --c-space: 0;
     }
-
-    @media screen and (width >=480px) {
-        header {
-            --x: var(--b-md-x, right calc(-1 * (var(--s) / 4)));
-            --y: var(--b-md-y, top 2rem);
-            --bg: var(--b-md-bg, linear-gradient(15deg, #0000, var(--c1)) var(--x) var(--y) / var(--s) no-repeat);
-            --mask: var(--rounding) var(--x) var(--y) / var(--s) no-repeat;
-        }
-
-        .md-show {
-            max-inline-size: max-content;
-            position: static;
-            clip-path: none;
-            visibility: visible;
-        }
-    }
-
-    @media screen and (width >=768px) {
-
-        header,
-        .contact-grid {
-            text-align: start;
-        }
-    }
 }
 
 @layer layout {
-
     :where(.stack, .xl-stack)>*+*,
     .mt-xl {
         margin-block-start: var(--s-space, 1.5em);
@@ -334,12 +309,8 @@ body {
         list-style-type: "";
     }
 
-    :is(button, fieldset) {
+    :is(button, fieldset, dialog) {
         border: none;
-    }
-
-    :is(dialog, [popover])::backdrop {
-        background-color: hsl(0deg 0% 0% / 80%);
     }
 
     a {
@@ -475,7 +446,7 @@ body {
 
 @media screen and (prefers-reduced-motion: no-preference) {
 
-    :is(a, img, .transition-all, [popover]),
+    :is(a, img, .transition-all),
     [data-icon-position="start"]::before,
     [data-icon-position="end"]::after {
         transition: all .35s var(--easing, ease-out);

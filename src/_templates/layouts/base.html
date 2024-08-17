@@ -11,7 +11,7 @@
     <title>{{title}}</title>
     <!-- Preloads -->
     <link rel="preload" href="/assets/mouse-memoirs.regular.woff2" as="font" crossorigin="anonymous">
-    <link rel="icon" sizes="32x32" href="/assets/favicon.ico">
+    <link rel="icon" sizes="32x32" href="/assets/images/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/images/icon.svg">
     <link rel="manifest" href="/assets/app.webmanifest">
     <style>{%cssmin "includes/foundations.css" %}</style>
@@ -32,7 +32,6 @@
 
 <body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
     {{content}}
-    {% if pageRole != "play" %}<script src="/sw-registration.js" defer></script>{% endif %}
 </body>
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
     <defs>
@@ -53,6 +52,13 @@
             <feFlood flood-color="#243041" flood-opacity="1" result="flood1" />
             <feComposite in="flood1" in2="morphology" operator="in" result="composite" />
             <feComposite in="SourceGraphic" in2="composite" operator="over" result="composite1" />
+        </filter>
+        <filter id="a" >
+            <feFlood flood-color="#000" flood-opacity="1" result="flood"/>
+            <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation=".2"/>
+            <feOffset dx=".2" dy="-5.5" in="blur" result="offset"/>
+            <feComposite in="flood" in2="offset" operator="out" result="comp1"/>
+            <feComposite in="comp1" in2="SourceGraphic" operator="atop" result="comp2"/>
         </filter>
         <clipPath id="heart" clipPathUnits="objectBoundingBox">
             <path clip-rule="evenodd" fill-rule="evenodd" d="m.49.99-.07-.07c-.25-.25-.42-.41-.42-.61 0-.16.12-.29.27-.29.09 0 .17.04.22.11.05-.07.14-.11.22-.11.15 0 .27.13.27.29 0 .2-.17.37-.42.61l-.07.07z"/>
