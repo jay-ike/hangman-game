@@ -5,7 +5,7 @@ importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
-    version: 4
+    version: 5
 };
 const cachableUrls = {
     pages: {
@@ -316,8 +316,8 @@ async function handleFetch(event) {
 async function handle404({cache, event, response}) {
     let res;
     if (
-        req.method === "GET" &&
-        (/text\/html/i).test(req.headers.get("accept"))
+        event.request.method === "GET" &&
+        (/text\/html/i).test(event.req.headers.get("accept"))
     ) {
         res = await cache.match("/404.html");
         if (res) {

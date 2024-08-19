@@ -5,8 +5,17 @@ const {DOMException, HTMLButtonElement, URL, document, navigator} = window;
 const isButton = (target) => HTMLButtonElement.prototype.isPrototypeOf(target);
 let engine;
 let workerPort;
+
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+        updateViaCache: "imports"
+    });
+    navigator.serviceWorker.addEventListener("message", handleMessage);
+    navigator.serviceWorker.startMessages();
+}
 function notifyWorker(data) {
-    if (typeof workerPort.postMessage === "function") {
+    if (typeof workerPort?.postMessage === "function") {
         workerPort.postMessage(data);
     }
 }
@@ -51,35 +60,41 @@ function getGameData(url) {
         };
     });
 }
-function focusHandler(popover) {
-    let active;
-    popover.addEventListener("beforetoggle", function (event) {
-        if (event.oldState === "closed") {
-            active = document.activeElement;
-            utils.getFocusableChildren(popover)[0].focus();
-        }
-        if (event.oldState === "open") {
-            active.focus();
+
+function dialogHandler(emitter) {
+    const {dispatch, target} = emitter;
+    const allowedStatus = ["won", "lost", "paused"];
+    let activeElement;
+
+    if (typeof dispatch !== "function") {
+        throw new Error("emitter Should implement the dispatch function !!!");
+    }
+    if (typeof target.close !== "function") {
+        throw new DOMException("The emitter target should be a Dialog !!!");
+    }
+    target.addEventListener("close", function () {
+        if (activeElement) {
+            activeElement.focus();
         }
     });
-}
+    target.addEventListener("click", function (event) {
+        const btn = event.target
+        let {status} = target.dataset;
 
-function Engine(rootElement, dispatcher, maxHearts = 8) {
-    const self = Object.create(this);
-    const components = Object.create(null);
-
-    if (typeof dispatcher?.emitterOf !== "function") {
-        throw new DOMException(
-            "the dispatcher should implement the emitterOf function !!!"
-        );
-    }
+        if (isButton(btn) && btn.classList.contains("continue-btn")) {
+            if (allowedStatus.includes(status) && status !== "paused") {
+                wakeupWorker();
+            }
+            target.close();
+        }
+    });
     function showDialog(status) {
-        const {dispatch, target} = components.dialogEmitter;
-        const allowedStatus = ["won", "lost", "paused"];
         let data = {};
         if (!allowedStatus.includes(status)) {
             return;
         }
+        activeElement = document.activeElement;
+        utils.getFocusableChildren(target)[0].focus();
         target.dataset.status = status;
         if (status === "paused") {
             data.action = "continue";
@@ -98,7 +113,23 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             }
         }
     }
+    return Object.freeze(showDialog);
+}
 
+function Engine(rootElement, dispatcher, maxHearts = 8) {
+    const self = Object.create(this);
+    const components = Object.create(null);
+    let showDialog;
+
+    if (typeof dispatcher?.emitterOf !== "function") {
+        throw new DOMException(
+            "the dispatcher should implement the emitterOf function !!!"
+        );
+    }
+    components.letterEmitter = dispatcher.emitterOf("letter-found");
+    components.headerEmitter = dispatcher.emitterOf("heading-change");
+    components.dialogEmitter = dispatcher.emitterOf("dialog-updated");
+    showDialog = dialogHandler(components.dialogEmitter);
     function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         if (hearts < 1) {
@@ -141,23 +172,6 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         );
     }
 
-    function listenRestartClick(parent, target) {
-        let status = parent?.dataset?.status;
-        if (typeof parent.close !== "function") {
-            throw new DOMException(
-                "The parent should be a dialog !!!"
-            );
-        }
-        if (
-            isButton(target) &&
-            target.classList.contains("continue-btn")
-        ) {
-            if (typeof status === "string" && status !== "paused") {
-                wakeupWorker();
-            }
-            parent.close();
-        }
-    }
     function listenKeyboard(event) {
         let isLetter = (
             event.key.match(/[a-z]/i) ||
@@ -218,20 +232,10 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     }
 
     self.init = initialize;
-    components.letterEmitter = dispatcher.emitterOf("letter-found");
-    components.headerEmitter = dispatcher.emitterOf("heading-change");
-    components.dialogEmitter = dispatcher.emitterOf("dialog-updated");
     rootElement.addEventListener("click", listenLetterClick);
     rootElement.addEventListener("keydown", listenKeyboard);
-    components.dialogEmitter.target.addEventListener(
-        "click",
-        (event) => listenRestartClick(
-            components.dialogEmitter.target,
-            event.target
-        )
-    );
     utils.trapFocus(components.dialogEmitter.target);
-    focusHandler(components.dialogEmitter.target);
+
     document.querySelector(
         "button[aria-controls='menu-dialog']"
     ).addEventListener("click", function (event) {

@@ -8,6 +8,10 @@ module.exports = Object.freeze({
         en: "available letters",
         fr: "lettres disponibles"
     },
+    cancel: {
+        en: "cancel",
+        fr: "annuler"
+    },
     category_loading: {
         en: "loading category",
         fr: "chargement de la catégorie"
@@ -34,7 +38,7 @@ module.exports = Object.freeze({
     },
     letter_selected: {
         en: "you have already selected the letter {{letter}}",
-        fr: "la lettre {{letter}} a déjà été selectionnée"
+        fr: "la lettre {{letter}} est déjà selectionnée"
     },
     lost: {
         en: "you lose",

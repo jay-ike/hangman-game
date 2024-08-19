@@ -3,6 +3,15 @@ title: "Unavailable page"
 layout: "layouts/base.html"
 bodyClass: "center"
 permalink: 404.html
+locale: "en"
+path: "404"
+site_name: "Hangman game, 404"
+site_title: "Failed to find your page"
+og_description: "We are currently unable to provide the page you are looking for"
+og_image: "https://ike-hangman-game.vercel.app/assets/images/404-og-image.png"
+og_imageW: 1200
+og_imageH: 630
+og_imageAlt: "A screenshot of the 404 page showing the text 'oh no! page not found' with all occurences of the letter o hidden"
 ---
 {%assign words = "oh no! page not found" | split: ' '%}
 <style>{%cssmin "includes/404.css"%}</style>

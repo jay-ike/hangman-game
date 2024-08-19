@@ -6,7 +6,7 @@ article {
     --p-space: collapse pretty;
     --continer-name: article;
 
-    color: oklch(45% 0.14 287);
+    color: oklch(45% 0.14 287deg);
 }
 
 span:where(.rule-grid > *) {
@@ -69,12 +69,15 @@ nav:where(.main-box > *) {
 
 @container rules (inline-size > 43rem) {
     article {
-        --g-template: "area2 " "area1" " area3";
-        place-items: center;
+        --g-template: "area2 " "area1" " area3" 1fr;
+        --f-size: 1.5rem;
+
+        place-items: start center;
+
     }
 }
 
-@media screen and (min-width: 26.7em) {
+@media screen and (width >= 26.7em) {
     span {
         font-size: 3rem;
         align-self: center;
@@ -90,7 +93,7 @@ nav:where(.main-box > *) {
     }
 }
 
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
     .rules-wrapper {
         --col-dir: row;
 

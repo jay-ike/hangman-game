@@ -1,9 +1,11 @@
-body:has(dialog[open]) {
-    overflow: clip;
-}
 body {
     overflow: auto;
 }
+
+body:has(dialog[open]) {
+    overflow: clip;
+}
+
 progress {
     appearance: none;
     border-radius: 5rem;
@@ -54,7 +56,7 @@ progress {
     color: var(--system-color-dark-blue);
     aspect-ratio: 1.08;
     inline-size: min(10vi, 2.5rem);
-    clip-path: url(#heart);
+    clip-path: url("#heart");
     background: var(--pinky-gradient);
 }
 
@@ -85,7 +87,8 @@ progress {
 }
 
 .box-letter-load {
-    --color-fill: oklch(56% 0.24 264deg / .25);
+    --color-fill: oklch(56% 0.24 264deg / 25%);
+
     background: linear-gradient(in oklch -25deg, transparent 30%, oklch(91% 0.05 283deg / 25%) 70%, transparent) 0% 0% / 400% 400%;
 }
 
@@ -113,6 +116,7 @@ progress {
 @container (inline-size <=13.5rem) {
     .heading-box {
         place-content: center;
+
         --r-space: 8cqi;
     }
 }
@@ -127,6 +131,29 @@ button[aria-disabled="true"] {
     --color-fill: oklch(98.5% 0% 0deg / 25%);
 }
 
+.menu {
+    --alignment: center;
+    --min-padding: .75rem min(15vi, 4rem);
+    --radius: calc(min(15vi, 4rem) / 2);
+    --c-space: 2rem;
+
+    position: relative;
+    padding: min(5vmin, 1.5em) min(5vmin, 1.5em) min(11lvb, 87px);
+    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg), oklch(29% 0.166 264deg / 83%));
+
+    &::before {
+        content: "";
+        display: block;
+        block-size: 2rem;
+    }
+
+    &> :is(a, button) {
+        line-height: 1.3;
+        text-align: center;
+        font-size: clamp(1.2rem, 1.113rem + 0.58 * var(--font-unit, 1vw), 1.5625rem);
+    }
+}
+
 .menu-wrapper {
     inset: 1px;
     margin: auto;
@@ -135,16 +162,19 @@ button[aria-disabled="true"] {
     transform: scale(0.1);
     inline-size: min(85vi, 500px);
     background: transparent;
+    overflow: clip auto;
+    overflow: clip / auto; /* for safari */
 
     &>h2 {
         letter-spacing: 0.01em;
         font-size: clamp(3.7994rem, 2.5557rem + 1.6245 * var(--font-unit, 1vw), 4.8147rem);
         text-transform: capitalize;
-        text-wrap: nowrap;
+        white-space: nowrap;
         margin-block-end: -2rem;
         z-index: 2;
         align-self: center;
     }
+
     & > .menu {
         flex-grow: 2;
     }
@@ -163,35 +193,9 @@ button[aria-disabled="true"] {
     }
 }
 
-.menu {
-    --alignment: center;
-    --min-padding: .75rem min(15vi, 4rem);
-    --radius: calc(min(15vi, 4rem) / 2);
-    --c-space: 2rem;
-
-    position: relative;
-    padding: min(5vmin, 1.5em) min(5vmin, 1.5em) min(11lvb, 87px);
-    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270), oklch(29% 0.166 264 / 83%));
-    overflow: clip auto;
-    overflow: clip / auto; /* for safari */
-
-    &::before {
-        content: "";
-        display: block;
-        block-size: 2rem;
-    }
-
-    &> :is(a, button) {
-        line-height: 1.3;
-        text-align: center;
-        font-size: clamp(1.2rem, 1.113rem + 0.58 * var(--font-unit, 1vw), 1.5625rem);
-    }
-
-}
-
 .pink-shadow {
-    --shadow: inset 0 -2px 0 3px oklch(26% .143 273),
-        inset 0 2px 0 4px oklch(57% .269 304);
+    --shadow: inset 0 -2px 0 3px oklch(26% .143 273deg),
+        inset 0 2px 0 4px oklch(57% .269 304deg);
 }
 
 [aria-disabled="true"]:focus~.tooltip {
@@ -214,6 +218,7 @@ button[aria-disabled="true"] {
 
 .box-placeholder {
     --min-padding: 1rem;
+
     min-inline-size: var(--holder-width, 30vi);
 }
 

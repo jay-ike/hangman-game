@@ -4,7 +4,7 @@
   "description": "An implementation of the hangman game in the web",
   "scripts": {
     "build": "eleventy",
-    "dev": "eleventy --serve --port 8089",
+    "dev": "eleventy --serve --port 8088",
     "lint": "stylelint **/*.css",
     "lint:fix": "stylelint **/*.css --fix"
   },

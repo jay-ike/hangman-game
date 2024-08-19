@@ -6,16 +6,19 @@
 }
 
 .menu-wrapper {
-    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265 / 83%));
+    background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265deg / 83%));
     min-inline-size: min(90vi, 592px);
     border-radius: min(2.5em, 72px);
     padding: 5em min(5vmin, 1.5em) min(5vmin, 1.5em);
-    position: relative;
     display: flex;
 
     & > .menu {
         flex-grow: 2;
     }
+}
+
+.relative {
+    position: relative;
 }
 
 .brand:where(.grid) {
@@ -29,7 +32,7 @@
     inset: -3.5rem 1em auto;
     margin-inline: auto;
     inline-size: max-content;
-    filter: url(#dilated-shadow);
+    filter: url("#dilated-shadow");
 
     &>span:nth-of-type(2) {
         font-size: 1.5em;
@@ -58,12 +61,14 @@
     display: flex;
     gap: 1.5em;
 }
+
 .lang-wrapper {
     flex-flow: row wrap;
     place-content: center;
 
     & > * {
         --radius: .5rem;
+
         flex-flow: column nowrap;
         place-items: center;
         background: linear-gradient(in oklch 135deg, var(--system-color-light-blue), var(--system-color-white));
@@ -78,6 +83,7 @@
 @container (inline-size >= 30rem) {
     .lang-wrapper {
         flex-flow: row nowrap;
+
          & > * {
              flex: 2 1 auto;
          }
@@ -87,16 +93,18 @@
 :is(.btn-help, .box-quit) {
     --i-padding: min(10vi, 3em);
     --min-padding: 0.75em var(--i-padding);
+
     border-radius: calc(var(--i-padding) / 2);
 }
+
 .box-quit {
     --color-fill: var(--system-color-dark-navy);
     --color-text: var(--system-color-white);
-    --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273),
-    inset 0 1px 0 6px oklch(60.26% 0.215 264);
+    --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273deg),
+    inset 0 1px 0 6px oklch(60.26% 0.215 264deg);
 
     &:is(:focus-visible, :hover) {
-        --color-fill: oklch(43% 0.18 265);
+        --color-fill: oklch(43% 0.18 265deg);
     }
 }
 
@@ -104,13 +112,19 @@
 .btn-play {
     --min-padding: min(10vi, 3em);
     --shadow: inset 0 -4px 0 5px var(--system-color-black),
-        inset 0 -8px 0 10px oklch(57% 0.27 304);
+        inset 0 -8px 0 10px oklch(57% 0.27 304deg);
 
     min-inline-size: min(30vi, 5em);
 }
+
 .wrap {
     display: flex;
     flex-flow: row wrap;
     place-content: center;
     gap: var(--spacing, 1.5em);
+}
+.extend-click::before {
+    content: "";
+    inset: 0;
+    position: absolute;
 }

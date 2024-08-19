@@ -22,10 +22,10 @@ module.exports = Object.freeze({
     site_image: {
         "alt": "a screenshot of the hangman game home page showing how to play",
         "description": "Try to guess the hidden item until you run out of hearts. Don't be scared I know you can do it",
-        "height": 728,
+        "height": 630,
         "name": "Hangman game",
-        "src": "https://ike-hangman-game.vercel.app/assets/images/main-view-screenshot.webp",
+        "src": "https://ike-hangman-game.vercel.app/assets/images/menu-en-og-image.png",
         "title": "The hangman game. will you guess it right ?",
-        "width": 1024
+        "width": 1200
     }
 });

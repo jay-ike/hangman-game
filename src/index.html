@@ -3,25 +3,32 @@ layout: "layouts/base.html"
 title: "Language selection"
 bodyClass: "center"
 locale: "en"
+site_name: "Hangman game, Language Selection"
+site_title: "Choose your prefered language"
+og_description: "Choose the language you are most comfortable with and enjoy the hangman game"
+og_image: "https://ike-hangman-game.vercel.app/assets/images/home-og-image.png"
+og_imageW: 1200
+og_imageH: 630
+og_imageAlt: "A screenshot of the language selection where you can choose French and English"
 ---
 
 <style>{%cssmin "includes/main-menu.css"%}</style>
-<main aria-labelledby="main-title" class="box shadowed menu-wrapper">
+<main aria-labelledby="main-title" class="box shadowed menu-wrapper relative">
     <h1 id="main-title" class="sky-text-bg brand grid" translate="no"><span>the</span> <span class="h-content">Hangman</span> <span>game</span></h1>
     <ul class="lang-wrapper menu">
-        <li class="box">
+        <li class="box relative">
             <svg aria-labelledby="en-flag" width="90" height="80">
                 <title id="en-flag">England's flag</title>
                 <use href="/assets/images/sprites.svg#england-flag">
             </svg>
-            <a class="box-blue shadowed" href="/en">continue in english</a>
+            <a class="box-blue shadowed extend-click" href="/en">continue in english</a>
         </li>
-        <li class="box" lang="fr">
+        <li class="box relative" lang="fr">
             <svg aria-labelledby="fr-flag" width="90" height="80">
                 <title id="fr-flag">drapeau de la France</title>
                 <use href="/assets/images/sprites.svg#france-flag">
             </svg>
-            <a class="box-blue shadowed" href="/fr">continuer en français</a>
+            <a class="box-blue shadowed extend-click" href="/fr">continuer en français</a>
         </li>
     </ul>
 </main>

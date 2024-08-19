@@ -21,6 +21,13 @@
     "screenshots": [
         {
             "form_factor": "wide",
+            "label": "get into the main menu",
+            "src": "/assets/images/main-view-screenshot.webp",
+            "sizes": "1024x728",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
             "label": "select the category of the item to guess",
             "src": "/assets/images/category-pick-screenshot.webp",
             "sizes": "1024x728",
