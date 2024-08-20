@@ -123,6 +123,7 @@
     place-content: center;
     gap: var(--spacing, 1.5em);
 }
+
 .extend-click::before {
     content: "";
     inset: 0;

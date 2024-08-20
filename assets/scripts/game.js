@@ -79,11 +79,10 @@ function dialogHandler(emitter) {
     });
     target.addEventListener("click", function (event) {
         const btn = event.target
-        let {status} = target.dataset;
+        let {status} = btn.dataset;
 
         if (isButton(btn) && btn.classList.contains("continue-btn")) {
             if (allowedStatus.includes(status) && status !== "paused") {
-                wakeupWorker();
             }
             target.close();
         }

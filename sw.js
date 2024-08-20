@@ -5,7 +5,7 @@ importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
-    version: 5
+    version: 6
 };
 const cachableUrls = {
     pages: {
@@ -23,8 +23,6 @@ const cachableUrls = {
     static: [
         "/assets/mouse-memoirs.regular.woff2",
         "/assets/images/sprites.svg",
-        "/assets/scripts/utils.js",
-        "/assets/scripts/game.js",
         "/sw-registration.js",
         "/assets/scripts/idb-min.js",
         "/assets/images/favicon.ico",
@@ -33,6 +31,10 @@ const cachableUrls = {
         "assets/lose-sound.wav",
         "assets/win-sound.wav",
         "assets/scripts/pwacompat.min.js"
+    ],
+    updatable: [
+        "/assets/scripts/utils.js",
+        "/assets/scripts/game.js"
     ]
 };
 config.cacheName = `hangman-${config.version}`;
@@ -265,7 +267,9 @@ async function cacheStaticFiles(reload = false) {
         method: "GET"
     };
     return Promise.all(
-        cachableUrls.static.concat(Object.values(cachableUrls.pages)).map(
+        cachableUrls.static.concat(Object.values(cachableUrls.pages)).concat(
+            cachableUrls.updatable
+        ).map(
             async function (url) {
                 let res;
                 try {
@@ -291,33 +295,53 @@ async function handleFetch(event) {
     const cache = await caches.open(config.cacheName);
     const url = new URL(request.url);
     let path = url.pathname.replace(/\/$/, "");
-    let response;
     if (path.length === 0) {
         path = "/";
     }
     if (url.origin !== location.origin) {
         return fetch(request);
     }
-    response = await cache.match(cachableUrls.pages[path] ?? path);
-    if (response) {
-        return response;
+    if (config.isOnline) {
+        return handleOnlineFetch({cache, event, path});
     } else {
-        response = await fetch(request);
-        if (response.ok) {
-            event.waitUntil(
-                cache.put(request.url, response.clone())
-            );
-        } else {
-            return handle404({cache, event, response});
-        }
-        return response;
+        return handleOfflineFetch({cache, event, path});
     }
+}
+async function handleOfflineFetch({cache, event, path}) {
+    let response = await cache.match(cachableUrls.pages[path] ?? path);
+    return response ?? handle404({cache, event});
+}
+async function handleOnlineFetch({cache, event, path}) {
+    let response;
+
+    if (cachableUrls.static.includes(path)) {
+        response = await cache.match(path);
+    }
+    if (!response) {
+        try { //for safari because if a fetch request fail everything breaks
+            response = await fetch(cachableUrls.pages[path] ?? event.request);
+        } catch (e) {
+            response = null;
+        }
+        if (response?.ok) {
+            event.waitUntil(cache.put(
+                cachableUrls.pages[path] ?? path,
+                response.clone()
+            ));
+        } else {
+            response = (
+                cache.match(cachableUrls.pages[path] ?? path) ??
+                handle404({cache, event, response})
+            );
+        }
+    }
+    return response;
 }
 async function handle404({cache, event, response}) {
     let res;
     if (
         event.request.method === "GET" &&
-        (/text\/html/i).test(event.req.headers.get("accept"))
+        (/text\/html/i).test(event.request.headers.get("accept"))
     ) {
         res = await cache.match("/404.html");
         if (res) {
@@ -329,7 +353,7 @@ async function handle404({cache, event, response}) {
         }
         return res;
     } else {
-        return response;
+        return response ?? fetch(event.request);
     }
 
 }
@@ -339,7 +363,7 @@ async function getWord(category) {
 
     if (title.trim().length === 0) {
         title = config.db.getStores();
-        title = title[Math.floor(Math.random() * title.length)];
+        title = title[getRandomIndex(title.length)];
     }
     word = await config.db.getRandomQuestion(title);
     return {title, word};
