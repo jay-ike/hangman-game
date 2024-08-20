@@ -1,18 +1,44 @@
 /*jslint browser, this*/
 import utils from "./utils.js";
 
-const {DOMException, HTMLButtonElement, URL, document, navigator} = window;
-const isButton = (target) => HTMLButtonElement.prototype.isPrototypeOf(target);
+const {Audio, DOMException, URL, document, navigator} = window;
+const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
 let engine;
 let workerPort;
+let refreshed;
 
-if (navigator.serviceWorker) {
-    navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-        updateViaCache: "imports"
-    });
+async function registerWorker() {
+    const registration = await navigator.serviceWorker.register(
+        "/sw.js",
+        {scope: "/"}
+    );
     navigator.serviceWorker.addEventListener("message", handleMessage);
     navigator.serviceWorker.startMessages();
+    navigator.serviceWorker.addEventListener("controllerchange", function() {
+        if (refreshed) {
+            console.log("controller changed");
+            window.location.reload();
+            refreshed = true;
+        }
+    });
+    if (registration.waiting) {
+        console.log("worker is waiting");
+        registration.waiting.postMessage("SKIP_WAITING");
+    }
+    registration.addEventListener("updatefound", function () {
+        if (registration.installing) {
+            registration.installing.addEventListener("statechange", function () {
+                if (registration.waiting) {
+                    if (navigator.serviceWorker.controller) {
+                        console.log("hey worker stop waiting");
+                        registration.waiting.postMessage("SKIP_WAITING");
+                    } else {
+                        console.log("first installation");
+                    }
+                }
+            });
+        }
+    });
 }
 function notifyWorker(data) {
     if (typeof workerPort?.postMessage === "function") {
@@ -78,11 +104,12 @@ function dialogHandler(emitter) {
         }
     });
     target.addEventListener("click", function (event) {
-        const btn = event.target
-        let {status} = btn.dataset;
+        const btn = event.target;
+        let {status} = target.dataset;
 
         if (isButton(btn) && btn.classList.contains("continue-btn")) {
             if (allowedStatus.includes(status) && status !== "paused") {
+                wakeupWorker();
             }
             target.close();
         }
@@ -255,7 +282,10 @@ function wakeupWorker() {
         workerPort.onmessage = handleMessage;
     }
 }
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", async function () {
+    if (navigator.serviceWorker) {
+        await registerWorker();
+    }
     engine = new Engine(document.body, new utils.EventDispatcher());
     if (!navigator.serviceWorker) {
         engine.init(utils.getFallBack(

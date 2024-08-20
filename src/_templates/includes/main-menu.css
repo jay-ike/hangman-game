@@ -63,6 +63,7 @@
 }
 
 .lang-wrapper {
+    --outline-clr: var(--system-color-dark-navy);
     flex-flow: row wrap;
     place-content: center;
 

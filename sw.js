@@ -238,9 +238,9 @@ async function fetchQuestions({url}) {
 }
 
 
-function onInstall(event) {
+async function onInstall(event) {
     event.waitUntil(handleInstallation());
-    self.skipWaiting();
+    await self.skipWaiting();
 }
 function onActivate(event) {
     event.waitUntil(handleActivation());
@@ -250,13 +250,22 @@ function onFetch(event) {
 }
 async function handleActivation() {
     await clearOldCache();
-    await sendMessage({statusUpdateRequest: true});
     await self.clients.claim();
+    await sendMessage({statusUpdateRequest: true});
 }
 
 async function handleInstallation() {
     await setupQuestions();
     await cacheStaticFiles();
+}
+function tryFetch(param) { //implemented to avoid safari break on failed request
+    let res;
+    try {
+        res = fetch(param);
+    } catch (ignore) {
+        res = Promise.resolve(null);
+    }
+    return res;
 }
 
 async function cacheStaticFiles(reload = false) {
@@ -301,38 +310,21 @@ async function handleFetch(event) {
     if (url.origin !== location.origin) {
         return fetch(request);
     }
-    if (config.isOnline) {
-        return handleOnlineFetch({cache, event, path});
-    } else {
-        return handleOfflineFetch({cache, event, path});
-    }
+    return safeFetch({cache, event, path});
 }
-async function handleOfflineFetch({cache, event, path}) {
-    let response = await cache.match(cachableUrls.pages[path] ?? path);
-    return response ?? handle404({cache, event});
-}
-async function handleOnlineFetch({cache, event, path}) {
+async function safeFetch({cache, event, path}) {
     let response;
 
-    if (cachableUrls.static.includes(path)) {
-        response = await cache.match(path);
-    }
+    response = await cache.match(cachableUrls.pages[path] ?? path);
     if (!response) {
-        try { //for safari because if a fetch request fail everything breaks
-            response = await fetch(cachableUrls.pages[path] ?? event.request);
-        } catch (e) {
-            response = null;
-        }
+        response = await tryFetch(cachableUrls.pages[path] ?? event.request);
         if (response?.ok) {
             event.waitUntil(cache.put(
                 cachableUrls.pages[path] ?? path,
                 response.clone()
             ));
         } else {
-            response = (
-                cache.match(cachableUrls.pages[path] ?? path) ??
-                handle404({cache, event, response})
-            );
+            return handle404({cache, event, response});
         }
     }
     return response;
@@ -347,14 +339,13 @@ async function handle404({cache, event, response}) {
         if (res) {
             return res;
         }
-        res = await fetch("/404.html");
-        if (res.ok) {
-            event.waitUntil(cache.put("/404.html", res));
+        res = await tryFetch("/404.html");
+        if (res?.ok) {
+            event.waitUntil(cache.put("/404.html", res.clone()));
         }
         return res;
-    } else {
-        return response ?? fetch(event.request);
     }
+    return response ?? fetch(event.request);
 
 }
 async function getWord(category) {
@@ -403,6 +394,10 @@ async function sendMessage(msg) {
 }
 async function handleMessage({data, ports}) {
     let response;
+
+    if (data === "SKIP_WAITING") {
+        self.skipWaiting();
+    }
     if (data.statusUpdate) {
         config.isOnline = data.statusUpdate.isOnline;
     }

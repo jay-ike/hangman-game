@@ -224,7 +224,6 @@ body {
     }
 
     .box-blue {
-        --outline-clr: var(--system-color-dark-navy);
         --color-fill: var(--system-color-deep-blue);
         --color-text: var(--system-color-white);
         --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273deg),
