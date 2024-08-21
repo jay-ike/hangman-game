@@ -20,6 +20,10 @@ module.exports = Object.freeze({
         en: "continue",
         fr: "Reprendre"
     },
+    gift_unavailable: {
+        en: "you cannot use this feature you need at least 2 hearts",
+        fr: "vous devez avoir au moins 2 points de vie pour dévoiler une lettre"
+    },
     hearts_left: {
         en: "hearts remaining",
         fr: "vies restantes"
@@ -35,6 +39,10 @@ module.exports = Object.freeze({
     lang_switch: {
         en: "change the language",
         fr: "changer de langue"
+    },
+    letter_reveal: {
+        en: "reveal a letter in the hidden item",
+        fr: "dévoiller une lettre de l'élement masqué"
     },
     letter_selected: {
         en: "you have already selected the letter {{letter}}",

@@ -396,7 +396,8 @@ async function handleMessage({data, ports}) {
     let response;
 
     if (data === "SKIP_WAITING") {
-        self.skipWaiting();
+        await self.skipWaiting();
+        return;
     }
     if (data.statusUpdate) {
         config.isOnline = data.statusUpdate.isOnline;

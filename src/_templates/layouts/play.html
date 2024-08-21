@@ -25,8 +25,8 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
         <a class="box-pink shadowed pink-shadow" href="/{{locale}}" style="view-transition-name: play-button;">{{ "quit_game" | i18n }}</a>
     </div>
 </dialog>
-<main aria-labelledby="main-title" class="contain column main-box">
-    <div class="segragator heading-box" data-emit="heading-change">
+<main aria-labelledby="main-title" class="contain column main-box" data-emit="heading-change">
+    <div class="segragator heading-box">
         <div class="i-flex">
             <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog">
                 <svg width="24" height="24">
@@ -61,10 +61,19 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
     <section class="responsive-grid letter-wrapper keyboard" aria-labelledby="keyboard-title">
         {%for key in site.keyboard%}
         <div class="center relative">
-            <button class="letter" aria-keyshortcuts="{{key.letter | upcase}} Shift+{{key.letter | upcase}}">{{key.letter}}</button>
+            <button class="letter" aria-keyshortcuts="{{key.letter | upcase}} Shift+{{key.letter | upcase}}" data-tooltip="{{key.letter}}">{{key.letter}}</button>
             <span class="tooltip visually-hidden" id="{{key.letter}}" aria-hidden="true">{{"letter_selected" | i18n: key}}</span>
         </div>
         {%endfor%}
+        <div class="center relative gift-box">
+            <button aria-labelledby="gift-title" class="letter center box" data-tooltip="gift-tooltip" data-listen="bonus-updated" data-attributes="aria-disabled:{preventTrigger}">
+                <svg width="48" height="48" class="gift-icon">
+                    <title id="gift-title">{{"letter_reveal" | i18n}}</title>
+                    <use href="/assets/images/sprites.svg#gift">
+                </svg>
+            </button>
+            <span class="tooltip visually-hidden" id="gift-tooltip" aria-hidden="true">{{"gift_unavailable" | i18n}}</span>
+        </div>
     </section>
 </main>
 <script type="module" src="/assets/scripts/game.js" defer></script>

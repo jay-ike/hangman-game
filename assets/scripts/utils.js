@@ -36,7 +36,7 @@ function getListeners(target, fn) {
         throw new Error("you should pass a callback function !!!");
     }
     return Array.from(
-        target.querySelectorAll("[data-listen]:not([data-emit] [data-emit] *)")
+        target.querySelectorAll("[data-listen]:not(:scope[data-emit] [data-emit] *)")
     ).reduce(function (acc, element) {
         const {listen} = element.dataset;
         if (acc[listen] === undefined) {
@@ -157,6 +157,28 @@ function getIndexes(word, letter) {
     );
 
 }
+function getRandomLetter(sentence, foundLetters) {
+    const word = getWords(sentence).join("").toLowerCase();
+    let availableLetters;
+    let result;
+    if (!Array.isArray(foundLetters)) {
+        throw new Error("the foundLetters should be an array");
+    }
+    availableLetters = word.split("").reduce(function (acc, letter) {
+        if (foundLetters.includes(letter)) {
+            return acc;
+        }
+        if (acc[letter]) {
+            acc[letter] += 1;
+        } else {
+            acc[letter] = 1;
+        }
+        return acc;
+    }, Object.create(null));
+    result = Object.entries(availableLetters).sort((a, b) => a[1] - b[1])[0];
+    result[1] = getIndexes(word, result[0]);
+    return result;
+}
 function letterTemplate(index) {
     return "<span class='center letter box-blue shadowed' data-listen=" +
     "'letter" + (index + 1) + "-changed' data-attributes=" +
@@ -219,12 +241,72 @@ function getFallBack(lang) {
     };
     return fallback[lang];
 }
+function createCrypto() {
+    return Object.freeze({
+        decrypt(data) {
+            return window.atob(data).toString();
+        },
+        encrypt(data) {
+            return window.btoa(data).toString();
+        }
+    });
+}
+function jsonStorage() {
+    const cipher = createCrypto();
+    const store = window.localStorage;
+    return Object.freeze({
+        emptyStore() {
+            store.clear();
+        },
+        getValue(entry, key) {
+            let value;
+            if (typeof key !== "string" || typeof entry !== "string") {
+                throw new Error("the key and the entry should be strings.");
+            }
+            value = store.getItem(entry);
+            try {
+                value = JSON.parse(value);
+                value = cipher.decrypt(value[cipher.encrypt(key)]);
+            } catch (ignore) {
+                value = null;
+            }
+            return value;
+        },
+        onChange(entry, fn) {
+            window.addEventListener("storage", function (event) {
+                if (entry === event.key) {
+                    fn(event);
+                }
+            });
+        },
+        removeEntry(entry) {
+            store.removeItem(entry);
+        },
+        setValue(entry, key, value) {
+            let stored;
+            if (typeof key !== "string" || typeof entry !== "string") {
+                throw new Error("the key and the entry should be strings.");
+            }
+            stored = store.getItem(entry);
+            try {
+                stored = JSON.parse(stored);
+            } catch (ignore) {
+                stored = {};
+            }
+            stored[cipher.encrypt(key)] = cipher.encrypt(value);
+            store.setItem(entry, JSON.stringify(stored));
+        },
+        supported: () => typeof window.Storage === "function"
+    });
+}
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
     getFallBack,
     getFocusableChildren,
     getIndexes,
+    getRandomLetter,
     getWords,
+    jsonStorage,
     trapFocus
 });
