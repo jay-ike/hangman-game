@@ -1,4 +1,5 @@
 /*jslint node*/
+const link = "<a href='mailto:ndimah22@protonmail.com'>ndimah22@protonmail</a>";
 module.exports = Object.freeze({
     available_categories: {
         en: "available categories",
@@ -43,6 +44,14 @@ module.exports = Object.freeze({
     how_to_play: {
         en: "how to play",
         fr: "comment jouer"
+    },
+    js_error_content: {
+        en: "It seems that scripting is not enabled. If you you have disabled" +
+        " it, please consider enabling it. If not consider reporting the bug" +
+        "<br>At the address: " + link,
+        fr: "Il semblerait que Javascript ne soit pas autoritorisé.<br>Si " +
+        "vous l'avez désactivé penser à l'activer au cas contraire reportez " +
+        "l'érreur <br>À l'adresse: " + link
     },
     lang_switch: {
         en: "change the language",

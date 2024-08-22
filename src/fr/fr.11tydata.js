@@ -14,8 +14,13 @@ module.exports = Object.freeze({
             "title": "deviner les lettres"
         },
         {
-            "description": "Vous gagnez en devinant toutes les lettres du mot avant que votre barre de santé ne s'épuise. Si votre barre de santé se vide avant que vous n'ayez deviné le mot, vous perdez.",
+            "description": "Si vous avez du mal à deviner un élément, vous pouvez utiliser le bouton « cadeau » pour révéler une lettre de l'élément.<br>Notez que vous ne pouvez utiliser cette fonctionnalité que si vous avez au moins 2 points de vie.",
             "number": "03",
+            "title": "dévoiler une lettre"
+        },
+        {
+            "description": "Vous gagnez en devinant toutes les lettres du mot avant que votre barre de santé ne s'épuise. Si votre barre de santé se vide avant que vous n'ayez deviné le mot, vous perdez.",
+            "number": "04",
             "title": "gagner ou perdre"
         }
     ],

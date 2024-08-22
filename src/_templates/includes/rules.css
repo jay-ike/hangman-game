@@ -7,6 +7,7 @@ article {
     --continer-name: article;
 
     color: oklch(45% 0.14 287deg);
+    min-inline-size: 265px;
 }
 
 span:where(.rule-grid > *) {
@@ -73,7 +74,7 @@ nav:where(.main-box > *) {
         --f-size: 1.5rem;
 
         place-items: start center;
-
+        container: article / inline-size;
     }
 }
 
@@ -95,11 +96,10 @@ nav:where(.main-box > *) {
 
 @media screen and (width >= 48em) {
     .rules-wrapper {
-        --col-dir: row;
-
-        &>* {
-            flex: 2 1 auto;
-        }
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, max(265px, (25% - 1rem))), 1fr));
+        grid-auto-rows: auto;
+        gap: 1rem;
     }
 
     .main-box {

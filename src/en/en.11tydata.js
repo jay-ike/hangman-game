@@ -14,8 +14,13 @@ module.exports = Object.freeze({
             "title": "guess letters"
         },
         {
-            "description": "You win by guessing all the letters in the word before your health runs out. If the health bar empties before you guess the word, you lose.",
+            "description": "In case you find the item difficult to guess, you can use the gift button to reveal a letter of the item.<br>Notice that you can use this feature only if you have at least 2 hearts",
             "number": "03",
+            "title": "reveal letters optionally"
+        },
+        {
+            "description": "You win by guessing all the letters in the word before your health runs out. If the health bar empties before you guess the word, you lose.",
+            "number": "04",
             "title": "win or lose"
         }
     ],

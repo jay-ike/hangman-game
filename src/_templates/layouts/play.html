@@ -14,6 +14,9 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
 ---
 {%assign placeholder = ".....|......" | split: '|'%}
 <style>{%cssmin "includes/in-game.css" %}</style>
+<div class="no-script center box-red" role="region" aria-labelledby="error-content">
+    <p id="error-content">{{"js_error_content" | i18n}}</p>
+</div>
 <dialog aria-labelledby="dialog-title" id="menu-dialog" class="menu-wrapper" data-emit="dialog-updated" role="dialog" tabindex="0" autofocus>
     <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">
         <span class="paused">{{ "paused" | i18n }}</span><span class="won">{{ "won" | i18n }}</span><span

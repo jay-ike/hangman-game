@@ -386,6 +386,9 @@ window.addEventListener("beforeunload", function () {
     engine.saveHearts();
 });
 window.addEventListener("DOMContentLoaded", async function () {
+    document.querySelectorAll(".no-script").forEach(function (node) {
+        node.remove();
+    });
     if (navigator.serviceWorker) {
         await registerWorker();
     }

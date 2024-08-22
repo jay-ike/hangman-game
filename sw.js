@@ -5,7 +5,7 @@ importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
-    version: 7
+    version: 8
 };
 const cachableUrls = {
     pages: {

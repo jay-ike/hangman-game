@@ -298,6 +298,19 @@ button[aria-disabled="true"] {
     }
 }
 
+.box-red {
+    --min-padding: 1.5em 1em;
+    --color-fill: oklch(56% 0.19 18deg);
+    --color-text: var(--system-color-white);
+}
+
+.no-script {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 2;
+}
+
 @media screen and (prefers-reduced-motion: no-preference) {
     .box-letter-load {
         animation: moving-bg 1.35s .5s infinite alternate-reverse cubic-bezier(0.86, 0, 0.07, 0.5);
