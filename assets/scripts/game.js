@@ -139,6 +139,7 @@ function dialogHandler(emitter) {
 function Engine(rootElement, dispatcher, maxHearts = 8) {
     const self = Object.create(this);
     const components = Object.create(null);
+    const warningDialog = document.querySelector("dialog#warning-dialog");
     let showDialog;
 
     if (typeof dispatcher?.emitterOf !== "function") {
@@ -151,6 +152,11 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     components.headerEmitter = dispatcher.emitterOf("heading-change");
     components.dialogEmitter = dispatcher.emitterOf("dialog-updated");
     showDialog = dialogHandler(components.dialogEmitter);
+    if (window.HTMLDialogElement.prototype.isPrototypeOf(warningDialog)) {
+        components.warn = warningHandler(warningDialog);
+    } else {
+        components.warn = () => Promise.resolve(true);
+    }
     function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         const found = Object.values(lettersFound).reduce((a, v) => a + v, 0);
@@ -196,6 +202,37 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
                 Math.floor(components.hearts / maxHearts) * 100
             ) + "%"
         });
+    }
+    function warningHandler(element) {
+        const {store} = components;
+        let activeElement;
+        element.addEventListener("input", function ({target}) {
+            if (target.id !== "o-reminder") {
+                return;
+            }
+            store.setValue("_warn_", "remind", !target.checked);
+        });
+        utils.trapFocus(element);
+        return function () {
+            const remind = store.getValue("_warn_", "remind") ?? "true";
+
+            if (remind === "true") {
+                return new Promise(function (res) {
+                    activeElement = document.activeElement;
+                    element.showModal();
+                    element.addEventListener("close", function (event) {
+                        if (event.target.returnValue === "proceed") {
+                            res(true);
+                        }
+                        event.target.returnValue = "";
+                        activeElement.focus();
+                        res(false);
+                    }, {once: true});
+                });
+            }
+
+            return Promise.resolve(true);
+        };
     }
     async function initialize(gameData) {
         let data;
@@ -254,7 +291,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         }
     }
 
-    function listenLetterClick(event) {
+    async function listenLetterClick(event) {
         let indexes;
         let letter;
         const {target} = event;
@@ -269,6 +306,10 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             return;
         }
         if (tooltip === "gift-tooltip") {
+            letter = await components.warn();
+            if (!letter) {
+                return;
+            }
             [letter, indexes] = utils.getRandomLetter(
                 components.word,
                 Object.keys(components.lettersFound)

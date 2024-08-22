@@ -12,6 +12,10 @@ module.exports = Object.freeze({
         en: "cancel",
         fr: "annuler"
     },
+    cancel_popup: {
+        en: "Don't prompt me again",
+        fr: "Ne plus afficher ce message"
+    },
     category_loading: {
         en: "loading category",
         fr: "chargement de la catégorie"
@@ -19,6 +23,10 @@ module.exports = Object.freeze({
     continue: {
         en: "continue",
         fr: "Reprendre"
+    },
+    deduct_points: {
+        en: "deduct points",
+        fr: "débiter mes points"
     },
     gift_unavailable: {
         en: "you cannot use this feature you need at least 2 hearts",
@@ -42,7 +50,7 @@ module.exports = Object.freeze({
     },
     letter_reveal: {
         en: "reveal a letter in the hidden item",
-        fr: "dévoiller une lettre de l'élement masqué"
+        fr: "dévoiler une lettre de l'élement masqué"
     },
     letter_selected: {
         en: "you have already selected the letter {{letter}}",
@@ -68,6 +76,14 @@ module.exports = Object.freeze({
         en: "play {{name}} now",
         fr: "jouer à {{name}} maintenant"
     },
+    point_deduction_warning: {
+        en: "You are going to loose 2 hearts if you want a letter to be" +
+        " revealed. Is it really your intent ?<br>(Note: this action can " +
+        "not be undone)",
+        fr: "Vous allez perdre 2 points de vie si vous voullez qu'une lettre " +
+        "soit dévoilée. Est-ce vraiment votre intention ?<br>(Note: cette " +
+        "action est irréversible)"
+    },
     quit_game: {
         en: "quit game",
         fr: "quitter le jeu"
@@ -79,6 +95,10 @@ module.exports = Object.freeze({
     return_home: {
         en: "return to main menu",
         fr: "retourner au menu principal"
+    },
+    warning: {
+        en: "caution !!!",
+        fr: "Attention !!!"
     },
     won: {
         en: "you win",

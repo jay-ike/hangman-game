@@ -1,6 +1,6 @@
 /*jslint node*/
 function generateLetters() {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVXYZ";
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return alphabet.split("").map(function (letter) {
         return Object.freeze({letter});
     });

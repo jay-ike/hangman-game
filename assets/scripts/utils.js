@@ -265,7 +265,7 @@ function jsonStorage() {
             }
             value = store.getItem(entry);
             try {
-                value = JSON.parse(value);
+                value = JSON.parse(value ?? "");
                 value = cipher.decrypt(value[cipher.encrypt(key)]);
             } catch (ignore) {
                 value = null;
@@ -289,7 +289,7 @@ function jsonStorage() {
             }
             stored = store.getItem(entry);
             try {
-                stored = JSON.parse(stored);
+                stored = JSON.parse(stored ?? "");
             } catch (ignore) {
                 stored = {};
             }

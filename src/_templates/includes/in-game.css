@@ -6,6 +6,10 @@ body:has(dialog[open]) {
     overflow: clip;
 }
 
+dialog:focus-visible {
+    outline-style: ridge;
+}
+
 progress {
     appearance: none;
     border-radius: 5rem;
@@ -137,12 +141,12 @@ button[aria-disabled="true"] {
 
 .menu {
     --alignment: center;
-    --min-padding: .75rem min(15vi, 4rem);
+    --min-padding: .75rem min(15vi, 3rem);
     --radius: calc(min(15vi, 4rem) / 2);
     --c-space: 2rem;
 
     position: relative;
-    padding: min(5vmin, 1.5em) min(5vmin, 1.5em) min(11lvb, 87px);
+    padding: min(5vmin, 1.5em) min(5vmin, 1.5em) min(11lvb, 64px);
     background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg), oklch(29% 0.166 264deg / 83%));
 
     &::before {
@@ -151,7 +155,7 @@ button[aria-disabled="true"] {
         block-size: 2rem;
     }
 
-    &> :is(a, button) {
+    & :is(a, button) {
         line-height: 1.3;
         text-align: center;
         font-size: clamp(1.2rem, 1.113rem + 0.58 * var(--font-unit, 1vw), 1.5625rem);
@@ -202,6 +206,10 @@ button[aria-disabled="true"] {
         inset 0 2px 0 4px oklch(57% .269 304deg);
 }
 
+.self-start {
+    place-self: start var(--justify, start);
+}
+
 .gift-box {
     --icon-fill: var(--system-color-dark-blue);
     --tt-clr: var(--system-color-dark-blue);
@@ -233,6 +241,11 @@ button[aria-disabled="true"] {
     min-inline-size: var(--holder-width, 30vi);
 }
 
+.wrap {
+    --wrap: wrap;
+    place-content: center;
+}
+
 :is(
 .paused:not([data-status="paused"] *),
 .won:not([data-status="won"] *),
@@ -243,12 +256,54 @@ button[aria-disabled="true"] {
     display: none;
 }
 
+.check-wrapper {
+    position: relative;
+    inline-size: 2rem;
+    aspect-ratio: 1;
+    isolation: isolate;
+
+    &:focus-within {
+        outline: max(2px, .3em) solid currentColor;
+        outline-offset: max(2px, .3em);
+    }
+
+    & > * {
+        position: absolute;
+        inset: 0;
+        inline-size: 100%;
+        block-size: 100%;
+    }
+
+    & > input[type="checkbox"] {
+        opacity: 0;
+        z-index: 0;
+        margin: 0;
+
+        &:checked + svg {
+            stroke-dashoffset: 0;
+            background-color: var(--system-color-dark-navy);
+            border-color: var(--system-color-dark-navy);
+        }
+    }
+
+    & > svg {
+        border-radius: 0.25rem;
+        border: 2px solid var(--system-color-light-blue);
+        padding: 0.15rem;
+        stroke: var(--system-color-white);
+        stroke-dashoffset: 1;
+        stroke-dasharray: 1;
+        z-index: -1;
+        transition: all 0.35s cubic-bezier(0.25, 0.1, 0.3, 1);
+    }
+}
+
 @media screen and (prefers-reduced-motion: no-preference) {
     .box-letter-load {
         animation: moving-bg 1.35s .5s infinite alternate-reverse cubic-bezier(0.86, 0, 0.07, 0.5);
     }
     .gift-icon {
-        animation: grow 1s 8 both alternate-reverse cubic-bezier(.25, .3, .1, 1.5);
+        animation: grow .5s 3 backwards alternate-reverse cubic-bezier(.25, .3, .1, 1.5);
     }
 }
 @keyframes grow {
