@@ -52,7 +52,8 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
         </div>
     </form>
 </dialog>
-<main aria-labelledby="main-title" class="contain column main-box" data-emit="heading-change">
+<main aria-labelledby="main-title guess" class="contain column main-box" data-emit="heading-change">
+    <span id="guess" hidden>{{"hidden_item_category" | i18n}}</span>
     <div class="segragator heading-box">
         <div class="i-flex">
             <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog">
@@ -62,8 +63,8 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
                 </svg>
             </button>
             <h1 id="main-title" class="box-letter-load box-placeholder" data-listen="title-updated"
-                data-attributes="class:{titleClass}" data-property="{title}">
-                <span class="visually-hidden" aria-hidden="true">{{"category_loading" | i18n}}</span>
+                data-attributes="class:{titleClass}" data-property="{title}" aria-labelledby="main-title guess">
+                <span class="visually-hidden">{{"loading_failed" | i18n}}</span>
             </h1>
         </div>
         <div class="i-flex">
@@ -87,12 +88,13 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
         </div>
         {%endfor%}
     </div>
-    <div class="visually-hidden" id="keyboard-title" aria-hidden="true">{{"available_letters" | i18n}}</div>
+    <div id="keyboard-title" hidden>{{"available_letters" | i18n}}</div>
     <section class="responsive-grid letter-wrapper keyboard" aria-labelledby="keyboard-title">
+        <span id="key" hidden>{{"key" | i18n}}</span>
         {%for key in site.keyboard%}
         <div class="center relative">
             <button class="letter" aria-keyshortcuts="{{key.letter | upcase}} Shift+{{key.letter | upcase}}"
-                data-tooltip="{{key.letter}}">{{key.letter}}</button>
+                data-tooltip="{{key.letter}}" id="key_{{key.letter}}" aria-labelledby="key key_{{key.letter}}">{{key.letter}}</button>
             <span class="tooltip visually-hidden" id="{{key.letter}}" aria-hidden="true">{{"letter_selected" | i18n:
                 key}}</span>
         </div>

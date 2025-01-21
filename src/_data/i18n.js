@@ -6,8 +6,8 @@ module.exports = Object.freeze({
         fr: "catégories disponibles"
     },
     available_letters: {
-        en: "available letters",
-        fr: "lettres disponibles"
+        en: "available keys",
+        fr: "touches disponibles"
     },
     cancel: {
         en: "cancel",
@@ -16,10 +16,6 @@ module.exports = Object.freeze({
     cancel_popup: {
         en: "Don't prompt me again",
         fr: "Ne plus afficher ce message"
-    },
-    category_loading: {
-        en: "loading category",
-        fr: "chargement de la catégorie"
     },
     continue: {
         en: "continue",
@@ -41,17 +37,25 @@ module.exports = Object.freeze({
         en: "you have {hearts} hearts remaining",
         fr: "Il vous reste {hearts} vies"
     },
+    hidden_item_category: {
+        en: "item to guess",
+        fr: "élément à deviner"
+    },
     how_to_play: {
         en: "how to play",
         fr: "comment jouer"
     },
     js_error_content: {
         en: "It seems that scripting is not enabled. If you you have disabled" +
-        " it, please consider enabling it. If not consider reporting the bug" +
-        "<br>At the address: " + link,
+        " Javascript, please consider enabling it. If not consider reporting " +
+        "the bug At the address: " + link,
         fr: "Il semblerait que Javascript ne soit pas autoritorisé.<br>Si " +
-        "vous l'avez désactivé penser à l'activer au cas contraire reportez " +
-        "l'érreur <br>À l'adresse: " + link
+        "vous l'avez désactivé penser à l'activer au cas contraire " +
+        "reportez l'érreur À l'adresse: " + link
+    },
+    key: {
+        en: "key",
+        fr: "touche"
     },
     lang_switch: {
         en: "change the language",
@@ -64,6 +68,10 @@ module.exports = Object.freeze({
     letter_selected: {
         en: "you have already selected the letter {{letter}}",
         fr: "la lettre {{letter}} est déjà selectionnée"
+    },
+    loading_failed: {
+        en: "failed to load",
+        fr: "n'a pas pu être chargé"
     },
     lost: {
         en: "you lose",
@@ -90,8 +98,8 @@ module.exports = Object.freeze({
         " revealed. Is it really your intent ?<br>(Note: this action can " +
         "not be undone)",
         fr: "Vous allez perdre 2 points de vie si vous voullez qu'une lettre " +
-        "soit dévoilée. Est-ce vraiment votre intention ?<br>(Note: cette " +
-        "action est irréversible)"
+        "soit dévoilée. Est-ce vraiment votre intention ?<br>" +
+        "(Note: cette action est irréversible)"
     },
     quit_game: {
         en: "quit game",
