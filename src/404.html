@@ -1,5 +1,5 @@
 ---
-title: "Unavailable page"
+title: "Page not found - Hangman game"
 layout: "layouts/base.html"
 bodyClass: "center"
 permalink: 404.html
@@ -16,7 +16,7 @@ og_imageAlt: "A screenshot of the 404 page showing the text 'oh no! page not fou
 {%assign words = "oh no! page not found" | split: ' '%}
 <style>{%cssmin "includes/404.css"%}</style>
 <main aria-labelledby="main-title" class="box segragator shadowed menu">
-    <p class="visually-hidden" id="main-title">oh no! page not found</p>
+    <p id="main-title" hidden>oh no! page not found</p>
     <h1 aria-labelledby="main-title" class="segragator letter-wrapper">
         {%for word in words%}
         <span class="i-flex">
