@@ -19,16 +19,40 @@ og_imageAlt: "A screenshot of the language selection where you can choose French
         <li class="box relative">
             <svg aria-labelledby="en-flag" width="90" height="80">
                 <title id="en-flag">Great Britain's flag</title>
-                <use href="/assets/images/sprites.svg#england-flag">
+                <use href="#england-flag">
             </svg>
             <a class="box-blue shadowed extend-click" href="/en">continue in english</a>
         </li>
         <li class="box relative" lang="fr">
             <svg aria-labelledby="fr-flag" width="90" height="80">
                 <title id="fr-flag">drapeau du Cameroun</title>
-                <use href="/assets/images/sprites.svg#france-flag">
+                <use href="#france-flag">
             </svg>
             <a class="box-blue shadowed extend-click" href="/fr">continuer en français</a>
         </li>
     </ul>
 </main>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
+    <defs>
+        <clipPath id="flag-path" clipPathUnits="userSpaceOnUse">
+            <path d="M-1 48.4v30h60v-30z"/>
+        </clipPath>
+    </defs>
+    <symbol id="england-flag" viewBox="0 0 90 60">
+        <path fill="#012169" d="M0 0v60h90V0Z" style="stroke-width:1.73205"/>
+        <g clip-path="url(#flag-path)" transform="matrix(1.5 0 0 2 1.5 -96.8)">
+            <path stroke="#fff" stroke-width="6" d="m-1 48.4 60 30m0-30-60 30"/>
+            <path stroke="#c8102e" stroke-width="4" d="m-1 48.4 60 30m0-30-60 30"/>
+            <path stroke="#fff" stroke-width="10" d="M29 48.4v30m-30-15h60"/>
+            <path stroke="#c8102e" stroke-width="6" d="M29 48.4v30m-30-15h60"/>
+
+        </g>
+    </symbol>
+    <symbol id="france-flag" viewBox="0 0 9 6">
+        <path fill="#ce1126" d="M3 0h3v6H3Z" style="stroke-width:.57735"/>
+        <path fill="#007a5e" d="M0 0h3v6H0Z"/>
+        <path d="m4 3.6 1.3-.8H3.7l1.3.8-.5-1.4ZM6 0h3v6H6Z" style="fill:#fcd116;fill-opacity:1;stroke-width:1.00094"/>
+    </symbol>
+
+</svg>
+
