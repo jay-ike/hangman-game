@@ -2,6 +2,20 @@
 /*global self, idb*/
 importScripts("./assets/scripts/idb-min.js");
 
+
+/**
+* @typedef {Object} QuestionData
+* @property {string} name
+* @property {number} level
+* @property {"not-selected"|"selected"} status
+*/
+
+/**
+* @typedef {Object} Question
+* @property {string} store
+* @property {QuestionData[]} datas
+*/
+
 const {caches, clients, crypto} = self;
 const config = {
     isOnline: true,
@@ -54,6 +68,15 @@ function getRandomIndex(length) {
     result = array[Math.floor(Math.random() * length)];
     return result % length;
 }
+
+/**
+* Utility for fetching data while handling cache
+* @param {Object} param0
+* @param {RequestInit} param0.options - The fetching options
+* @param {number?} param0.timeout - The eventual fetch timeout
+* @param {string|Request} param0.url - The url to fetch
+* @returns {Promise<any>}
+*/
 async function fetchData({options, timeout, url}) {
     const cache = await self.caches.open(config.cacheName);
     let controller = new AbortController();
@@ -104,10 +127,7 @@ async function questionStorage({
 }) {
     let result = Object.create(null);
     let cipher = createCrypto();
-    const storeKeys = {
-        indexes: ["status"],
-        keyPath: "name"
-    };
+    const storeKeys = {indexes: ["status", "level"], keyPath: "name"};
     const db = await idb.openDB(dbName, version, {
         upgrade: function upgrade(database, oldVersion) {
             let invalidStores = [];
@@ -174,7 +194,7 @@ async function questionStorage({
         }
         return res;
     };
-    result.getRandomQuestion = async function (category) {
+    result.getRandomQuestion = async function (category, level = 1) {
         let tx;
         let res;
         let actions = [];
@@ -182,8 +202,10 @@ async function questionStorage({
         if (!db.objectStoreNames.contains(category)) {
             return;
         }
-        questions = await db.getAllFromIndex(category, "status");
-        questions = questions.filter((el) => el.status === "not-selected");
+        questions = await db.getAllFromIndex(category, "level");
+        questions = questions.filter(
+            (el) => el.level === level && el.status === "not-selected"
+        );
         res = questions[getRandomIndex(questions.length)];
         if (res === undefined) {
             tx = db.transaction(category, "readwrite");
@@ -206,29 +228,41 @@ async function questionStorage({
     };
     return result;
 }
+
+/**
+* Utility for fetching questions in the dataset
+* @param {Object} param0
+* @param {*} param0.url - The dataset URL
+* @returns {Question[]}
+*/
 async function fetchQuestions({url}) {
     let result = [];
     let datas = await fetchData({url});
-
     if (datas.success) {
         result = Object.entries(datas.categories).reduce(
             function (acc, [store, val]) {
                 let tmp = {store};
-                if (Array.isArray(val) && datas.cached === undefined) {
-                    tmp.datas = val.map(function (question) {
-                        const res = Object.assign({}, question);
-                        res.status = (
-                            res.selected
-                            ? "selected"
-                            : "not-selected"
-                        );
-                        delete res.selected;
-                        return res;
-                    });
-                    acc[acc.length] = tmp;
-                } else {
-                    tmp.datas = [];
+                if (datas.cached) {
+                    return acc;
                 }
+                tmp.datas = Object.entries(val).reduce(
+                    function (words, [k, v]) {
+                        const status = "not-selected";
+                        let level = Number.parseInt(
+                            k.replace(/level_/i, ""),
+                            10
+                        );
+                        if (!Number.isFinite(level)) {
+                            return words;
+                        }
+                        words = words.concat(v.map(function (word) {
+                            return Object.assign(word, {level, status})
+                        }));
+                        return words;
+                    },
+                    []
+                );
+                acc[acc.length] = tmp;
                 return acc;
             },
             []
@@ -236,7 +270,6 @@ async function fetchQuestions({url}) {
     }
     return result;
 }
-
 
 async function onInstall(event) {
     event.waitUntil(handleInstallation());
@@ -348,17 +381,17 @@ async function handle404({cache, event, response}) {
     return response ?? fetch(event.request);
 
 }
-async function getWord(category) {
+async function getWord(category, level = 1) {
     let title = String(category ?? "");
     let word;
-
     if (title.trim().length === 0) {
         title = config.db.getStores();
         title = title[getRandomIndex(title.length)];
     }
-    word = await config.db.getRandomQuestion(title);
+    word = await config.db.getRandomQuestion(title, level);
     return {title, word};
 }
+
 async function clearOldCache() {
     let oldCacheNames = await caches.keys();
     oldCacheNames = oldCacheNames.filter(function (cacheName) {
@@ -392,6 +425,7 @@ async function sendMessage(msg) {
         return client.postMessage(msg, [channel.port2]);
     }));
 }
+
 async function handleMessage({data, ports}) {
     let response;
 
@@ -416,6 +450,7 @@ async function handleMessage({data, ports}) {
         await config.db.markFound(data.wordFound);
     }
 }
+
 self.addEventListener("install", onInstall);
 self.addEventListener("activate", onActivate);
 self.addEventListener("fetch", onFetch);
