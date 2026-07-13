@@ -2,14 +2,34 @@
 /*global self, idb*/
 importScripts("./assets/scripts/idb-min.js");
 
-
+/**
+* A Progres Indicator
+* @typedef {Object} Progress
+* @property {string} store
+* @property {number} level
+* @property {number} totalWords
+* @property {number} uncovered
+*/
+/**
+ * An item with a name.
+ * @typedef {Object} Item
+ * @property {string} name
+ */
+/**
+ * A collection of items grouped under a dynamic sub‑key.
+ * @typedef {Record<string, Item[]>} SubCategories
+ */
+/**
+ * A data source from the API
+ * @typedef {Object} Source
+ * @property {Record<string, SubCategories>} categories
+ */
 /**
 * @typedef {Object} QuestionData
 * @property {string} name
 * @property {number} level
 * @property {"not-selected"|"selected"} status
 */
-
 /**
 * @typedef {Object} Question
 * @property {string} store
@@ -17,10 +37,7 @@ importScripts("./assets/scripts/idb-min.js");
 */
 
 const {caches, clients, crypto} = self;
-const config = {
-    isOnline: true,
-    version: 9
-};
+const config = {isOnline: true, version: 9};
 const cachableUrls = {
     pages: {
         "/": "/index.html",
@@ -104,6 +121,8 @@ async function fetchData({options, timeout, url}) {
         clearTimeout(timeoutId);
         return consume(response);
     } catch (error) {
+        console.log("error occured");
+        console.error(error);
         return Object.assign({success: false}, {message: error.message});
     }
 }
@@ -120,8 +139,45 @@ function createCrypto() {
         }
     });
 }
-async function questionStorage({
+
+/**
+* Utility for computing the status for each progress
+* @param {Progress[]} data
+* @returns {Array<Progress & {status: string}>}
+*/
+function computeStatus(data) {
+    const map = data.reduce(function (acc, progress) {
+        if (!acc[progress.level]) {
+            acc[progress.level] = progress;
+        }
+        return acc;
+    }, Object.create(null));
+    return Object.entries(map).map(function ([i, val]) {
+        let status = "unlocked";
+        if (i > 1 && map[i-1].uncovered < 3) {
+            status = "locked"
+        }
+        if (i > 1 && map[i-1].uncovered >= 3) {
+            status = "unlocked";
+        }
+        if (val.uncovered === val.totalWords && val.totalWords > 0) {
+            status = "perfect";
+        }
+        return Object.assign(val, {status});
+    });
+}
+
+/**
+* Utility for managing the game storage
+* @param {Object} param0
+* @param {string} [param0.dbName="jay-ike_hangman"]
+* @param {string[]} [param0.stores=[]]
+* @param {number} [param0.version=config.version]
+* @param {Progress[]} [param0.progress=[]]
+*/
+async function gameStorage({
     dbName = "jay-ike_hangman",
+    progress = [],
     stores = [],
     version = config.version
 }) {
@@ -160,6 +216,17 @@ async function questionStorage({
                     objectStore.createIndex(index, index, {unique: false});
                 });
             });
+            if (!objectStores.contains("progress")) {
+                store = database.createObjectStore("progress", {
+                    keyPath: ["store", "level"]
+                });
+                store.createIndex("category", "store");
+            }
+            if (!objectStores.contains("config")) {
+                store = database.createObjectStore("config", {
+                    keyPath: "version"
+                });
+            }
         }
     });
     function encryptEntry(entry) {
@@ -172,17 +239,26 @@ async function questionStorage({
         res.name = cipher.decrypt(res.name);
         return res;
     }
+    async function initProgress() {
+        let tx = db.transaction("progress", "readwrite");
+        const actions = progress.map(async function progressHandler(e) {
+            let exists = await tx.store.get([e.store, e.level]);
+            if (!exists) {
+                return tx.store.add(e);
+            }
+        });
+        await Promise.all(actions.concat([tx.done]));
+    }
     result.addMany = async function insertMany(storeName, questions) {
         const encrypted = questions.map(encryptEntry);
         let tx = db.transaction(storeName, "readwrite");
-        let actions = encrypted.map(async function insertionHandler(entry) {
+        const actions = encrypted.map(async function insertionHandler(entry) {
             let existing = await tx.store.get(entry.name);
             if (!existing) {
                 return tx.store.add(entry);
             }
         });
-        actions[actions.length] = tx.done;
-        await Promise.all(actions);
+        await Promise.all(actions.concat([tx.done]));
     };
     result.getStores = function () {
         let i = 0;
@@ -195,80 +271,90 @@ async function questionStorage({
         return res;
     };
     result.getRandomQuestion = async function (category, level = 1) {
-        let tx;
         let res;
-        let actions = [];
         let questions;
         if (!db.objectStoreNames.contains(category)) {
             return;
         }
-        questions = await db.getAllFromIndex(category, "level");
-        questions = questions.filter(
-            (el) => el.level === level && el.status === "not-selected"
-        );
+        questions = await db.getAllFromIndex(category, "level", level);
+        questions = questions.filter((el) => el.status === "not-selected");
         res = questions[getRandomIndex(questions.length)];
         if (res === undefined) {
-            tx = db.transaction(category, "readwrite");
-            actions = await tx.store.getAll();
-            res = await tx.store.openCursor();
-            actions.map((value) => tx.store.put(
-                clone(value, {status: "not-selected"})
-            ));
-            actions[actions.length] = tx.done;
-            await Promise.all(actions);
-            res = res.value;
+            return null;
         }
         return decryptEntry(res).name;
     };
     result.markFound = async function ({category, word}) {
         let res = await db.get(category, cipher.encrypt(word));
         if (res) {
-            await db.put(category, {name: res.name, status: "selected"});
+            await db.put(category, Object.assign(res, {status: "selected"}));
         }
     };
+    result.incrementUncovered = async function (store, level) {
+        let res = await db.get("progress", [store, level]);
+        if (res) {
+            res.uncovered += 1;
+            await db.put("progress", res);
+        }
+        console.error(`Cannot increment progress for ${store} level ${level}`);
+    };
+    result.getProgress = async function (store, level) {
+        let res = await db.get("progress", [store, level]);
+        if (res) {
+            return res;
+        }
+        console.error(`Progress for ${store} level ${level} does not exists`);
+    };
+    result.getCategoryProgress = async function (store) {
+        let res = await db.getAllFromIndex("category", store);
+        return computeStatus(res ?? []);
+    };
+    await initProgress();
     return result;
 }
 
 /**
+* Utility for getting the progress from a data source
+* @param {Source} data
+* @returns {Progress[]}
+*/
+function getProgress(data) {
+    console.dir(data, {depth: 10});
+    return Object.entries(data.categories).reduce(function (acc, [store, val]) {
+        let tmp = Object.entries(val).reduce(function (words, [k, v]) {
+            let level = Number.parseInt(k.replace(/level_/i, ""), 10);
+            if (!Number.isFinite(level)) {
+                return words;
+            }
+            return words.concat([
+                {store, level, totalWords: v.length, uncovered: 0}
+            ]);
+        }, []);
+        return acc.concat(tmp);
+    }, []);
+}
+
+/**
 * Utility for fetching questions in the dataset
-* @param {Object} param0
-* @param {*} param0.url - The dataset URL
+* @param {Source} data
 * @returns {Question[]}
 */
-async function fetchQuestions({url}) {
-    let result = [];
-    let datas = await fetchData({url});
-    if (datas.success) {
-        result = Object.entries(datas.categories).reduce(
-            function (acc, [store, val]) {
-                let tmp = {store};
-                if (datas.cached) {
-                    return acc;
-                }
-                tmp.datas = Object.entries(val).reduce(
-                    function (words, [k, v]) {
-                        const status = "not-selected";
-                        let level = Number.parseInt(
-                            k.replace(/level_/i, ""),
-                            10
-                        );
-                        if (!Number.isFinite(level)) {
-                            return words;
-                        }
-                        words = words.concat(v.map(function (word) {
-                            return Object.assign(word, {level, status})
-                        }));
-                        return words;
-                    },
-                    []
-                );
-                acc[acc.length] = tmp;
-                return acc;
-            },
-            []
-        );
-    }
-    return result;
+function getQuestions(data) {
+    return Object.entries(data.categories).reduce(function (acc, [store, val]) {
+        let tmp = {store};
+        tmp.datas = Object.entries(val).reduce(function (words, [k, v]) {
+            const status = "not-selected";
+            let level = Number.parseInt(k.replace(/level_/i, ""), 10);
+            if (!Number.isFinite(level)) {
+                return words;
+            }
+            return words.concat(v.map(function (word) {
+                return Object.assign(word, {level, status})
+            }));
+        }, []);
+        acc[acc.length] = tmp;
+        return acc;
+    }, []);
 }
 
 async function onInstall(event) {
@@ -291,6 +377,7 @@ async function handleInstallation() {
     await setupQuestions();
     await cacheStaticFiles();
 }
+
 function tryFetch(param) { //implemented to avoid safari break on failed request
     let res;
     try {
@@ -347,7 +434,6 @@ async function handleFetch(event) {
 }
 async function safeFetch({cache, event, path}) {
     let response;
-
     response = await cache.match(cachableUrls.pages[path] ?? path);
     if (!response) {
         response = await tryFetch(cachableUrls.pages[path] ?? event.request);
@@ -362,6 +448,7 @@ async function safeFetch({cache, event, path}) {
     }
     return response;
 }
+
 async function handle404({cache, event, response}) {
     let res;
     if (
@@ -379,8 +466,8 @@ async function handle404({cache, event, response}) {
         return res;
     }
     return response ?? fetch(event.request);
-
 }
+
 async function getWord(category, level = 1) {
     let title = String(category ?? "");
     let word;
@@ -405,14 +492,24 @@ async function clearOldCache() {
     }).map((name) => caches.delete(name));
     return Promise.all(oldCacheNames);
 }
+
 async function setupQuestions() {
-    let questions = await fetchQuestions({url: "/assets/data.json"});
-    config.db = await questionStorage({
-        stores: questions.map((val) => val.store),
+    let words;
+    let progress;
+    const datas = await fetchData({url: "/assets/data.json"});
+    console.log(datas);
+    if (datas.cached || !datas.success) {
+        return;
+    }
+    words = getQuestions(datas);
+    progress = getProgress(datas);
+    config.db = await gameStorage({
+        progress,
+        stores: words.map((val) => val.store),
         version: config.version
     });
     await Promise.all(
-        questions.map(function ({datas, store}) {
+        words.map(function ({datas, store}) {
             return config.db.addMany(store, datas);
         })
     );
@@ -428,7 +525,6 @@ async function sendMessage(msg) {
 
 async function handleMessage({data, ports}) {
     let response;
-
     if (data === "SKIP_WAITING") {
         await self.skipWaiting();
         return;
@@ -439,7 +535,7 @@ async function handleMessage({data, ports}) {
     if (data.connectionRequest && ports[0]) {
         config.isOnline = data.connectionRequest.isOnline;
         ports[0].onmessage = handleMessage;
-        config.db = await questionStorage({version: config.version});
+        config.db = await gameStorage({version: config.version});
         ports[0].postMessage({connectionAcknowledged: true});
     }
     if (data.randomWordRequest && ports[0]) {
