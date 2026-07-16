@@ -222,10 +222,20 @@ async function gameStorage({
                 });
                 store.createIndex("category", "store");
             }
-            if (!objectStores.contains("config")) {
-                store = database.createObjectStore("config", {
-                    keyPath: "version"
+            if (!objectStores.contains("player")) {
+                database.createObjectStore("player", {keyPath: "id"});
+            }
+            if (!objectStores.contains("achievements")) {
+                store = database.createObjectStore("achievements", {
+                    keyPath: "id",
+                    autoIncrement: true
                 });
+                store.createIndex("playerId", "playerId", {unique: false});
+                store.createIndex(
+                    "playerAchievements",
+                    ["playerId", "achievementId"],
+                    {unique: false}
+                );
             }
         }
     });
@@ -242,11 +252,20 @@ async function gameStorage({
     async function initProgress() {
         let tx = db.transaction("progress", "readwrite");
         const actions = progress.map(async function progressHandler(e) {
-            let exists = await tx.store.get([e.store, e.level]);
+            const exists = await tx.store.get([e.store, e.level]);
             if (!exists) {
                 return tx.store.add(e);
             }
         });
+        await Promise.all(actions.concat([tx.done]));
+    }
+    async function initPoints() {
+        let tx = db.transaction("player", "readwrite");
+        const actions = [];
+        const exists = await tx.store.get("default");
+        if (!exists) {
+            actions.push(tx.store.add({id: "default", hearts: 9}));
+        }
         await Promise.all(actions.concat([tx.done]));
     }
     result.addMany = async function insertMany(storeName, questions) {
@@ -309,7 +328,58 @@ async function gameStorage({
         let res = await db.getAllFromIndex("category", store);
         return computeStatus(res ?? []);
     };
+    result.getHearts = async function (playerId = "default") {
+        let res = await db.get("player", playerId);
+        return res?.hearts ?? 0;
+    };
+    result.setHearts = async function (playerId = "default", hearts) {
+        let res;
+        if (!Number.isFinite(Number(hearts))) {
+            throw new Error("Invalid heart count provided");
+        }
+        res = await db.get("player", playerId);
+        if (!res) {
+            console.warn("Attempting to set a non-existing player hearts");
+            return;
+        }
+        await db.put("player", {id: playerId, hearts});
+    };
+    result.addAchievement = async function ({
+        achievementId,
+        category,
+        level,
+        playerId = "default",
+    }) {
+        const ev = {achievementId, category, level, playerId};
+        ev.unlockedAt = Date.now();
+        await db.put("achievements", ev);
+    };
+    result.getAchievements = async function (player = "default") {
+        let res = await db.getAllFromIndex("achievements", "playerId", player);
+        res = (res ?? []).reduce(function (acc, ev) {
+            if (!acc[ev.achievementId]) {
+                acc[ev.achievementId] = {id: ev.achievementId, events: [ev]};
+            } else {
+                acc[ev.achievementId].events.push(ev);
+            }
+            return acc;
+        }, Object.create(null));
+        return Object.values(res);
+    };
+    result.hasAchieved = async function ({
+        achievementId,
+        category,
+        player = "default",
+    }) {
+        const res = await db.getAllFromIndex(
+            "achievements",
+            "playerAchievements",
+            [player, achievementId]
+        );
+        return (res ?? []).some((e) => e.category === category);
+    };
     await initProgress();
+    await initPoints();
     return result;
 }
 
