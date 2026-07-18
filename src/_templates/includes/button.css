@@ -1,0 +1,62 @@
+:where(button, .btn) {
+    --color-fill: var(--system-color-deep-blue);
+    --color-text: var(--system-color-white);
+    --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273deg),
+        inset 0 1px 0 6px oklch(60.26% 0.215 264deg);
+    --radius: 1.5em;
+    --min-padding: .75em 1.5em;
+
+    &:where([aria-disabled], :disabled) {
+        --color-fill: oklch(78.86% 0.1063 267deg);
+        --shadow: inset 0 -2px 0 3px oklch(65% 0.105 286deg),
+            inset 0 1px 0 6px oklch(74.8% 0.087 267deg);
+    }
+
+    &:is(button, a):where(:focus-visible, :hover):not([aria-disabled]) {
+        --color-fill: oklch(65.83% 0.1809 265.3deg);
+    }
+
+    &[data-theme="secondary"] {
+        --color-fill: var(--pinky-gradient);
+        --shadow: inset 0 -2px 0 3px oklch(26% 0.143 273deg),
+            inset 0 1px 0 6px oklch(64% 0.266 314deg);
+
+        &:where([aria-disabled], :disabled) {
+            --color-fill: var(--sky-gradient);
+            --shadow: inset 0 -2px 0 3px oklch(65% 0.105 286deg),
+                inset 0 1px 0 6px oklch(64.6% 0.266 314deg / 35%);
+        }
+
+        &:is(button, a):where(:focus-visible, :hover):not([aria-disabled]) {
+            --color-fill: var(--light-pinky-gradient);
+        }
+    }
+
+    &[data-size="xl"] {
+        --min-padding: min(10vi, 3em);
+
+        min-inline-size: min(30vi, 5em);
+    }
+
+    &[data-size="sm"] {
+        --min-padding: min(5vi, 1em);
+
+        min-inline-size: min(10vi, 3em);
+    }
+
+    &[data-theme="play"] {
+        --color-fill: var(--pinky-gradient);
+        --shadow: inset 0 -3px 0 4px var(--system-color-black),
+            inset 0 -6px 0 8px oklch(57% 0.27 304deg);
+
+        &:where([aria-disabled], :disabled) {
+            --color-fill: var(--sky-gradient);
+            --shadow: inset 0 -4px 0 5px oklch(65% 0.105 286deg),
+                inset 0 -8px 0 10px oklch(64.6% 0.266 314deg / 35%);
+        }
+
+        &:is(button, a):where(:focus-visible, :hover):not([aria-disabled]) {
+            --color-fill: var(--light-pinky-gradient);
+        }
+    }
+}

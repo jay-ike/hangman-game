@@ -1,6 +1,7 @@
 .menu {
     --direction: column;
     --i-alignment: space-evenly;
+    --col-align: center;
 
     container: menu / inline-size;
 }
@@ -64,6 +65,7 @@
 
 .lang-wrapper {
     --outline-clr: var(--system-color-dark-navy);
+
     flex-flow: row wrap;
     place-content: center;
 

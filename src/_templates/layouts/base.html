@@ -15,6 +15,7 @@
     <link rel="icon" type="image/svg+xml" href="/assets/images/icon.svg">
     <link rel="manifest" href="/assets/app.webmanifest">
     <style>{%cssmin "includes/foundations.css" %}</style>
+    <style>{%cssmin "includes/button.css" %}</style>
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ike-hangman-game.vercel.app{%if path%}/{{path}}{%endif%}">
@@ -33,7 +34,6 @@
 
 <body {%if bodyClass %}class="{{bodyClass}}" {% endif %}>
     {{content}}
-    {% if pageRole != "play" %}<script src="/sw-registration.js" defer></script>{% endif %}
 </body>
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="visually-hidden" aria-hidden="true">
     <defs>

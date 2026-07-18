@@ -4,22 +4,22 @@ module.exports = Object.freeze({
     locale: "en",
     rules: [
         {
-            "description": "First, choose a word category, like animals or movies. The computer then randomly selects a secret word from that topic and shows you blanks for each letter of the word.",
+            "description": "Choose a theme like Animals or Movies. A secret word will be chosen with blank spaces for each letter.",
             "number": "01",
-            "title": "choose a category"
+            "title": "select a category"
         },
         {
-            "description": "Take turns guessing letters. The computer fills in the relevant blank spaces if your guess is correct. If it’s wrong, you lose some health, which empties after eight incorrect guesses.",
+            "description": "Choose your challenge tier. Advanced difficulties and levels must be unlocked through previous play.",
             "number": "02",
+            "title": "choose difficulty"
+        },
+        {
+            "description": "Tap letters to reveal them in the blanks. Correct guesses fill the spaces, while wrong guesses decrease your hearts.",
+            "number": "03",
             "title": "guess letters"
         },
         {
-            "description": "In case you find the item difficult to guess, you can use the gift button to reveal a letter of the item.<br>Notice that you can use this feature only if you have at least 2 hearts",
-            "number": "03",
-            "title": "reveal letters optionally"
-        },
-        {
-            "description": "You win by guessing all the letters in the word before your health runs out. If the health bar empties before you guess the word, you lose.",
+            "description": "Uncover every letter before you run out of hearts to win or  game over!",
             "number": "04",
             "title": "win or lose"
         }

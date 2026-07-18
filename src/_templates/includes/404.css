@@ -1,5 +1,9 @@
-.letter {
-    font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
+.btn[data-type="letter"] {
+    --i-padding: min(5vmin, 1em);
+    --min-padding: var(--i-padding);
+    --radius: calc(var(--i-padding) / 2);
+
+    font-size: clamp(1.24rem, 1.169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
     min-inline-size: min(10vi, 10cqi, 88px);
     aspect-ratio: var(--letter-ratio, 112 / 128);
 }
@@ -7,7 +11,7 @@
 .i-flex {
     display: inline-flex;
     align-items: center;
-    gap: var(--r-space, .5rem);
+    gap: var(--i-flex-space, .25rem);
     flex-flow: row wrap;
     place-content: center;
 
@@ -17,12 +21,8 @@
 }
 
 .letter-wrapper {
-    --min-padding: min(5vi, .5rem);
-    --wrap: wrap;
-    --radius: min(25%, .75rem);
-    --direction: row;
+    --r-space: .75rem;
 
-    gap: min(5vi, .5rem);
     text-transform: uppercase;
     letter-spacing: .1em;
     container: letters / inline-size;
@@ -30,16 +30,9 @@
     min-inline-size: 100%;
 }
 
-.btn-primary {
-    --i-padding: min(10vi, 3em);
-    --min-padding: 0.75em var(--i-padding);
-
-    border-radius: calc(var(--i-padding) / 2);
-}
-
 .menu {
     --direction: column;
-    --min-padding: min(5vmin, 1.5em);
+    --min-padding: min(15vmin, 4em) min(5vmin, 1.5em);
     --i-alignment: space-evenly;
 
     color: var(--system-color-white);

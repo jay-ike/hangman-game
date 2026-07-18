@@ -180,7 +180,7 @@ function getRandomLetter(sentence, foundLetters) {
     return result;
 }
 function letterTemplate(index) {
-    return "<span class='center letter box-blue shadowed' data-listen=" +
+    return "<span class='center letter shadowed btn' data-listen=" +
     "'letter" + (index + 1) + "-changed' data-attributes=" +
     "'data-dimmed:{dimmed}' data-property='{letter}' data-dimmed></span>";
 

@@ -22,12 +22,8 @@ h2:where(.rule-grid > *) {
 .main-box {
     --s-space: 2.5rem;
 
-    padding-block: 32px 48px;
+    padding-block: 32px 16px;
     border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
-}
-
-nav:where(.main-box > *) {
-    --s-space: min(13lvb, 6.25rem);
 }
 
 .back-btn {
@@ -45,8 +41,11 @@ nav:where(.main-box > *) {
     }
 }
 
-.rules-wrapper {
+.rules-wrapper, .categories {
     --container-name: rules;
+
+    max-block-size: 78lvb;
+    overflow-y: auto;
 }
 
 .categories {
@@ -68,7 +67,7 @@ nav:where(.main-box > *) {
     }
 }
 
-@container rules (inline-size > 43rem) {
+@container rules (inline-size > 45rem) {
     article {
         --g-template: "area2 " "area1" " area3" 1fr;
         --f-size: 1.5rem;

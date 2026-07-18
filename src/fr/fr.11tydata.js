@@ -4,24 +4,24 @@ module.exports = Object.freeze({
     locale: "fr",
     rules: [
         {
-            "description": "Tout d'abord, choisissez une catégorie de mots, comme les animaux ou les films. L'ordinateur sélectionne ensuite au hasard un mot secret dans cette catégorie et vous montre des cases vides pour chaque lettre du mot.",
+            "description": "Choisis un thème comme Animaux ou Films. Un mot secret sera choisi et affiché avec des tirets pour chaque lettre.",
             "number": "01",
-            "title": "choisir une catégorie"
+            "title": "Choisis une catégorie"
         },
         {
-            "description": "À tour de rôle, vous devez deviner les lettres. L'ordinateur remplit les espaces vides correspondants si votre devinette est correcte. Si vous vous êtes trompé, vous perdrez des points de vie, qui se videront au bout de huit mauvaises réponses.",
+            "description": "Choisis ton niveau de défi. Les difficultés avancées et les niveaux se débloquent en jouant.",
             "number": "02",
-            "title": "deviner les lettres"
+            "title": "Choisis la difficulté"
         },
         {
-            "description": "Si vous avez du mal à deviner un élément, vous pouvez utiliser le bouton « cadeau » pour révéler une lettre de l'élément.<br>Notez que vous ne pouvez utiliser cette fonctionnalité que si vous avez au moins 2 points de vie.",
+            "description": "Appuie sur les lettres pour les révéler dans les cases. Les bonnes réponses remplissent les tirets, et les mauvaises te font perdre des cœurs.",
             "number": "03",
-            "title": "dévoiler une lettre"
+            "title": "Devine les lettres"
         },
         {
-            "description": "Vous gagnez en devinant toutes les lettres du mot avant que votre barre de santé ne s'épuise. Si votre barre de santé se vide avant que vous n'ayez deviné le mot, vous perdez.",
+            "description": "Trouve toutes les lettres avant de perdre tous tes cœurs pour gagner. Sinon, c'est le game over !",
             "number": "04",
-            "title": "gagner ou perdre"
+            "title": "Gagne ou perds"
         }
     ],
     site_image: {

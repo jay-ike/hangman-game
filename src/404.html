@@ -15,19 +15,19 @@ og_imageAlt: "A screenshot of the 404 page showing the text 'oh no! page not fou
 ---
 {%assign words = "oh no! page not found" | split: ' '%}
 <style>{%cssmin "includes/404.css"%}</style>
-<main aria-labelledby="main-title" class="box segragator shadowed menu">
+<main aria-labelledby="main-title" class="box repel shadowed menu">
     <p id="main-title" hidden>oh no! page not found</p>
-    <h1 aria-labelledby="main-title" class="segragator letter-wrapper">
+    <h1 aria-labelledby="main-title" class="row letter-wrapper" data-wrap="">
         {%for word in words%}
         <span class="i-flex">
             {%assign dots = word | split: ''%}
             {%for dot in dots%}
-            <span class="letter center box-blue shadowed" {%if dot == 'o'%}data-dimmed{%endif%}>{{dot}}</span>
+            <span class="shadowed btn" data-type="letter" {%if dot == 'o'%}data-dimmed{%endif%}>{{dot}}</span>
             {%endfor%}
         </span>
         {%endfor%}
     </h1>
     <p>The page you are looking for does not exists at the moment.<br>
     The good news is that you can still visit the home page</p>
-    <a href="/" class="btn-primary box-blue shadowed">go to home page</a>
+    <a href="/" class="shadowed btn">go to home page</a>
 </main>

@@ -24,13 +24,13 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
             class="lost">{{ "lost" | i18n }}</span>
     </h2>
     <div class="menu shadowed column box">
-        <button class="box-blue shadowed continue-btn" data-listen="title-changed"
+        <button class="shadowed btn continue-btn" data-listen="title-changed"
             data-attributes="data-action:{action}" data-action="continue">
             <span class="action-continue">{{"continue" | i18n}}</span><span class="action-replay">{{"replay" |
                 i18n}}</span>
         </button>
-        <a class="box-blue shadowed" href="/{{locale}}/categories">{{ "new_category" | i18n }}</a>
-        <a class="box-pink shadowed pink-shadow" href="/{{locale}}" style="view-transition-name: play-button;">{{
+        <a class="shadowed btn" href="/{{locale}}/categories">{{ "new_category" | i18n }}</a>
+        <a class="shadowed btn" data-theme="secondary" href="/{{locale}}" style="view-transition-name: play-button;">{{
             "quit_game" | i18n }}</a>
     </div>
 </dialog>
@@ -47,17 +47,17 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
             </div>
             <label for="o-reminder">{{"cancel_popup" | i18n}}</label>
         </div>
-        <div class="row wrap">
-            <button value="cancel" class="box-blue shadowed">{{"cancel" | i18n}}</button>
-            <button value="proceed" class="box-pink shadowed pink-shadow">{{"deduct_points" | i18n}}</button>
+        <div class="row" data-wrap="">
+            <button value="cancel" class="shadowed btn">{{"cancel" | i18n}}</button>
+            <button value="proceed" class="shadowed btn" data-theme="secondary">{{"deduct_points" | i18n}}</button>
         </div>
     </form>
 </dialog>
 <main aria-labelledby="main-title guess" class="contain column main-box" data-emit="heading-change">
     <span id="guess" hidden>{{"hidden_item_category" | i18n}}</span>
-    <div class="segragator heading-box">
+    <div class="repel heading-box">
         <div class="i-flex">
-            <button aria-labelledby="menu-title" class="center box-pink rounded shadowed" aria-controls="menu-dialog">
+            <button aria-labelledby="menu-title" class="center rounded shadowed btn" data-theme="secondary" aria-controls="menu-dialog">
                 <svg width="24" height="24">
                     <title id="menu-title">Menu</title>
                     <use href="/assets/images/sprites.svg#hamburger">
@@ -79,7 +79,7 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
                 aria-live="polite"></div>
         </div>
     </div>
-    <div class="segragator content-center letter-wrapper" data-emit="letter-found">
+    <div class="repel content-center letter-wrapper" data-emit="letter-found">
         {%for word in placeholder%}
         <div class="i-flex">
             {%assign dots = word | split: ''%}
