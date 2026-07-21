@@ -1,0 +1,48 @@
+---
+layout: "layouts/base.html"
+title: "Your Hangman Badge Collection – Achievements"
+path: "en/achievements"
+site_name: "Hangman game, achievements"
+site_title: "View the badges you've earned so far in the hangman game."
+og_locale: "en"
+og_description: "Check out the badges you’ve earned while playing Hangman. From flawless guesses to mastering whole categories, each badge tells a story. Can you get them all?"
+og_image: "https://ike-hangman-game.vercel.app/assets/images/category-og-image.png"
+og_imageW: 1200
+og_imageH: 630
+og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of them yet earned"
+
+---
+<style>{%cssmin "includes/header.css"%}</style>
+<style>{%cssmin "includes/cards.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-wrapper">
+    <div class="row heading" data-variant="title-only">
+        <a href="/{{locale}}/" class="shadowed rounded btn" data-theme="secondary" data-size="sm" aria-labelledby="return">
+            <svg width="25" height="24">
+                <title id="return">{{ "return_home" | i18n }}</title>
+                <use href="/assets/images/sprites.svg#back"/>
+            </svg>
+        </a>
+        <h1 class="dilated-effect sky-text-bg" id="main-title">{{ "badge_earned" | i18n }}</h1>
+    </div>
+    <div class="column scrollview" style="view-transition-name: play;">
+        {%for progress in achievements%}
+        {% assign section_name = progress.type | replace: ' ', '_' %}
+        <section class="stack" data-space="sm" data-tier="" aria-labelledby="{{section_name}}" aria-describedby="{{section_name}}-desc">
+                <h2 id="{{section_name}}">{{progress.type}}</h2>
+                <p id="{{section_name}}-desc">{{progress.description}}</p>
+                <div class="responsive-grid contain" data-space="md">
+                    {%for data in progress.badges %}
+                    <button aria-labelledby="badge_{{section_name}}-{{forloop.index}}" aria-describedby="badge_{{section_name}}-{{forloop.index}}-desc" class="box structured-grid card" data-variant="achievement" data-content="{{data.description}}">
+                        {%badge data.meta%}
+                        <div class="row card-title">
+                            <span class="h3" id="badge_{{section_name}}-{{forloop.index}}">{{data.title}}</span>
+                        </div>
+                        <p id="badge_{{section_name}}-{{forloop.index}}-desc" hidden>{{data.purpose}}</p>
+                    </button>
+                    {%endfor%}
+                </div>
+            </section>
+        {%endfor%}
+    </div>
+
+</main>

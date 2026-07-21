@@ -13,7 +13,7 @@
     }
 
     &:is(button, a):where(:focus-visible, :hover):not([aria-disabled]) {
-        --color-fill: oklch(65.83% 0.1809 265.3deg);
+        --color-fill: var(--btn-hover-fill, oklch(65.83% 0.1809 265.3deg));
     }
 
     &[data-theme="secondary"] {

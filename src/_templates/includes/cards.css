@@ -11,6 +11,14 @@
     --m-row-h: 8rem;
 }
 
+.contain:has(> .card[data-variant="achievement"]) {
+    --m-col-s: 3;
+    --m-col-w: 16rem;
+    --m-row-h: 8rem;
+
+    padding: .5em .75em;
+}
+
 .card {
     --color-fill: var(--card-fill, var(--system-color-white));
     --radius: 1.25rem;
@@ -45,6 +53,11 @@
 
     &:where([data-tier="hard"]  *) {
         color: oklch(37% 0.13 22deg);
+    }
+
+    &:where(.card[data-variant="achievement"] *) {
+        color: inherit;
+        text-align: center;
     }
 }
 
@@ -102,6 +115,18 @@ span[data-label="locked"]:where([data-state="unlocked"] *) {
     --container-name: rule;
 
     color: oklch(45% 0.14 287deg);
+}
+
+.card[data-variant="achievement"] {
+    --g-template: "area2" "area1" 1fr;
+    --card-fill: transparent;
+    --p-items: center;
+    --g-gap: min(1.5cqb, 1rem);
+    --r-space: .5em;
+
+    color: oklch(92% 0.015 277deg);
+    border: 3px solid currentcolor;
+    min-inline-size: min(80lvi, 215px);
 }
 
 .card[data-variant="level"] {

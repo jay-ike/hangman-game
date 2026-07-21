@@ -42,10 +42,51 @@ async function minifyScripts(dir) {
     }, []);
     await Promise.all(files.map(minifyJs));
 }
+function getSize(width) {
+    return (
+        width <= 375
+        ? `(max-width: 30em) ${width}px`
+        : `${width}px`
+    );
+}
+function getAttributes(metadata, sizeGetter) {
+    let result = Object.values(metadata).reduce(function (acc, val) {
+        val.forEach(function (img) {
+            const {format, height, width, srcset, url} = img;
+            const size = sizeGetter(width);
+            if (width <= acc.width) {
+                acc.width = width;
+                acc.height = height;
+                if (format === "webp") {
+                    acc.src = url;
+                    acc.srcset.unshift(srcset);
+                    acc.sizes.unshift(size);
+                }
+                if (format !== "webp" && acc.src) {
+                    acc.srcset = [acc.srcset[0], srcset].concat(acc.srcset.slice(1));
+                    acc.sizes = [acc.sizes[0], size].concat(acc.sizes.slice(1));
+                }
+            } else {
+                acc.srcset.push(srcset);
+                acc.sizes.push(size);
+            }
+        });
+        return acc;
+    }, {width: Number.MAX_SAFE_INTEGER, srcset: [], sizes: []});
+    result.srcset = result.srcset.join(", ");
+    result.sizes = result.sizes.join(", ");
+    return result;
+}
+async function parseBadge(props) {
+    return `<img ${Object.entries(props ?? {}).reduce(function (acc, [k, v]) {
+        return acc + ` ${k}="${v}"`;
+    }, "")} >`;
+}
 module.exports = function (config) {
     config.addPassthroughCopy("assets");
     config.addPassthroughCopy("sw.js");
     config.addPassthroughCopy("sw-registration.js");
+    config.addShortcode("badge", parseBadge);
     config.addShortcode("cssmin", function (src) {
         return parseCss(config, src);
     });

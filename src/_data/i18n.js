@@ -9,6 +9,10 @@ module.exports = Object.freeze({
         en: "available keys",
         fr: "touches disponibles"
     },
+    badge_earned: {
+        en: "badges earned",
+        fr: "badges obtenus"
+    },
     category: {
         en: "category",
         fr: "catégorie"
@@ -138,8 +142,8 @@ module.exports = Object.freeze({
         fr: "retourner au menu principal"
     },
     start: {
-        en: "start",
-        fr: "débuter"
+        en: "play now",
+        fr: "lance-toi !"
     },
     warning: {
         en: "caution !!!",
