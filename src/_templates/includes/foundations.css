@@ -128,6 +128,12 @@ body {
         }
     }
 
+    .extend-click::before {
+        content: "";
+        inset: 0;
+        position: absolute;
+    }
+
     @keyframes fade-in {
         from {
             opacity: 0;
@@ -152,13 +158,34 @@ body {
 }
 
 @layer layout {
-    .stack>*+*,
-    .mt-xl {
+    .stack>*+* {
         margin-block-start: var(--s-space, 1.5em);
     }
 
-    .mt-xl, .stack:where([data-space="xl"]) {
-        --s-space: 8rem;
+    [data-space="xl"] {
+        --s-space: 4rem;
+    }
+
+    [data-space="sm"] {
+        --s-space: .25em;
+    }
+
+    [data-space="md"] {
+        --s-space: 1em;
+    }
+
+    .main-wrapper {
+        --s-space: 2.5rem;
+
+        color: var(--system-color-white);
+        padding-block: 32px 16px;
+        border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
+
+        &[data-type="play"] {
+            --c-space: min(8lvb, 4.5rem);
+
+            padding-block: 32px 48px;
+        }
     }
 
     :is(.row, .column) {
@@ -200,7 +227,7 @@ body {
         border-radius: var(--radius, 0);
     }
 
-    :is([class$="grid"]) {
+    :is([class$="grid"], .structured-grid) {
         --col-align: center;
 
         display: grid;
@@ -241,6 +268,17 @@ body {
         grid-auto-rows: minmax(var(--min-row-height), auto);
         gap: var(--gap);
     }
+
+    .scrollview {
+        max-block-size: 78lvb;
+        overflow: hidden auto;
+    }
+
+    @media screen and (height >=48em) {
+        .main-wrapper {
+            --s-space: min(10lvb, 4rem);
+        }
+    }
 }
 
 
@@ -253,7 +291,7 @@ body {
         line-height: 1.2;
         overflow-wrap: break-word;
         hyphens: auto;
-        letter-spacing: -0.01em;
+        letter-spacing: 0.05em;
     }
 
     h1 {
@@ -296,7 +334,7 @@ body {
         &:not([class]) {
             --outline-style: dashed;
 
-            text-decoration-thickness: max(0.08em, 1px);
+            text-decoration-thickness: max(0.01em, 1px);
             text-underline-offset: 0.15em;
             color: var(--link-clr, inherit);
 
@@ -325,15 +363,12 @@ body {
         padding: var(--space-xs);
     }
 
-    button,
-    a,
-    dt {
+    button, a, dt {
         font-weight: 700;
     }
 
-    button,
-    a {
-        text-transform: uppercase;
+    button, a {
+        text-transform: capitalize;
         font: inherit;
     }
 
@@ -418,7 +453,7 @@ body {
     }
 
     :is(h2, h3, h4, h5) {
-        text-transform: var(--t-transform, uppercase);
+        text-transform: var(--t-transform, capitalize);
         color: var(--heading-clr, currentColor);
     }
 
@@ -426,24 +461,24 @@ body {
         font-size: clamp(2.0736rem, 1.8388rem + 1.5651 * var(--font-unit, 1vw), 3.0518rem);
     }
 
-    h2 {
+    h2, .h2 {
         font-size: clamp(1.728rem, 1.5568rem + 1.1415 * var(--font-unit, 1vw), 2.4414rem);
     }
 
-    h3 {
+    h3, .h3 {
         font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
     }
 
-    h4 {
+    h4, .h4 {
         font-size: clamp(1.2rem, 1.113rem + 0.58 * var(--font-unit, 1vw), 1.5625rem);
     }
 
-    h5 {
+    h5, .h5 {
         font-size: clamp(0.8333rem, 0.7933rem + 0.2667 * var(--font-unit, 1vw), 1rem);
     }
 
     @supports (font-size: 1cqi) {
-        :is(h1, h2, h3, h4, p, dt, dd, .fluid-type, a) {
+        :is(h1, h2, h3, h4, p, dt, dd, .fluid-type, .h2, .h3, .h4, .h5, a) {
             --font-unit: 1cqi;
         }
     }

@@ -1,0 +1,158 @@
+.contain:not([data-tier] > *):has(> .card) {
+    --container-name: card-container;
+
+    max-block-size: 78lvb;
+    overflow-y: auto;
+}
+
+.contain:has(> .card[data-variant="level"]) {
+    --m-col-s: 4;
+    --m-col-w: 16rem;
+    --m-row-h: 8rem;
+}
+
+.card {
+    --color-fill: var(--card-fill, var(--system-color-white));
+    --radius: 1.25rem;
+    --g-gap: min(1cqb, 1rem) 1em;
+    --p-space: collapse pretty;
+    --icon-gradient: linear-gradient(in oklch to right, oklch(56% 0.24 264deg), oklch(65% 0.16 286deg));
+
+    min-inline-size: min(80lvi, 265px);
+}
+
+
+.card-action {
+    grid-area: area2;
+
+    &:where([data-variant="rule"] > *) {
+        font-size: min(8cqi, 2em);
+        color: var(--system-color-deep-blue);
+    }
+
+    &:where([data-variant="level"][data-state="perfect"] *) {
+        display: none;
+    }
+}
+
+.card-title {
+    color: var(--system-color-dark-navy);
+    grid-area: area1;
+
+    &:where([data-tier="medium"]  *) {
+        color: oklch(50% 0.1 91deg);
+    }
+
+    &:where([data-tier="hard"]  *) {
+        color: oklch(37% 0.13 22deg);
+    }
+}
+
+div:has(> .card-icon) {
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%));
+}
+
+.card-icon {
+    inline-size: 24px;
+    background: var(--icon-gradient);
+    aspect-ratio: 1;
+
+    &:where([data-state="locked"] *) {
+        clip-path: url("#lock");
+    }
+
+    &:where([data-state="unlocked"] *) {
+        clip-path: url("#unlock");
+    }
+
+    &:where([data-state="perfect"] *) {
+        clip-path: url("#star");
+    }
+}
+
+span[data-label="unlocked"]:where([data-state="locked"] *) {
+    display: none;
+}
+
+span[data-label="locked"]:where([data-state="unlocked"] *) {
+    display: none;
+}
+
+.card-desc {
+    grid-area: area3;
+}
+
+[data-tier="normal"] {
+    --card-fill: oklch(92% 0.015 277deg);
+    --color-text: oklch(48% 0.053 293deg);
+}
+
+[data-tier="medium"] {
+    --card-fill: oklch(94.6% 0.0329 91deg);
+    --color-text: oklch(55% 0.04 95deg);
+}
+
+[data-tier="hard"] {
+    --card-fill: oklch(92.86% 0.013 22deg);
+    --color-text: oklch(50% 0.04 20deg);
+}
+
+.card[data-variant="rule"] {
+    --g-template: "area2 area1" "area3 area3" / max-content 1fr;
+    --container-name: rule;
+
+    color: oklch(45% 0.14 287deg);
+}
+
+.card[data-variant="level"] {
+    --g-template: "area1 " " area3" " area2" 1fr;
+    --container-name: level;
+    --color-fill: var(--card-fill);
+    --p-items: center;
+    --r-space: .5em;
+
+    color: var(--color-text);
+    position: relative;
+
+    &:where([data-state="perfect"]) {
+        --g-template: "area1" "area3" 1fr;
+    }
+
+    &:where([data-tier="hard"] *):last-of-type {
+        --range: entry 0% entry 100%;
+    }
+}
+
+@container card-container (inline-size > 24rem) {
+    .card[data-variant="rule"] {
+        --g-template: "area2 area1" "area2 area3" / max-content 1fr;
+        --g-gap: .75rem 2rem;
+    }
+}
+
+@container card-container (inline-size > 45rem) {
+    .card[data-variant="rule"] {
+        --g-template: "area2 " "area1" " area3" 1fr;
+        --f-size: 1.5rem;
+
+        place-items: start center;
+    }
+
+    .card-action:where(.card[data-variant="rule"]> *) {
+        font-size: 3rem;
+        align-self: center;
+    }
+}
+
+@media screen and (width >= 48em) {
+    .contain:has(> .card:not([data-variant="level"])) {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, max(215px, (25% - 1rem))), 1fr));
+        grid-auto-rows: auto;
+        gap: 1rem;
+    }
+
+    .card[data-variant="level"]:where([data-tier="hard"] *) {
+        --range: entry 0% entry 100%;
+    }
+}

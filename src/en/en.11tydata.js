@@ -2,6 +2,26 @@ const {categoryList} = require("../../assets/data.json");
 module.exports = Object.freeze({
     categories: categoryList.en,
     locale: "en",
+    levels: [
+        {
+            description: "Everyday answers, very common, short to medium length.",
+            indexes: [1, 2, 3],
+            tier: "normal",
+            title: "safe zone"
+        },
+        {
+            description: "Less common answers, a bit longer or trickier to guess.",
+            indexes: [4, 5, 6, 7],
+            tier: "medium",
+            title: "tightrope"
+        },
+        {
+            description: "Rare answers, tricky spellings, and obscure terms.",
+            indexes: [8, 9, 10],
+            tier: "hard",
+            title: "dead end"
+        }
+    ],
     rules: [
         {
             "description": "Choose a theme like Animals or Movies. A secret word will be chosen with blank spaces for each letter.",

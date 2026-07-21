@@ -1,9 +1,10 @@
 ---
 layout: "layouts/base.html"
 ---
-<style>{%cssmin "includes/rules.css"%}</style>
-<main aria-labelledby="main-title" class="stack main-box">
-    <div class="row heading-box">
+<style>{%cssmin "includes/cards.css"%}</style>
+<style>{%cssmin "includes/header.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-wrapper">
+    <div class="row heading" data-variant="title-only">
         <a href="/{{locale}}" class="shadowed rounded btn" data-theme="secondary" data-size="sm" aria-labelledby="return">
             <svg width="25" height="24">
                 <title id="return">{{ "return_home" | i18n }}</title>
@@ -12,14 +13,14 @@ layout: "layouts/base.html"
         </a>
         <h1 class="dilated-effect sky-text-bg" id="main-title">{{ "how_to_play" | i18n }}</h1>
     </div>
-    <div class="column contain rules-wrapper" data-scroll-view="fade-in" style="view-transition-name: play;">
+    <section class="column contain" aria-labelledby="rules-desc" data-scroll-view="fade-in" style="view-transition-name: play;">
+        <p id="rules-desc" hidden>{{ "game_rules" | i18n }}</p>
         {%for rule in rules %}
-        <article aria-labelledby="rule-{{rule.number}}" class="box contain rule-grid">
-            <h2 id="rule-{{rule.number}}">{{rule.title}}</h2>
-            <span>{{rule.number}}</span>
-            <p>{{rule.description}}</p>
+        <article aria-labelledby="rule-{{rule.number}}" aria-describedby="rule-{{rule.number}}-desc" class="box structured-grid card" data-variant="rule">
+            <h2 class="h3" id="rule-{{rule.number}}" class="card-title">{{rule.title}}</h2>
+            <span class="card-action">{{rule.number}}</span>
+            <p class="card-desc" id="rule-{{rule.number}}-desc">{{rule.description}}</p>
         </article>
         {%endfor%}
-    </div>
-
+    </section>
 </main>

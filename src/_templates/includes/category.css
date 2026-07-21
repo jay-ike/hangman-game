@@ -1,0 +1,25 @@
+.categories {
+    --m-row-h: 4.5rem;
+    --radius: 1.25rem;
+    --min-padding: min(1vi, .5em);
+
+    max-block-size: 78lvb;
+    overflow-y: auto;
+
+    & a {
+        font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
+        letter-spacing: .1em;
+        text-align: center;
+        min-block-size: 100%;
+    }
+}
+
+@media screen and (width >= 26.7em) {
+    .categories {
+        --m-row-h: 8.875rem;
+        --radius: 2.5rem;
+
+        overflow-y: visible;
+    }
+}
+

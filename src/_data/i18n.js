@@ -9,6 +9,10 @@ module.exports = Object.freeze({
         en: "available keys",
         fr: "touches disponibles"
     },
+    category: {
+        en: "category",
+        fr: "catégorie"
+    },
     cancel: {
         en: "cancel",
         fr: "annuler"
@@ -24,6 +28,10 @@ module.exports = Object.freeze({
     deduct_points: {
         en: "deduct points",
         fr: "débiter mes points"
+    },
+    game_rules: {
+        en: "Gameplay rules",
+        fr: "Règles du jeu"
     },
     gift_unavailable: {
         en: "you cannot use this feature you need at least 2 hearts",
@@ -69,9 +77,21 @@ module.exports = Object.freeze({
         en: "you have already selected the letter {{letter}}",
         fr: "la lettre {{letter}} est déjà selectionnée"
     },
+    level: {
+        en: "level",
+        fr: "niveau"
+    },
+    level_selection: {
+        en: "Pick your difficulty",
+        fr: "Choisis ta difficulté"
+    },
     loading_failed: {
         en: "failed to load",
         fr: "n'a pas pu être chargé"
+    },
+    locked: {
+        en: "locked",
+        fr: "vérouillé"
     },
     lost: {
         en: "you lose",
@@ -86,8 +106,8 @@ module.exports = Object.freeze({
         fr: "en pause"
     },
     pick_category: {
-        en: "pick a category",
-        fr: "choisir une catégorie"
+        en: "pick your category",
+        fr: "choisis ta catégorie"
     },
     play_now: {
         en: "play {{name}} now",
@@ -109,9 +129,17 @@ module.exports = Object.freeze({
         en: "play again",
         fr: "Rejouer"
     },
+    return_category: {
+        en: "change category",
+        fr: "changer de catégorie"
+    },
     return_home: {
         en: "return to main menu",
         fr: "retourner au menu principal"
+    },
+    start: {
+        en: "start",
+        fr: "débuter"
     },
     warning: {
         en: "caution !!!",

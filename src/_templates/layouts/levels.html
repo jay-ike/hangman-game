@@ -1,0 +1,52 @@
+---
+layout: "layouts/base.html"
+title: "Hangman Levels – Pick Challenge & Start Guessing"
+path: "en/levels"
+site_name: "Hangman game, difficulty level"
+site_title: "Select hidden item's difficulty level"
+og_locale: "en"
+og_description: "Pick your difficulty and start guessing words in our free Hangman game. Unlock harder levels as you play. Can you master every category ?"
+og_image: "https://ike-hangman-game.vercel.app/assets/images/category-og-image.png"
+og_imageW: 1200
+og_imageH: 630
+og_imageAlt: "A screenshot of the Hangman difficulty level selection where you can choose between Level 1 to 10, but only the level 1 is unlocked"
+
+---
+<style>{%cssmin "includes/header.css"%}</style>
+<style>{%cssmin "includes/cards.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-wrapper">
+    <div class="row heading" data-variant="with-sub">
+        <a href="/{{locale}}/categories" class="shadowed rounded btn" data-theme="secondary" data-size="sm" aria-labelledby="return">
+            <svg width="25" height="24">
+                <title id="return">{{ "return_category" | i18n }}</title>
+                <use href="/assets/images/sprites.svg#back"/>
+            </svg>
+        </a>
+        <h1 class="dilated-effect sky-text-bg"  aria-describedby="category_description" id="main-title">{{ "level_selection" | i18n }}</h1>
+        <p class="h3 heading-sub" id="category_description">{{ "category" | i18n | capitalize}}: <span class="sky-text-bg" id="current-category">countries</span></p>
+    </div>
+    <div class="column scrollview" style="view-transition-name: play;">
+        {%for level in levels%}
+        {% assign level_name = level.title | replace: ' ', '_' %}
+        <section class="stack" data-space="sm" data-tier="{{level.tier}}" aria-labelledby="{{level_name}}" aria-describedby="{{level_name}}-desc">
+                <h2 id="{{level_name}}">{{level.title}}</h2>
+                <p id="{{level_name}}-desc">{{level.description}}</p>
+                <div class="responsive-grid contain" data-space="md">
+                    {%for index in level.indexes %}
+                    <article aria-labelledby="level_{{index}}" aria-describedby="level_{{index}}-desc" class="box structured-grid card" data-variant="level" data-state="unlocked" data-scroll-view="fade-in">
+                        <div class="row card-title">
+                            <h3 id="level_{{index}}">{{"level" | i18n}} {{index}}</h3>
+                            <div><div class="card-icon"></div></div>
+                        </div>
+                        <a href="/" class="card-action shadowed btn extend-click">
+                            <span data-label="unlocked">{{"start" | i18n}}</span><span data-label="locked">{{"locked" | i18n}}</span>
+                        </a>
+                        <p class="card-desc" id="level_{{index}}-desc">Guessed 0 of 10 words </p>
+                    </article>
+                    {%endfor%}
+                </div>
+            </section>
+        {%endfor%}
+    </div>
+
+</main>

@@ -1,0 +1,40 @@
+.heading {
+    --wrap: wrap;
+    --r-space: min(2lvi, 1.5em);
+
+    color: var(--system-color-white);
+
+    & > h1 {
+        text-transform: capitalize;
+        flex: 2 1 auto;
+    }
+
+    &:where([data-variant="title-only"], [data-variant="with-sub"]) > h1 {
+        text-align: end;
+    }
+
+    &[data-variant="with-sub"] {
+        --r-space: 0 min(2lvi, 1.5em);
+    }
+
+    .heading-sub {
+        flex: 2 1 auto;
+        text-align: end;
+    }
+
+    @media screen and (width > 26.7em) {
+        &[data-variant="title-only"] > h1 {
+            text-align: center;
+        }
+
+        &[data-variant="with-sub"] > h1 {
+            text-align: start;
+        }
+
+        .heading-sub {
+            flex: 1 1 auto;
+        }
+    }
+}
+
+
