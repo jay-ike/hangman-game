@@ -50,7 +50,6 @@ function getListeners(target, fn) {
 function updateContent(element) {
     const {property} = element.dataset;
     return function (data) {
-
         element.textContent = parsedTemplate(data, property);
     };
 }

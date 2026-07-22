@@ -94,8 +94,8 @@ module.exports = Object.freeze({
         fr: "n'a pas pu être chargé"
     },
     locked: {
-        en: "locked",
-        fr: "vérouillé"
+        en: "unlock to play",
+        fr: "débloque pour jouer"
     },
     lost: {
         en: "you lose",

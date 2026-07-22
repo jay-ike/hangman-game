@@ -12,48 +12,56 @@ module.exports = Object.freeze({
                             description: "Tu as traversé la zone de confort. Il est temps de marcher sur la corde raide.",
                             meta: data["knot"],
                             purpose: "Débloque le niveau 4 pour obtenir ce badge.",
+                            tag: "knot",
                             title: "Expert des nœuds"
                         },
                         {
                             description: "Bienvenue dans l'impasse. Chaque lettre compte désormais.",
                             meta: data["gallow"],
                             purpose: "Débloque le niveau 8 pour obtenir ce badge.",
+                            tag: "gallow",
                             title: "Marcheur du gibet"
                         },
                         {
                             description: "Tu as trouvé toutes les réponses du niveau 1 sans aucun effort.",
                             meta: data["level1"],
                             purpose: "Trouve toutes les réponses du niveau 1.",
+                            tag: "level1",
                             title: "Intouchable"
                         },
                         {
                             description: "Tu maîtrises parfaitement la zone de confort. Le nœud coulant ne peut pas t'attraper ici.",
                             meta: data["shield"],
                             purpose: "Trouve toutes les réponses du palier Zone de confort (niveaux 1, 2 et 3).",
+                            tag: "shield",
                             title: "Esquiveur de corde"
                         },
                         {
                             description: "Tu as découvert toutes les réponses cachées en équilibre sur la corde raide.",
                             meta: data["balancing"],
                             purpose: "Trouve toutes les réponses du niveau 5.",
+                            tag: "balancing",
                             title: "Numéro d'équilibriste"
                         },
                         {
                             description: "Tu as conquis le palier Corde raide avec une exécution parfaite.",
                             meta: data["accrobat"],
                             purpose: "Trouve toutes les réponses du palier Corde raide (niveaux 4, 5, 6 et 7).",
+                            tag: "accrobat",
                             title: "Acrobate"
                         },
                         {
                             description: "Tu as découvert toutes les réponses avancées au bord de l'abîme.",
                             meta: data["gate"],
                             purpose: "Trouve toutes les réponses du niveau 9.",
+                            tag: "gate",
                             title: "Évasion de l'impasse"
                         },
                         {
                             description: "L'évasion ultime. Tu as entièrement conquis une catégorie !",
                             meta: data["immortal"],
                             purpose: "Trouve toutes les réponses d'une catégorie.",
+                            tag: "immortal",
                             title: "Immortel"
                         }
                     ],
@@ -66,24 +74,28 @@ module.exports = Object.freeze({
                             description: "Tu as résolu une énigme sans laisser le bourreau tracer une seule ligne.",
                             meta: data["quill"],
                             purpose: "Devine la réponse sans une seule lettre fausse.",
+                            tag: "quill",
                             title: "Parcours sans faute"
                         },
                         {
                             description: "Tu t'es sauvé au tout dernier souffle.",
                             meta: data["clutch"],
                             purpose: "Devine la réponse à ta toute dernière erreur autorisée.",
+                            tag: "clutch",
                             title: "Sauvetage in extremis"
                         },
                         {
                             description: "Tu as résolu 3 réponses d'affilée sans te faire attraper.",
                             meta: data["streak"],
                             purpose: "Devine 3 réponses d'affilée sans perdre une partie.",
+                            tag: "streak",
                             title: "Série de survie"
                         },
                         {
                             description: "Tu as démantelé une énigme énorme avant que la trappe ne s'ouvre.",
                             meta: data["slayer"],
                             purpose: "Devine une réponse de 10 lettres ou plus.",
+                            tag: "slayer",
                             title: "Tueur de géants"
                         }
                     ],

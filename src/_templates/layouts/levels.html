@@ -25,7 +25,7 @@ og_imageAlt: "A screenshot of the Hangman difficulty level selection where you c
         <h1 class="dilated-effect sky-text-bg"  aria-describedby="category_description" id="main-title">{{ "level_selection" | i18n }}</h1>
         <p class="h3 heading-sub" id="category_description">{{ "category" | i18n | capitalize}}: <span class="sky-text-bg" id="current-category">countries</span></p>
     </div>
-    <div class="column scrollview" style="view-transition-name: play;">
+    <div class="column scrollview"  style="view-transition-name: main-content;">
         {%for level in levels%}
         {% assign level_name = level.title | replace: ' ', '_' %}
         <section class="stack" data-space="sm" data-tier="{{level.tier}}" aria-labelledby="{{level_name}}" aria-describedby="{{level_name}}-desc">
@@ -33,20 +33,21 @@ og_imageAlt: "A screenshot of the Hangman difficulty level selection where you c
                 <p id="{{level_name}}-desc">{{level.description}}</p>
                 <div class="responsive-grid contain" data-space="md">
                     {%for index in level.indexes %}
-                    <article aria-labelledby="level_{{index}}" aria-describedby="level_{{index}}-desc" class="box structured-grid card" data-variant="level" data-state="unlocked" data-scroll-view="fade-in">
+                    <article aria-labelledby="level_{{index}}" aria-describedby="level_{{index}}-desc" class="box structured-grid card" data-variant="level" data-state="unlocked" data-scroll-view="fade-in" data-level="{{index}}">
                         <div class="row card-title">
                             <h3 id="level_{{index}}">{{"level" | i18n}} {{index}}</h3>
                             <div><div class="card-icon"></div></div>
                         </div>
-                        <a href="/" class="card-action shadowed btn extend-click">
+                        <a href="/{{locale}}/play" class="card-action shadowed btn extend-click" data-label="unlocked">
                             {{"start" | i18n}}
                         </a>
                         <p class="card-desc" id="level_{{index}}-desc">Guessed 0 of 10 words </p>
+                        <span class="card-action btn shadowed h5" aria-disabled="true" data-label="locked"> {{"locked" | i18n | capitalize}} </span>
                     </article>
                     {%endfor%}
                 </div>
             </section>
         {%endfor%}
     </div>
-
 </main>
+<script type="module" src="/assets/scripts/levels.js" defer></script>

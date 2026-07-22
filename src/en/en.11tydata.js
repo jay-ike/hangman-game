@@ -11,48 +11,56 @@ module.exports = Object.freeze({
                             description: "You’ve navigated the safe zone. Time to walk the tightrope.",
                             meta: data["knot"],
                             purpose: "Unlock level 4 to earn this badge.",
+                            tag: "knot",
                             title: "Knot Expert"
                         },
                         {
                             description: "Welcome to the dead end. Every single letter counts now.",
                             meta: data["gallow"],
                             purpose: "Unlock level 8 to earn this badge.",
+                            tag: "gallow",
                             title: "Gallows Walker"
                         },
                         {
                             description: "Found every answer in Level 1 without breaking a sweat.",
                             meta: data["level1"],
                             purpose: "Find every answer in level 1.",
+                            tag: "level1",
                             title: "Untouchable"
                         },
                         {
                             description: "Completely mastered the Safe Zone. The noose can't catch you here.",
                             meta: data["shield"],
                             purpose: "Find every answer in the Safe Zone tier (levels 1, 2, and 3).",
+                            tag: "shield",
                             title: "Rope Dodger"
                         },
                         {
                             description: "Uncovered every hidden answer while balancing on the tightrope.",
                             meta: data["balancing"],
                             purpose: "Find every answer in level 5.",
+                            tag: "balancing",
                             title: "Balancing Act"
                         },
                         {
                             description: "You conquered the Tightrope tier with flawless execution.",
                             meta: data["accrobat"],
                             purpose: "Find every answer in the Tightrope tier (levels 4, 5, 6, and 7).",
+                            tag: "accrobat",
                             title: "Acrobat"
                         },
                         {
                             description: "Discovered all advanced answers at the edge of the abyss.",
                             meta: data["gate"],
                             purpose: "Find every answer in level 9.",
+                            tag: "gate",
                             title: "Dead End Escape"
                         },
                         {
                             description: "The ultimate escape. You fully conquered a category!",
                             meta: data["immortal"],
                             purpose: "Find every answer in a category.",
+                            tag: "immortal",
                             title: "Immortal"
                         }
                     ],
@@ -65,24 +73,28 @@ module.exports = Object.freeze({
                             description: "Solved a puzzle without letting the executioner draw a single line.",
                             meta: data["quill"],
                             purpose: "Guess the answer without a single wrong letter.",
+                            tag: "quill",
                             title: "Flawless Run"
                         },
                         {
                             description: "Saved yourself on the absolute last breath.",
                             meta: data["clutch"],
                             purpose: "Guess the answer on your very last allowed mistake.",
+                            tag: "clutch",
                             title: "Clutch Snap"
                         },
                         {
                             description: "Solved 3 answers in a row without getting caught.",
                             meta: data["streak"],
                             purpose: "Guess 3 answers in a row without losing a game.",
+                            tag: "streak",
                             title: "Survival Streak"
                         },
                         {
                             description: "Successfully dismantled a massive puzzle before the trap door opened.",
                             meta: data["slayer"],
                             purpose: "Guess an answer with 10 or more letters.",
+                            tag: "slayer",
                             title: "Giant Slayer"
                         }
                     ],

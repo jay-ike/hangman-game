@@ -32,7 +32,7 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
                 <p id="{{section_name}}-desc">{{progress.description}}</p>
                 <div class="responsive-grid contain" data-space="md">
                     {%for data in progress.badges %}
-                    <button aria-labelledby="badge_{{section_name}}-{{forloop.index}}" aria-describedby="badge_{{section_name}}-{{forloop.index}}-desc" class="box structured-grid card" data-variant="achievement" data-content="{{data.description}}">
+                    <button aria-labelledby="badge_{{section_name}}-{{forloop.index}}" aria-describedby="badge_{{section_name}}-{{forloop.index}}-desc" class="box structured-grid card" data-variant="achievement" data-content="{{data.description}}" data-tag="{{data.tag}}">
                         {%badge data.meta%}
                         <div class="row card-title">
                             <span class="h3" id="badge_{{section_name}}-{{forloop.index}}">{{data.title}}</span>

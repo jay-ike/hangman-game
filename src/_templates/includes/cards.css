@@ -83,16 +83,17 @@ div:has(> .card-icon) {
     }
 }
 
-span[data-label="unlocked"]:where([data-state="locked"] *) {
+[data-label="unlocked"]:where([data-state="locked"] *) {
     display: none;
 }
 
-span[data-label="locked"]:where([data-state="unlocked"] *) {
+[data-label="locked"]:where([data-state="unlocked"] *) {
     display: none;
 }
 
 .card-desc {
     grid-area: area3;
+    text-align: center;
 }
 
 [data-tier="normal"] {

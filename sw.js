@@ -40,16 +40,16 @@ const {caches, clients, crypto} = self;
 const config = {isOnline: true, version: 9};
 const cachableUrls = {
     pages: {
-        "/": "/index.html",
-        "/404": "/404.html",
-        "/en": "/en/index.html",
-        "/en/categories": "/en/categories/index.html",
-        "/en/play": "/en/play/index.html",
-        "/en/rules": "/en/rules/index.html",
-        "/fr": "/fr/index.html",
-        "/fr/categories": "/fr/categories/index.html",
-        "/fr/play": "/fr/play/index.html",
-        "/fr/rules": "/fr/rules/index.html"
+        // "/": "/index.html",
+        // "/404": "/404.html",
+        // "/en": "/en/index.html",
+        // "/en/categories": "/en/categories/index.html",
+        // "/en/play": "/en/play/index.html",
+        // "/en/rules": "/en/rules/index.html",
+        // "/fr": "/fr/index.html",
+        // "/fr/categories": "/fr/categories/index.html",
+        // "/fr/play": "/fr/play/index.html",
+        // "/fr/rules": "/fr/rules/index.html"
     },
     static: [
         "/assets/mouse-memoirs.regular.woff2",
@@ -483,6 +483,7 @@ function getQuestions(data) {
 
 async function onInstall(event) {
     event.waitUntil(handleInstallation());
+    config.db = await gameStorage({version: config.version});
     await self.skipWaiting();
 }
 function onActivate(event) {
@@ -543,9 +544,10 @@ async function cacheStaticFiles(reload = false) {
         )
     );
 }
+
 async function handleFetch(event) {
     const {request} = event;
-    const cache = await caches.open(config.cacheName);
+    // const cache = await caches.open(config.cacheName);
     const url = new URL(request.url);
     let path = url.pathname.replace(/\/$/, "");
     if (path.length === 0) {
@@ -554,7 +556,11 @@ async function handleFetch(event) {
     if (url.origin !== location.origin) {
         return fetch(request);
     }
-    return safeFetch({cache, event, path});
+    if (url.pathname.startsWith("/api")) {
+        return handleAPI(request);
+    }
+    // return safeFetch({cache, event, path});
+    return fetch(request);
 }
 
 async function safeFetch({cache, event, path}) {
@@ -591,6 +597,13 @@ async function handle404({cache, event, response}) {
         return res;
     }
     return response ?? fetch(event.request);
+}
+
+async function unsupported(req) {
+    const path = new URL(req.url).pathname;
+    return createResponse(400, {
+        message: `path ${path} not supported for method ${req.method}`
+    });
 }
 
 async function word(req, ctx, next) {
@@ -645,16 +658,16 @@ async function hearts(req, ctx, next) {
 }
 
 async function progress(req, ctx, next) {
-    const path = new URL(req.url).pathname;
+    const url = new URL(req.url);
     let tmp;
-    if (!path.startsWith("/api/progress")) {
+    if (!url.pathname.startsWith("/api/progress")) {
         return next(req, ctx);
     }
-    tmp = await req.json();
-    if (!tmp.category) {
+    tmp = url.searchParams
+    if (!tmp.has("cat")) {
         return createResponse(400, {message: "Missing category value"});
     }
-    tmp = await config.db.getCategoryProgress(tmp.category);
+    tmp = await config.db.getCategoryProgress(tmp.get("cat"));
     return createResponse(200, {result: tmp});
 }
 
@@ -702,6 +715,16 @@ async function guess(req, ctx, next) {
     }
     await config.db.incrementUncovered(tmp.category, tmp.level);
     return createResponse(200, {message: "New guess saved successfully !!"});
+}
+
+async function handleAPI(request) {
+    let chain;
+    if (request.method === "GET") {
+        chain = [word, hearts, progress, badges];
+    } else {
+        chain = [found, addBadge, guess, setHearts];
+    }
+    return createHandler(unsupported, chain)(request, {});
 }
 
 async function clearOldCache() {
@@ -759,7 +782,6 @@ async function handleMessage({data, ports}) {
     if (data.connectionRequest && ports[0]) {
         config.isOnline = data.connectionRequest.isOnline;
         ports[0].onmessage = handleMessage;
-        config.db = await gameStorage({version: config.version});
         ports[0].postMessage({connectionAcknowledged: true});
     }
 }
