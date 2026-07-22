@@ -68,7 +68,62 @@ const cachableUrls = {
         "/assets/scripts/game.js"
     ]
 };
+const headers = {
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json"
+};
 config.cacheName = `hangman-${config.version}`;
+
+function chainMiddlewares(handler, middlewares = []) {
+    let chain = [];
+    function nextMiddleware(ev, ctx) {
+        let firstMiddleware = chain.shift();
+        if (typeof firstMiddleware === "function") {
+            try {
+                return firstMiddleware(ev, ctx, nextMiddleware);
+            } catch (error) {
+                return Promise.reject(error);
+            }
+        }
+        return handler(ev, ctx);
+    }
+    return function (event, context, callback) {
+        if (Array.isArray(middlewares)) {
+            chain = middlewares.concat([]);
+        }
+        return nextMiddleware(event, context).then(
+            (result) => callback(null, result)
+        ).catch((err) => callback(err, null));
+    };
+}
+
+function createResponse(status, body) {
+    return new Response(JSON.stringify(body), {status, headers});
+}
+
+function alwaysResolve(resolve) {
+    return function (err, res) {
+        if (res) {
+            resolve(res);
+        } else {
+            console.error(err);
+            resolve(createResponse(500, {
+                message: "Unexpected error while handling your request"
+            }));
+        }
+    };
+}
+
+function createHandler(fn, middlewares) {
+    return function (event, context) {
+        return new Promise(function resolver(resolve) {
+            chainMiddlewares( fn,
+                middlewares
+            )(event, context, alwaysResolve(resolve));
+        });
+    };
+}
 
 async function consume(response, cached) {
     const result = {success: response.ok};
@@ -325,14 +380,14 @@ async function gameStorage({
         console.error(`Progress for ${store} level ${level} does not exists`);
     };
     result.getCategoryProgress = async function (store) {
-        let res = await db.getAllFromIndex("category", store);
+        let res = await db.getAllFromIndex("progress", "category", store);
         return computeStatus(res ?? []);
     };
     result.getHearts = async function (playerId = "default") {
         let res = await db.get("player", playerId);
         return res?.hearts ?? 0;
     };
-    result.setHearts = async function (playerId = "default", hearts) {
+    result.setHearts = async function (hearts, playerId = "default") {
         let res;
         if (!Number.isFinite(Number(hearts))) {
             throw new Error("Invalid heart count provided");
@@ -389,7 +444,6 @@ async function gameStorage({
 * @returns {Progress[]}
 */
 function getProgress(data) {
-    console.dir(data, {depth: 10});
     return Object.entries(data.categories).reduce(function (acc, [store, val]) {
         let tmp = Object.entries(val).reduce(function (words, [k, v]) {
             let level = Number.parseInt(k.replace(/level_/i, ""), 10);
@@ -502,6 +556,7 @@ async function handleFetch(event) {
     }
     return safeFetch({cache, event, path});
 }
+
 async function safeFetch({cache, event, path}) {
     let response;
     response = await cache.match(cachableUrls.pages[path] ?? path);
@@ -538,15 +593,115 @@ async function handle404({cache, event, response}) {
     return response ?? fetch(event.request);
 }
 
-async function getWord(category, level = 1) {
-    let title = String(category ?? "");
-    let word;
+async function word(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let title;
+    let tmp;
+    if (!path.startsWith("/api/word")) {
+        return next(req, ctx);
+    }
+    tmp =  await req.json();
+    title = String(tmp.category ?? "");
     if (title.trim().length === 0) {
         title = config.db.getStores();
         title = title[getRandomIndex(title.length)];
     }
-    word = await config.db.getRandomQuestion(title, level);
-    return {title, word};
+    tmp = await config.db.getRandomQuestion(title, tmp.level);
+    return createResponse(200, {title, word: tmp});
+}
+
+async function found(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/found")) {
+        return next(req, ctx);
+    }
+    tmp = await req.json();
+    if (!tmp.category || !tmp.word) {
+        return createResponse(400, {message: "Missing category or word"});
+    }
+    await config.db.markFound(tmp);
+    return createResponse(200, {message: "Word marked successfully found!!"});
+}
+
+async function badges(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/badges")) {
+        return next(req, ctx);
+    }
+    tmp = await config.db.getAchievements();
+    return createResponse(200, {badges: tmp});
+}
+
+async function hearts(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/hearts")) {
+        return next(req, ctx);
+    }
+    tmp = await config.db.getHearts();
+    return createResponse(200, {hearts: tmp});
+}
+
+async function progress(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/progress")) {
+        return next(req, ctx);
+    }
+    tmp = await req.json();
+    if (!tmp.category) {
+        return createResponse(400, {message: "Missing category value"});
+    }
+    tmp = await config.db.getCategoryProgress(tmp.category);
+    return createResponse(200, {result: tmp});
+}
+
+async function setHearts(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/set-hearts")) {
+        return next(req, ctx);
+    }
+    tmp = await req.json();
+    if (!tmp.hearts) {
+        return createResponse(400, {message: "Missing new hearts value"});
+    }
+    await config.db.setHearts(tmp.hearts);
+    return createResponse(200, {message: "Hearts updated successfully !!"});
+}
+
+async function addBadge(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/new-badge")) {
+        return next(req, ctx);
+    }
+    tmp = await req.json();
+    if (!tmp.achievementId || !tmp.category || !tmp.level) {
+        return createResponse(400, {
+            message: "badge tag or category or level are missing"
+        });
+    }
+    await config.db.addAchievement(tmp);
+    return createResponse(200, {message: "Badge added successfully !!"});
+}
+
+async function guess(req, ctx, next) {
+    const path = new URL(req.url).pathname;
+    let tmp;
+    if (!path.startsWith("/api/new-guess")) {
+        return next(req, ctx);
+    }
+    tmp = await req.json();
+    if (!tmp.category || !tmp.level) {
+        return createResponse(400, {
+            message: "Missing category or level in new guess"
+        });
+    }
+    await config.db.incrementUncovered(tmp.category, tmp.level);
+    return createResponse(200, {message: "New guess saved successfully !!"});
 }
 
 async function clearOldCache() {
@@ -594,7 +749,6 @@ async function sendMessage(msg) {
 }
 
 async function handleMessage({data, ports}) {
-    let response;
     if (data === "SKIP_WAITING") {
         await self.skipWaiting();
         return;
@@ -607,13 +761,6 @@ async function handleMessage({data, ports}) {
         ports[0].onmessage = handleMessage;
         config.db = await gameStorage({version: config.version});
         ports[0].postMessage({connectionAcknowledged: true});
-    }
-    if (data.randomWordRequest && ports[0]) {
-        response = await getWord(data.randomWordRequest.category);
-        ports[0].postMessage({randomWordResponse: response});
-    }
-    if (data.wordFound) {
-        await config.db.markFound(data.wordFound);
     }
 }
 
