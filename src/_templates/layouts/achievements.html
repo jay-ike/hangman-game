@@ -36,6 +36,7 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
                         {%badge data.meta%}
                         <div class="row card-title">
                             <span class="h3" id="badge_{{section_name}}-{{forloop.index}}">{{data.title}}</span>
+                            <span class="rounded box card-icon" id="{{data.tag}}-count"></span>
                         </div>
                         <p id="badge_{{section_name}}-{{forloop.index}}-desc" hidden>{{data.purpose}}</p>
                     </button>
@@ -44,5 +45,34 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
             </section>
         {%endfor%}
     </div>
-
 </main>
+<style>{%cssmin "includes/modals.css"%}</style>
+<dialog aria-labelledby="dialog-title" id="badge-details" class="modal" data-emit="dialog-updated" role="dialog" tabindex="0" autofocus data-variant="preview">
+    <div class="modal-menu btn shadowed column">
+        <div class="row" data-gray-img>
+            {%badge achievements.first.badges.first.meta 75 84%}
+            <div class="stack" id="dialog-title">
+                <h2 id="badge_name" class="sky-text-bg dilated-effect">Knot Expert <h2 hidden>badge</h2></h2>
+                <p class="h5" id="eaning-count" data-space="sm">Earned 2 times</p>
+            </div>
+        </div>
+        <p id="badge-description">your achievement has been setup</p>
+        <div class="stack preview-logs" data-space="md">
+            <h3 class="h4">{{"achievement_logs" | i18n}}</h3>
+            <ul class="row">
+                <li class="box structured-grid card" data-variant="achievement-tile" aria-labelledby="log-1-date" aria-describedby="log-1-desc">
+                    <p class="card-title" id="log-1-date">12 oct 2025</p>
+                    <p class="card-action" id="log-1-desc">Animals - {{"level" | i18n}} 1</p>
+                </li>
+            </ul>
+        </div>
+        <button class="shadowed modal-close rounded center" data-theme="secondary">
+            <svg width="24" height="24">
+                <title id="return">{{ "close" | i18n }}</title>
+                <use href="/assets/images/sprites.svg#x"/>
+            </svg>
+        </button>
+    </div>
+</dialog>
+
+<script type="module" src="/assets/scripts/achievements.js" defer></script>

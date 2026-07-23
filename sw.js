@@ -133,6 +133,7 @@ async function consume(response, cached) {
     }
     return Object.assign(result, res);
 }
+
 function getRandomIndex(length) {
     let array = new Uint8Array(length);
     let result;
@@ -483,7 +484,6 @@ function getQuestions(data) {
 
 async function onInstall(event) {
     event.waitUntil(handleInstallation());
-    config.db = await gameStorage({version: config.version});
     await self.skipWaiting();
 }
 function onActivate(event) {
@@ -499,7 +499,6 @@ async function handleActivation() {
 }
 
 async function handleInstallation() {
-    await setupQuestions();
     await cacheStaticFiles();
 }
 
@@ -606,89 +605,96 @@ async function unsupported(req) {
     });
 }
 
+async function parseParams(req, ctx, next) {
+    const url = new URL(req.url);
+    const meta = {path: url.pathname, params: {}};
+    url.searchParams.forEach(function (val, key) {
+        meta.params[key] = val;
+    });
+    meta.db = await getDb();
+    return next(req, Object.assign(ctx, meta));
+}
+
 async function word(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let title;
     let tmp;
-    if (!path.startsWith("/api/word")) {
+    if (!ctx.path.startsWith("/api/word")) {
         return next(req, ctx);
     }
-    tmp =  await req.json();
-    title = String(tmp.category ?? "");
+    if (!ctx.params?.cat) {
+        return createResponse(400, {message: "Missing category value"});
+    }
+    title = String(ctx.params.cat ?? "");
     if (title.trim().length === 0) {
         title = config.db.getStores();
         title = title[getRandomIndex(title.length)];
     }
-    tmp = await config.db.getRandomQuestion(title, tmp.level);
+    tmp = await ctx.db.getRandomQuestion(title, ctx.params.level);
     return createResponse(200, {title, word: tmp});
 }
 
 async function found(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let tmp;
-    if (!path.startsWith("/api/found")) {
+    if (!ctx.path.startsWith("/api/found")) {
         return next(req, ctx);
     }
-    tmp = await req.json();
     if (!tmp.category || !tmp.word) {
         return createResponse(400, {message: "Missing category or word"});
     }
-    await config.db.markFound(tmp);
+    await ctx.db.markFound(tmp);
     return createResponse(200, {message: "Word marked successfully found!!"});
 }
 
 async function badges(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let tmp;
-    if (!path.startsWith("/api/badges")) {
+    if (!ctx.path.startsWith("/api/badges")) {
         return next(req, ctx);
     }
-    tmp = await config.db.getAchievements();
+    tmp = await ctx.db.getAchievements();
     return createResponse(200, {badges: tmp});
 }
 
 async function hearts(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let tmp;
-    if (!path.startsWith("/api/hearts")) {
+    if (!ctx.path.startsWith("/api/hearts")) {
         return next(req, ctx);
     }
-    tmp = await config.db.getHearts();
+    tmp = await ctx.db.getHearts();
     return createResponse(200, {hearts: tmp});
 }
 
 async function progress(req, ctx, next) {
     const url = new URL(req.url);
     let tmp;
-    if (!url.pathname.startsWith("/api/progress")) {
+    let db;
+    if (!ctx.path.startsWith("/api/progress")) {
         return next(req, ctx);
     }
     tmp = url.searchParams
-    if (!tmp.has("cat")) {
+    if (!ctx.params?.cat) {
         return createResponse(400, {message: "Missing category value"});
     }
-    tmp = await config.db.getCategoryProgress(tmp.get("cat"));
+    db = await getDb();
+    tmp = await db.getCategoryProgress(ctx.params.cat);
     return createResponse(200, {result: tmp});
 }
 
 async function setHearts(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let tmp;
-    if (!path.startsWith("/api/set-hearts")) {
+    if (!ctx.path.startsWith("/api/set-hearts")) {
         return next(req, ctx);
     }
     tmp = await req.json();
     if (!tmp.hearts) {
         return createResponse(400, {message: "Missing new hearts value"});
     }
-    await config.db.setHearts(tmp.hearts);
+    await ctx.db.setHearts(tmp.hearts);
     return createResponse(200, {message: "Hearts updated successfully !!"});
 }
 
 async function addBadge(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let tmp;
-    if (!path.startsWith("/api/new-badge")) {
+    if (!ctx.path.startsWith("/api/new-badge")) {
         return next(req, ctx);
     }
     tmp = await req.json();
@@ -697,14 +703,13 @@ async function addBadge(req, ctx, next) {
             message: "badge tag or category or level are missing"
         });
     }
-    await config.db.addAchievement(tmp);
+    await ctx.db.addAchievement(tmp);
     return createResponse(200, {message: "Badge added successfully !!"});
 }
 
 async function guess(req, ctx, next) {
-    const path = new URL(req.url).pathname;
     let tmp;
-    if (!path.startsWith("/api/new-guess")) {
+    if (!ctx.path.startsWith("/api/new-guess")) {
         return next(req, ctx);
     }
     tmp = await req.json();
@@ -713,16 +718,16 @@ async function guess(req, ctx, next) {
             message: "Missing category or level in new guess"
         });
     }
-    await config.db.incrementUncovered(tmp.category, tmp.level);
+    await ctx.db.incrementUncovered(tmp.category, tmp.level);
     return createResponse(200, {message: "New guess saved successfully !!"});
 }
 
 async function handleAPI(request) {
     let chain;
     if (request.method === "GET") {
-        chain = [word, hearts, progress, badges];
+        chain = [parseParams, word, hearts, progress, badges];
     } else {
-        chain = [found, addBadge, guess, setHearts];
+        chain = [parseParams, found, addBadge, guess, setHearts];
     }
     return createHandler(unsupported, chain)(request, {});
 }
@@ -741,14 +746,14 @@ async function clearOldCache() {
     return Promise.all(oldCacheNames);
 }
 
-async function setupQuestions() {
+async function getDb() {
     let words;
     let progress;
-    const datas = await fetchData({url: "/assets/data.json"});
-    console.log(datas);
-    if (datas.cached || !datas.success) {
-        return;
+    let datas;
+    if (config.db) {
+        return config.db;
     }
+    datas = await fetchData({url: "/assets/data.json"});
     words = getQuestions(datas);
     progress = getProgress(datas);
     config.db = await gameStorage({
@@ -761,7 +766,9 @@ async function setupQuestions() {
             return config.db.addMany(store, datas);
         })
     );
+    return config.db;
 }
+
 async function sendMessage(msg) {
     const allClients = await clients.matchAll({includeUncontrolled: true});
     return Promise.all(allClients.map(function (client) {

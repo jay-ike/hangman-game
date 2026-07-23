@@ -1,6 +1,10 @@
 /*jslint node*/
 const link = "<a href='mailto:ndimah22@protonmail.com'>ndimah22@protonmail</a>";
 module.exports = Object.freeze({
+    achievement_logs: {
+        en: "achievement logs",
+        fr: "historique"
+    },
     available_categories: {
         en: "available categories",
         fr: "catégories disponibles"
@@ -24,6 +28,10 @@ module.exports = Object.freeze({
     cancel_popup: {
         en: "Don't prompt me again",
         fr: "Ne plus afficher ce message"
+    },
+    close: {
+        en: "close",
+        fr: "fermer"
     },
     continue: {
         en: "continue",

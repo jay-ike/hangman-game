@@ -1,0 +1,70 @@
+body {
+    overflow: auto;
+}
+
+body:has(dialog[open]) {
+    overflow: clip;
+}
+
+dialog:focus-visible {
+    outline-style: ridge;
+}
+
+.modal-title {
+    letter-spacing: 0.01em;
+    font-size: clamp(3.7994rem, 2.5557rem + 1.6245 * var(--font-unit, 1vw), 4.8147rem);
+    text-transform: capitalize;
+    white-space: nowrap;
+    margin-block-end: -2rem;
+    z-index: 2;
+    align-self: center;
+}
+
+.modal-menu:where(.modal > *) {
+    --color-fill: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265deg / 83%));
+    --min-padding: min(5lvi, 1.5em);
+
+    flex-grow: 2;
+}
+
+.modal[data-variant="preview"] {
+    --r-space: .5em;
+
+    position: relative;
+}
+
+.modal-close:where(.modal[data-variant="preview"] *) {
+    --min-padding: .5em;
+
+    position: absolute;
+    inset-inline-end: .5em;
+    inset-block-start: .5em;
+}
+
+.modal {
+    inset: 1px;
+    margin: auto;
+    display: flex;
+    flex-flow: column;
+    transform: scale(0.1);
+    inline-size: min(85vi, 500px);
+    background: transparent;
+    overflow: clip auto;
+    overflow: clip / auto; /* for safari */
+    max-block-size: min(75lvb, 465px);
+
+    &:not([open]) {
+        display: none;
+    }
+
+    &[open] {
+        transform: none;
+    }
+
+    &::backdrop {
+        background: linear-gradient(oklch(20% 0.1 295deg / 85%), oklch(28% 0.17 271deg / 85%) 70%, oklch(31% 0.152 283deg / 85%));
+        backdrop-filter: blur(4px);
+    }
+}
+
+

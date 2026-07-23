@@ -96,6 +96,7 @@ async function getBadges(badgePath="src/badges", props={}) {
         tags.forEach(function (tag) {
             badges[tag].srcset = tmp.srcset;
             badges[tag].style = tmp.style;
+            badges[tag].height = tmp.height;
         });
     }
     return badges;

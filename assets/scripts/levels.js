@@ -12,7 +12,7 @@ const dict = {
     },
     unlocked: {
         en: "You've guessed {x} of {y} answers - keep it up!",
-        fr: "{x} réponses sur {y} ont été devinée — continue comme ça !"
+        fr: "{x} réponse{z} sur {y} dévoilée{z} — continue comme ça !"
     }
 };
 
@@ -25,6 +25,7 @@ async function getProgress() {
     });
     if (!tmp.ok) {
         console.error("failed to retrieve progress ");
+        //TODO: Handle error Case in the UI
         return;
     }
     tmp = await tmp.json();
@@ -36,32 +37,30 @@ async function getProgress() {
         if (res.status === "unlocked") {
             props.x = res.uncovered;
             props.y = res.totalWords;
+            props.z = `${res.uncovered > 1 ? "s": ""}`;
         }
         if (res.status === "locked") {
             props.x = res.level - 1;
         }
-        desc = dict[res.status][props.lang];
+        desc = dict[res.status][props.lang].replaceAll("{z}", props.z);
         desc = desc.replace("{x}", props.x ?? "").replace("{y}", props.y ?? "");
         document.getElementById(`level_${res.level}-desc`).innerText = desc;
     });
 }
 
-function setGameData() {
-    let url = new URL(window.location.href);
-    let tmp = decodeURI(url.pathname).split("/")[1];
-    store.setValue("_game_", "lang", tmp);
-    tmp = decodeURI(url.hash).replace("#", "");
-    store.setValue("_game_", "category", tmp);
-    document.getElementById("current-category").innerText = tmp;
-}
-
 (function initialize() {
-    setGameData();
-    document.addEventListener("click", function (event) {
-        let lev = Number.parseInt(event.target.dataset.level, 10);
-        if (Number.isFinite(lev)) {
-            store.setValue("_game_", "level", lev);
-        }
-    });
+    const opts = {};
+    let url = new URL(window.location.href);
+    opts.category = decodeURIComponent(url.hash.replace("#", ""));
+    opts.lang = decodeURIComponent(url.pathname).split("/")[1];
+    if (!opts.category) {
+        console.warn(`Missing category ${opts.category}. redirecting ...`);
+        window.location.assign(`/${opts.lang}/categories`);
+        return;
+    }
+    store.setValue("_game_", "lang", opts.lang);
+    store.setValue("_game_", "category", opts.category);
+    document.getElementById("current-category").innerText = opts.category;
     getProgress();
+    window.history.replaceState(null, "", url.pathname);
 }())

@@ -77,8 +77,15 @@ function getAttributes(metadata, sizeGetter) {
     result.sizes = result.sizes.join(", ");
     return result;
 }
-async function parseBadge(props) {
-    return `<img ${Object.entries(props ?? {}).reduce(function (acc, [k, v]) {
+async function parseBadge(props, width, height) {
+    const obj = Object.assign({}, props ?? {});
+    if (Number.isFinite(width)) {
+        obj.width = width;
+    }
+    if (Number.isFinite(height)) {
+        obj.height = height;
+    }
+    return `<img ${Object.entries(obj).reduce(function (acc, [k, v]) {
         return acc + ` ${k}="${v}"`;
     }, "")} >`;
 }
@@ -90,6 +97,7 @@ module.exports = function (config) {
     config.addShortcode("cssmin", function (src) {
         return parseCss(config, src);
     });
+    config.addFilter("encode_uri", encodeURIComponent);
     config.addPlugin(i18n, {
         translations: require("./src/_data/i18n"),
         fallbackLocales: {"fr": "en"}

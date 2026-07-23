@@ -32,14 +32,15 @@
 
 .card-action {
     grid-area: area2;
+    flex-shrink: 2;
 
     &:where([data-variant="rule"] > *) {
         font-size: min(8cqi, 2em);
         color: var(--system-color-deep-blue);
     }
 
-    &:where([data-variant="level"][data-state="perfect"] *) {
-        display: none;
+    &:where(:is([data-variant="achievement"]:not([data-earned]), [data-gray-img]) > *) {
+        filter: grayscale(0.6) contrast(0.7) brightness(1.1) saturate(0.6);
     }
 }
 
@@ -66,9 +67,13 @@ div:has(> .card-icon) {
 }
 
 .card-icon {
-    inline-size: 24px;
+    --min-padding: .25em;
+
+    font-size: .75em;
+    min-inline-size: var(--icon-size, 24px);
     background: var(--icon-gradient);
     aspect-ratio: 1;
+    color: var(--icon-clr, currentcolor);
 
     &:where([data-state="locked"] *) {
         clip-path: url("#lock");
@@ -81,13 +86,14 @@ div:has(> .card-icon) {
     &:where([data-state="perfect"] *) {
         clip-path: url("#star");
     }
+
+    &:where(.card[data-variant="achievement"]:not([data-multiple]) *) {
+        display: none;
+    }
 }
 
-[data-label="unlocked"]:where([data-state="locked"] *) {
-    display: none;
-}
-
-[data-label="locked"]:where([data-state="unlocked"] *) {
+[data-label="unlocked"]:not([data-state="unlocked"] *),
+[data-label="locked"]:not([data-state="locked"] *) {
     display: none;
 }
 
@@ -96,7 +102,7 @@ div:has(> .card-icon) {
     text-align: center;
 }
 
-[data-tier="normal"] {
+[data-tier="normal"], .card[data-variant="achievement-tile"] {
     --card-fill: oklch(92% 0.015 277deg);
     --color-text: oklch(48% 0.053 293deg);
 }
@@ -124,10 +130,22 @@ div:has(> .card-icon) {
     --p-items: center;
     --g-gap: min(1.5cqb, 1rem);
     --r-space: .5em;
+    --icon-gradient: oklch(92% 0.015 277deg);
+    --icon-clr: var(--system-color-dark-navy);
+    --min-padding: .75em;
 
     color: oklch(92% 0.015 277deg);
     border: 3px solid currentcolor;
     min-inline-size: min(80lvi, 215px);
+}
+
+.card[data-variant="achievement-tile"] {
+    --g-template: "area1" "area2" 1fr;
+    --min-padding: .5em;
+    --radius: .5em;
+    --g-gap: .25em;
+
+    min-inline-size: auto;
 }
 
 .card[data-variant="level"] {
@@ -136,6 +154,7 @@ div:has(> .card-icon) {
     --color-fill: var(--card-fill);
     --p-items: center;
     --r-space: .5em;
+    --outline-clr: var(--system-color-deep-blue);
 
     color: var(--color-text);
     position: relative;
