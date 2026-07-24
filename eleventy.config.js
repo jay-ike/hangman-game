@@ -77,13 +77,10 @@ function getAttributes(metadata, sizeGetter) {
     result.sizes = result.sizes.join(", ");
     return result;
 }
-async function parseBadge(props, width, height) {
-    const obj = Object.assign({}, props ?? {});
-    if (Number.isFinite(width)) {
-        obj.width = width;
-    }
-    if (Number.isFinite(height)) {
-        obj.height = height;
+async function parseBadge(props, override) {
+    let obj = Object.assign({}, props ?? {});
+    if (override) {
+        obj = Object.assign(obj, override);
     }
     return `<img ${Object.entries(obj).reduce(function (acc, [k, v]) {
         return acc + ` ${k}="${v}"`;

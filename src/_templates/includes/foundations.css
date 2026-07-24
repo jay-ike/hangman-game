@@ -403,6 +403,7 @@ body {
     }
 
     p:where(:not([class])) {
+        text-align: var(--p-align, start);
         white-space: var(--p-space, collapse balance);
         max-inline-size: var(--p-width, 50em);
     }

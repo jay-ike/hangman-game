@@ -10,56 +10,56 @@ module.exports = Object.freeze({
                         {
                             description: "You’ve navigated the safe zone. Time to walk the tightrope.",
                             meta: data["knot"],
-                            purpose: "Unlock level 4 to earn this badge.",
+                            purpose: "Unlock level 4 by guessing 3 answers in level 3. Keep at it, you're making progress.",
                             tag: "knot",
                             title: "Knot Expert"
                         },
                         {
                             description: "Welcome to the dead end. Every single letter counts now.",
                             meta: data["gallow"],
-                            purpose: "Unlock level 8 to earn this badge.",
+                            purpose: "Unlock level 8 by guessing 3 answers in level 7. Stay focused, it's worth the effort.",
                             tag: "gallow",
                             title: "Gallows Walker"
                         },
                         {
                             description: "Found every answer in Level 1 without breaking a sweat.",
                             meta: data["level1"],
-                            purpose: "Find every answer in level 1.",
+                            purpose: "Find every answer in level 1 without missing a single one. Give it a try, you might surprise yourself.",
                             tag: "level1",
                             title: "Untouchable"
                         },
                         {
                             description: "Completely mastered the Safe Zone. The noose can't catch you here.",
                             meta: data["shield"],
-                            purpose: "Find every answer in the Safe Zone tier (levels 1, 2, and 3).",
+                            purpose: "Find every answer in the Safe Zone tier (levels 1, 2, and 3). Keep playing, you'll get there.",
                             tag: "shield",
                             title: "Rope Dodger"
                         },
                         {
                             description: "Uncovered every hidden answer while balancing on the tightrope.",
                             meta: data["balancing"],
-                            purpose: "Find every answer in level 5.",
+                            purpose: "Find every answer in level 5. Take your time and enjoy the challenge.",
                             tag: "balancing",
                             title: "Balancing Act"
                         },
                         {
                             description: "You conquered the Tightrope tier with flawless execution.",
                             meta: data["accrobat"],
-                            purpose: "Find every answer in the Tightrope tier (levels 4, 5, 6, and 7).",
+                            purpose: "Find every answer in the Tightrope tier (levels 4, 5, 6, and 7). It's tough, but you can do it.",
                             tag: "accrobat",
                             title: "Acrobat"
                         },
                         {
                             description: "Discovered all advanced answers at the edge of the abyss.",
                             meta: data["gate"],
-                            purpose: "Find every answer in level 9.",
+                            purpose: "Find every answer in level 9. A tough climb, but a rewarding one.",
                             tag: "gate",
                             title: "Dead End Escape"
                         },
                         {
                             description: "The ultimate escape. You fully conquered a category!",
                             meta: data["immortal"],
-                            purpose: "Find every answer in a category.",
+                            purpose: "Find every answer in a whole category. One step at a time, you'll get there.",
                             tag: "immortal",
                             title: "Immortal"
                         }
@@ -72,28 +72,28 @@ module.exports = Object.freeze({
                         {
                             description: "Solved a puzzle without letting the executioner draw a single line.",
                             meta: data["quill"],
-                            purpose: "Guess the answer without a single wrong letter.",
+                            purpose: "Guess an answer without a single wrong letter. It's rare, but when it happens it feels great.",
                             tag: "quill",
                             title: "Flawless Run"
                         },
                         {
                             description: "Saved yourself on the absolute last breath.",
                             meta: data["clutch"],
-                            purpose: "Guess the answer on your very last allowed mistake.",
+                            purpose: "Guess an answer on your very last allowed mistake. Nail‑biting, but oh so satisfying.",
                             tag: "clutch",
                             title: "Clutch Snap"
                         },
                         {
                             description: "Solved 3 answers in a row without getting caught.",
                             meta: data["streak"],
-                            purpose: "Guess 3 answers in a row without losing a game.",
+                            purpose: "Guess 3 answers in a row without losing a game. Stay steady, you'll hit your stride.",
                             tag: "streak",
                             title: "Survival Streak"
                         },
                         {
                             description: "Successfully dismantled a massive puzzle before the trap door opened.",
                             meta: data["slayer"],
-                            purpose: "Guess an answer with 10 or more letters.",
+                            purpose: "uess an answer with 10 or more letters. Big challenges bring big satisfaction.",
                             tag: "slayer",
                             title: "Giant Slayer"
                         }

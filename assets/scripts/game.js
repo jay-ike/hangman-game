@@ -2,7 +2,6 @@
 import utils from "./utils.js";
 
 const {Audio, DOMException, URL, document, navigator} = window;
-const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
 let engine;
 let workerPort;
 let refreshed;
@@ -100,7 +99,7 @@ function dialogHandler(emitter) {
         const btn = event.target;
         let {status} = target.dataset;
 
-        if (isButton(btn) && btn.classList.contains("continue-btn")) {
+        if (utils.isButton(btn) && btn.classList.contains("continue-btn")) {
             if (allowedStatus.includes(status) && status !== "paused") {
                 engine.saveHearts(8);
                 wakeupWorker();
@@ -281,7 +280,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         btn = rootElement.querySelector(
             `[aria-keyshortcuts="${event.key} Shift+${event.key}" i]`
         );
-        if (isButton(btn)) {
+        if (utils.isButton(btn)) {
             if (btn.getAttribute("aria-disabled") === "true") {
                 btn.focus();
             } else {
@@ -297,7 +296,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         const {target} = event;
         const {tooltip} = target.dataset;
         if (
-            !isButton(target) ||
+            !utils.isButton(target) ||
             !target.classList.contains("letter") ||
             target.getAttribute("aria-disabled") !== null ||
             (tooltip === "gift-tooltip" && components.hearts < 2) ||

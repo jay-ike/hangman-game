@@ -1,6 +1,12 @@
 /*jslint browser, this*/
 const {Element} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
+const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
+const dateOpts = {day: "numeric", month: "short", year: "numeric"};
+
+function formatDate(date, lang, options = dateOpts) {
+    return new Intl.DateTimeFormat(lang, options).format(date);
+}
 
 function parsedTemplate(data, string) {
     let result = string.replace(
@@ -301,11 +307,13 @@ function jsonStorage() {
 export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
+    formatDate,
     getFallBack,
     getFocusableChildren,
     getIndexes,
     getRandomLetter,
     getWords,
+    isButton,
     jsonStorage,
     trapFocus
 });

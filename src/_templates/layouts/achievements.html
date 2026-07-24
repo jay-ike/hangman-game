@@ -32,13 +32,14 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
                 <p id="{{section_name}}-desc">{{progress.description}}</p>
                 <div class="responsive-grid contain" data-space="md">
                     {%for data in progress.badges %}
-                    <button aria-labelledby="badge_{{section_name}}-{{forloop.index}}" aria-describedby="badge_{{section_name}}-{{forloop.index}}-desc" class="box structured-grid card" data-variant="achievement" data-content="{{data.description}}" data-tag="{{data.tag}}">
-                        {%badge data.meta%}
+                    <button aria-labelledby="{{data.tag}}-title" aria-describedby="{{data.tag}}-desc {{data.tag}}-count-desc" class="box structured-grid card" data-variant="achievement" data-content="{{data.description}}" data-tag="{{data.tag}}">
+                        {%badge data.meta site.badgeCardProps%}
                         <div class="row card-title">
-                            <span class="h3" id="badge_{{section_name}}-{{forloop.index}}">{{data.title}}</span>
+                            <span class="h3" id="{{data.tag}}-title">{{data.title}}</span>
                             <span class="rounded box card-icon" id="{{data.tag}}-count"></span>
                         </div>
-                        <p id="badge_{{section_name}}-{{forloop.index}}-desc" hidden>{{data.purpose}}</p>
+                        <span hidden id="{{data.tag}}-count-desc"></span>
+                        <p id="{{data.tag}}-desc" hidden>{{data.purpose}}</p>
                     </button>
                     {%endfor%}
                 </div>
@@ -49,14 +50,14 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
 <style>{%cssmin "includes/modals.css"%}</style>
 <dialog aria-labelledby="dialog-title" id="badge-details" class="modal" data-emit="dialog-updated" role="dialog" tabindex="0" autofocus data-variant="preview">
     <div class="modal-menu btn shadowed column">
-        <div class="row" data-gray-img>
-            {%badge achievements.first.badges.first.meta 75 84%}
+        <div class="row" data-gray>
+            {%badge achievements.first.badges.first.meta site.badgeModalProps%}
             <div class="stack" id="dialog-title">
-                <h2 id="badge_name" class="sky-text-bg dilated-effect">Knot Expert <h2 hidden>badge</h2></h2>
-                <p class="h5" id="eaning-count" data-space="sm">Earned 2 times</p>
+                <h2 id="badge_name" class="sky-text-bg dilated-effect" data-listen="heading-updated" data-property="{title}"></h2>
+                <p id="eaning-count" data-space="sm" data-listen="heading-updated" data-property="{count}"></p>
             </div>
         </div>
-        <p id="badge-description">your achievement has been setup</p>
+        <p id="badge-description" data-listen="heading-updated" data-property="{description}"></p>
         <div class="stack preview-logs" data-space="md">
             <h3 class="h4">{{"achievement_logs" | i18n}}</h3>
             <ul class="row">

@@ -39,7 +39,7 @@
         color: var(--system-color-deep-blue);
     }
 
-    &:where(:is([data-variant="achievement"]:not([data-earned]), [data-gray-img]) > *) {
+    &:where([data-variant="achievement"]:not([data-earned]) > *) {
         filter: grayscale(0.6) contrast(0.7) brightness(1.1) saturate(0.6);
     }
 }

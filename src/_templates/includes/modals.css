@@ -31,6 +31,15 @@ dialog:focus-visible {
     --r-space: .5em;
 
     position: relative;
+
+    &:where([data-not-earned]) {
+        --row-dir: column;
+        --p-align: center;
+    }
+}
+
+.preview-logs:where(.modal[data-not-earned] *) {
+    display: none;
 }
 
 .modal-close:where(.modal[data-variant="preview"] *) {
