@@ -1,33 +1,17 @@
 import utils from "./utils.js";
 
 const store = utils.jsonStorage();
-const dict = {
-    earned: {
-        en: "Earned {x} time{y}",
-        fr: "Obtenu {x} fois"
-    },
-    level: {
-        en: "Level",
-        fr: "Niveau"
-    },
-    not_earned: {
-        en: "Not earned yet",
-        fr: "Pas encore obtenu"
-    }
-}
+const api = new utils.ApiHandler();
 
 function getDescription(count) {
     const lang = store.getValue("_game_", "lang") ?? "en";
-    let res = count > 0 ? dict.earned : dict.not_earned;
+    let res = count > 0 ? utils.dict.earned : utils.dict.not_earned;
     res = res[lang].replace("{x}", count).replace("{y}", count > 1 ? "s" : "");
     return res;
 }
 
 async function getBadges(emitter) {
-    let res = await fetch("/api/badges", {
-        headers: {"Content-Type": "application/json"},
-        method: "GET"
-    });
+    let res = await api.getBadges(store.getValue("_game_", "lang"));
     let tags = Array.from(document.querySelectorAll("[data-tag]"));
     let showDialog = dialogHandler(emitter);
     if (!res.ok) {
@@ -35,13 +19,12 @@ async function getBadges(emitter) {
         //TODO: Handle error Case in the UI
         return;
     }
-    res = await res.json();
-    res = {badges: [
+    res.data = [
         {id: "quill", events: [{unlockedAt: Date.now(), category: "Countries", level: 3}]}
-    ]};
+    ];
     tags.forEach(function (el) {
         const {tag} = el.dataset;
-        const badge = res.badges.filter((t) => t.id === tag)[0];
+        const badge = res.data.filter((t) => t.id === tag)[0];
         let tmp = el.querySelector(`#${tag}-count-desc`);
         tmp.innerText = getDescription(badge?.events?.length ?? 0);
         if (!badge) {
@@ -71,7 +54,7 @@ async function getBadges(emitter) {
         if (!tag) {
             return;
         }
-        badge = res.badges.filter((b) => b.id === tag)[0];
+        badge = res.data.filter((b) => b.id === tag)[0];
         if (Array.isArray(badge?.events) && list) {
             data = badge.events.map(getAchievementDOM).join("");
             list.textContent = "";
@@ -98,7 +81,7 @@ function getAchievementDOM(evt, i) {
     const p = {
         date: new Date(evt.unlockedAt).toISOString(),
         title: utils.formatDate(evt.unlockedAt, lang),
-        desc: evt.category + " - " + dict.level[lang] + " " + evt.level
+        desc: evt.category + " - " + utils.dict.level[lang] + " " + evt.level
     };
     return `<li class="box structured-grid card" data-variant="achievement-tile"
     aria-labelledby="log-1-date" aria-describedby="log-${i}-desc">

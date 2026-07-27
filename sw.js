@@ -1,15 +1,8 @@
 /*jslint browser*/
 /*global self, idb*/
+/** @import {Progress} from './assets/scripts/utils.js' */
 importScripts("./assets/scripts/idb-min.js");
 
-/**
-* A Progres Indicator
-* @typedef {Object} Progress
-* @property {string} store
-* @property {number} level
-* @property {number} totalWords
-* @property {number} uncovered
-*/
 /**
  * An item with a name.
  * @typedef {Object} Item
@@ -286,7 +279,10 @@ async function gameStorage({
                     keyPath: "id",
                     autoIncrement: true
                 });
-                store.createIndex("playerId", "playerId", {unique: false});
+                store.createIndex("player",
+                    ["playerId", "lang"],
+                    {unique: false}
+                );
                 store.createIndex(
                     "playerAchievements",
                     ["playerId", "achievementId"],
@@ -403,15 +399,16 @@ async function gameStorage({
     result.addAchievement = async function ({
         achievementId,
         category,
+        lang,
         level,
-        playerId = "default",
+        playerId = "default"
     }) {
-        const ev = {achievementId, category, level, playerId};
+        const ev = {achievementId, category, lang, level, playerId};
         ev.unlockedAt = Date.now();
         await db.put("achievements", ev);
     };
-    result.getAchievements = async function (player = "default") {
-        let res = await db.getAllFromIndex("achievements", "playerId", player);
+    result.getAchievements = async function (lang, id = "default") {
+        let res = await db.getAllFromIndex("achievements", "player", [id, lang]);
         res = (res ?? []).reduce(function (acc, ev) {
             if (!acc[ev.achievementId]) {
                 acc[ev.achievementId] = {id: ev.achievementId, events: [ev]};
@@ -650,7 +647,12 @@ async function badges(req, ctx, next) {
     if (!ctx.path.startsWith("/api/badges")) {
         return next(req, ctx);
     }
-    tmp = await ctx.db.getAchievements();
+    if (!ctx.params?.lang) {
+        return createResponse(400, {
+            message: "Missing The language achievements has been made !!"
+        });
+    }
+    tmp = await ctx.db.getAchievements(ctx.params.lang);
     return createResponse(200, {badges: tmp});
 }
 
@@ -664,13 +666,11 @@ async function hearts(req, ctx, next) {
 }
 
 async function progress(req, ctx, next) {
-    const url = new URL(req.url);
     let tmp;
     let db;
     if (!ctx.path.startsWith("/api/progress")) {
         return next(req, ctx);
     }
-    tmp = url.searchParams
     if (!ctx.params?.cat) {
         return createResponse(400, {message: "Missing category value"});
     }
@@ -698,9 +698,9 @@ async function addBadge(req, ctx, next) {
         return next(req, ctx);
     }
     tmp = await req.json();
-    if (!tmp.achievementId || !tmp.category || !tmp.level) {
+    if (!tmp.achievementId || !tmp.category || !tmp.level || !tmp.lang) {
         return createResponse(400, {
-            message: "badge tag or category or level are missing"
+            message: "missing badge tag or category or level or language"
         });
     }
     await ctx.db.addAchievement(tmp);

@@ -1,7 +1,9 @@
 /*jslint browser, this*/
+/** @import {GameData} from "./utils.js" */
 import utils from "./utils.js";
 
 const {Audio, DOMException, URL, document, navigator} = window;
+const api = new utils.ApiHandler();
 let engine;
 let workerPort;
 let refreshed;
@@ -53,30 +55,36 @@ function handleMessage({data, ports}) {
         engine.init();
     }
 }
-function getGameData(url) {
-    const route = new URL(url);
-    const lang = decodeURI(route.pathname).split("/")[1];
-    let category = decodeURI(route.hash).replace("#", "");
-    category = (
-        category.length < 1
-        ? utils.getFallBack(lang).title
-        : category
-    );
-    return new Promise(function (res) {
-        const chan = new MessageChannel();
-        workerPort.postMessage(
-            {randomWordRequest: {category}},
-            [chan.port2]
-        );
-        chan.port1.onmessage = function ({data}) {
-            const {randomWordResponse} = data;
-            if (randomWordResponse.title && randomWordResponse.word) {
-                res(data.randomWordResponse);
-            } else {
-                res(utils.getFallBack(lang));
-            }
-        };
-    });
+
+/**
+* Utility for retrieving user game data
+* @returns {Promise<GameData>}
+*/
+async function getGameData(store) {
+    const url = new URL(document.URL);
+    const opts = {lang: decodeURI(url.pathname).split("/")[1]};
+    let tmp;
+    opts.level = Number.parseInt(decodeURI(url.hash).replace("#", ""), 10);
+    opts.category = store.getValue("_game_", "category");
+    tmp = Number.parseInt(store.getValue("_game_", "streak"), 10);
+    opts.streak = Number.isFinite(tmp) ? tmp : 0;
+    if (!opts.category || !Number.isFinite(opts.level)) {
+        window.location.assign(`/${opts.lang}/categories`);
+        return;
+    }
+    tmp = await api.getHearts();
+    if (!tmp.ok) {
+        console.error("Failed to retrieve user hearts !!!");
+        return;
+    }
+    opts.hearts = tmp.data;
+    tmp = await api.getWord(opts.category, opts.level);
+    if (!tmp.ok) {
+        console.error("Failed to retrieve hidden item !!");
+        return;
+    }
+    opts.word = tmp.data.word;
+    return opts;
 }
 
 function dialogHandler(emitter) {
@@ -233,26 +241,25 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             return Promise.resolve(true);
         };
     }
+    /**
+    * Utility for initializing the game engine
+    * @param {GameData} gameData
+    */
     async function initialize(gameData) {
         let data;
         if (gameData) {
             data = gameData;
         } else {
-            data = await getGameData(document.URL);
+            data = await getGameData(components.store);
         }
         components.lettersFound = Object.create(null);
-        components.word = data.word;
-        components.category = data.title;
-        components.hearts = Math.max(
-            getPoints(components.store, maxHearts),
-            maxHearts
-        );
+        Object.assign(components, data);
         components.headerEmitter.dispatch("title-updated", {
-            title: data.title,
+            title: data.category,
             titleClass: "nil"
         });
         components.headerEmitter.dispatch("heart-updated", {
-            hearts: components.hearts,
+            hearts: data.hearts,
             percentage: "100%"
         });
         components.letterEmitter.target.textContent = "";
@@ -363,6 +370,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     });
     return self;
 }
+
 function wakeupWorker() {
     let channel;
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {

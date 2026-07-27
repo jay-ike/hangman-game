@@ -1,8 +1,66 @@
 /*jslint browser, this*/
+/**
+* @template T
+* @typedef {Object} ApiResponse
+* @property {boolean} ok
+* @property {T} data
+*/
+/**
+* A Progress Indicator
+* @typedef {Object} Progress
+* @property {string} store
+* @property {number} level
+* @property {number} totalWords
+* @property {number} uncovered
+*/
+/**
+* An achievement Event
+* @typedef {Object} AchievementEvent
+* @property {string} achievementId
+* @property {string} category
+* @property {Number} level
+* @property {string} playerId
+* @property {Number} unlockedAt
+*/
+/**
+* Game user data
+* @typedef {Object} GameData
+* @property {number} hearts
+* @property {string} category
+* @property {number} level
+* @property {number} streak
+* @property {string} word
+*/
 const {Element} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
 const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
 const dateOpts = {day: "numeric", month: "short", year: "numeric"};
+const dict = {
+    earned: {
+        en: "Earned {x} time{y}",
+        fr: "Obtenu {x} fois"
+    },
+    level: {
+        en: "Level",
+        fr: "Niveau"
+    },
+    locked: {
+        en: "Guess 3 answers in Level {x} to unlock",
+        fr: "Devine 3 réponses dans le niveau {x} pour le débloquer."
+    },
+    not_earned: {
+        en: "Not earned yet",
+        fr: "Pas encore obtenu"
+    },
+    perfect: {
+        en: "You've guessed every answer perfectly!",
+        fr: "Toutes les réponses ont été devinées à la perfection !"
+    },
+    unlocked: {
+        en: "You've guessed {x} of {y} answers - keep it up!",
+        fr: "{x} réponse{z} sur {y} dévoilée{z} — continue comme ça !"
+    }
+};
 
 function formatDate(date, lang, options = dateOpts) {
     return new Intl.DateTimeFormat(lang, options).format(date);
@@ -304,9 +362,46 @@ function jsonStorage() {
         supported: () => typeof window.Storage === "function"
     });
 }
+
+/**
+* Utility for handling API calls
+* @constructor
+*/
+function ApiHandler() {
+    const defaultHeaders = {"Content-Type": "application/json"};
+    const headers = {
+        get: {headers: defaultHeaders, method: "GET"},
+        post: function (body) {
+            return {body, headers: defaultHeaders, method: "POST"};
+        }
+    };
+    const self = Object.create(null);
+
+    async function get(path, fn) {
+        const opts = {};
+        let res = await fetch(path, headers.get);
+        opts.ok = res.ok;
+        res = await res.json();
+        opts.data = typeof fn === "function" ? fn(res): res;
+        return opts;
+    }
+
+    /** @method getProgress */
+    self.getProgress = (c) => get(`/api/progress?cat=${c}`, (r) => r.result);
+    /** @method getBadges */
+    self.getBadges = (l) => get(`/api/badges?lang=${l}`, (r) => r.badges);
+    /** @method getHearts */
+    self.getHearts = () => get(`/api/hearts`, (r) => r.hearts);
+    /** @method getWord */
+    self.getWord = (c, lev) => get(`/api/word?cat=${c}&level=${lev}`);
+    return Object.freeze(self);
+}
+
 export default Object.freeze({
+    ApiHandler,
     EventDispatcher,
     createDOMSentence,
+    dict,
     formatDate,
     getFallBack,
     getFocusableChildren,
@@ -317,3 +412,4 @@ export default Object.freeze({
     jsonStorage,
     trapFocus
 });
+export {};

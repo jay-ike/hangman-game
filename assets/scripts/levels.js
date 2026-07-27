@@ -1,35 +1,17 @@
 import utils from "./utils.js";
 
 const store = utils.jsonStorage();
-const dict = {
-    locked: {
-        en: "Guess 3 answers in Level {x} to unlock",
-        fr: "Devine 3 réponses dans le niveau {x} pour le débloquer."
-    },
-    perfect: {
-        en: "You've guessed every answer perfectly!",
-        fr: "Toutes les réponses ont été devinées à la perfection !"
-    },
-    unlocked: {
-        en: "You've guessed {x} of {y} answers - keep it up!",
-        fr: "{x} réponse{z} sur {y} dévoilée{z} — continue comme ça !"
-    }
-};
-
+const api = new utils.ApiHandler();
 
 async function getProgress() {
     let tmp = store.getValue("_game_", "category");
-    tmp = await fetch(`/api/progress?cat=${encodeURI(tmp)}`, {
-        headers: {"Content-type": "application/json"},
-        method: "GET"
-    });
+    tmp = await api.getProgress(encodeURI(tmp));
     if (!tmp.ok) {
         console.error("failed to retrieve progress ");
         //TODO: Handle error Case in the UI
         return;
     }
-    tmp = await tmp.json();
-    tmp.result.forEach(function (res) {
+    tmp.data.forEach(function (res) {
         const level = document.querySelector(`[data-level="${res.level}"]`);
         const props = {lang: store.getValue("_game_", "lang")};
         let desc;
@@ -42,7 +24,7 @@ async function getProgress() {
         if (res.status === "locked") {
             props.x = res.level - 1;
         }
-        desc = dict[res.status][props.lang].replaceAll("{z}", props.z);
+        desc = utils.dict[res.status][props.lang].replaceAll("{z}", props.z);
         desc = desc.replace("{x}", props.x ?? "").replace("{y}", props.y ?? "");
         document.getElementById(`level_${res.level}-desc`).innerText = desc;
     });
