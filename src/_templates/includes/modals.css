@@ -20,14 +20,26 @@ dialog:focus-visible {
     align-self: center;
 }
 
+svg:where(input[type="checkbox"] + *) {
+    inline-size: 100%;
+    height: 100%;
+    border-radius: 0.25rem;
+    border: 1px solid var(--system-color-white);
+    padding: 0.15rem;
+    stroke: var(--system-color-white);
+    stroke-dashoffset: 1;
+    stroke-dasharray: 1;
+    z-index: -1;
+}
+
 .modal-menu:where(.modal > *) {
     --color-fill: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265deg / 83%));
-    --min-padding: min(5lvi, 1.5em);
+    --min-padding: var(--modal-padding, min(5lvi, 1.5em));
 
     flex-grow: 2;
 }
 
-.modal[data-variant="preview"] {
+.modal:where([data-variant="preview"]) {
     --r-space: .5em;
 
     position: relative;
@@ -36,6 +48,19 @@ dialog:focus-visible {
         --row-dir: column;
         --p-align: center;
     }
+}
+
+.modal:where([data-variant="menu"]) {
+    --alignment: center;
+    --modal-padding: min(15lvb, 3rem) min(10lvi, 2rem) 1.5em;
+    --radius: calc(min(15vi, 4rem) / 2);
+    --c-space: 2rem;
+    --link-text-align: center;
+}
+
+.modal[data-purpose="answer-reveal"] {
+    --c-space: 1rem;
+    --heart-size: min(10cqi, 3rem);
 }
 
 .preview-logs:where(.modal[data-not-earned] *) {
@@ -50,6 +75,47 @@ dialog:focus-visible {
     inset-block-start: .5em;
 }
 
+.check-wrapper:where(.modal[data-purpose] *) {
+    position: relative;
+    inline-size: 2rem;
+    aspect-ratio: 1;
+    isolation: isolate;
+
+    &:focus-within {
+        outline: max(2px, .3em) solid currentcolor;
+        outline-offset: max(2px, .3em);
+    }
+
+    & > * {
+        position: absolute;
+        inset: 0;
+        inline-size: 100%;
+        block-size: 100%;
+    }
+
+    & > input[type="checkbox"] {
+        opacity: 0;
+        z-index: 0;
+        margin: 0;
+
+        &:checked + svg {
+            stroke-dashoffset: 0;
+            background-color: var(--system-color-dark-navy);
+            border-color: var(--system-color-dark-navy);
+        }
+    }
+}
+
+div:has(> .check-wrapper) {
+    --r-space: .5rem;
+}
+
+.modal-actions:where(.modal[data-purpose] *) {
+    --r-space: 1rem;
+    --row-dir: column;
+    --row-align: stretch;
+}
+
 .modal {
     inset: 1px;
     margin: auto;
@@ -60,7 +126,7 @@ dialog:focus-visible {
     background: transparent;
     overflow: clip auto;
     overflow: clip / auto; /* for safari */
-    max-block-size: min(75lvb, 465px);
+    max-block-size: min(75lvb, 480px);
 
     &:not([open]) {
         display: none;
@@ -77,3 +143,21 @@ dialog:focus-visible {
 }
 
 
+:where(
+[data-label="paused"]:not(.modal[data-status="paused"] *),
+[data-label="won"]:not(.modal[data-status="won"] *),
+[data-label="lost"]:not(.modal[data-status="lost"] *),
+[data-label="letter-reveal"]:not(.modal[data-purpose="letter-reveal"] *),
+[data-label="answer-reveal"]:not(.modal[data-purpose="answer-reveal"] *),
+[data-action-label="replay"]:not([data-action="replay"] > *),
+[data-action-label="continue"]:not([data-action="continue"] > *)
+) {
+    display: none;
+}
+
+@media screen and (width > 28em){
+    .modal-actions:where(.modal[data-purpose] *) {
+        --row-dir: row;
+        --i-alignment: end;
+    }
+}

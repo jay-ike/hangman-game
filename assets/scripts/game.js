@@ -57,6 +57,34 @@ function handleMessage({data, ports}) {
 }
 
 /**
+* Utility for retrieving a hidden item based
+* @param {number} level
+* @param {string} category
+* @param {string} [lang="en"]
+* @returns {Promise<{title: string, word: string}>}
+*/
+function getAnswer(category, level, lang = "en") {
+    if (typeof workerPort?.postMessage !== "function") {
+        return utils.getFallBack(lang);
+    }
+    return new Promise(function (res) {
+        const chan = new MessageChannel();
+        workerPort.postMessage(
+            {randomWordRequest: {category, level}},
+            [chan.port2]
+        );
+        chan.port1.onmessage = function ({data}) {
+            const {wordResponse} = data;
+            if (wordResponse.title && wordResponse.word) {
+                res(data.wordResponse);
+            } else {
+                res(utils.getFallBack(lang));
+            }
+        };
+    });
+}
+
+/**
 * Utility for retrieving user game data
 * @returns {Promise<GameData>}
 */
@@ -78,12 +106,8 @@ async function getGameData(store) {
         return;
     }
     opts.hearts = tmp.data;
-    tmp = await api.getWord(opts.category, opts.level);
-    if (!tmp.ok) {
-        console.error("Failed to retrieve hidden item !!");
-        return;
-    }
-    opts.word = tmp.data.word;
+    tmp = await getAnswer(opts.category, opts.level, opts.lang);
+    opts.word = tmp.word;
     return opts;
 }
 
@@ -146,7 +170,6 @@ function dialogHandler(emitter) {
 function Engine(rootElement, dispatcher, maxHearts = 8) {
     const self = Object.create(this);
     const components = Object.create(null);
-    const warningDialog = document.querySelector("dialog#warning-dialog");
     let showDialog;
 
     if (typeof dispatcher?.emitterOf !== "function") {
@@ -158,12 +181,10 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     components.letterEmitter = dispatcher.emitterOf("letter-found");
     components.headerEmitter = dispatcher.emitterOf("heading-change");
     components.dialogEmitter = dispatcher.emitterOf("dialog-updated");
+    components.warningEmitter = dispatcher.emitterOf("reveal-intended");
     showDialog = dialogHandler(components.dialogEmitter);
-    if (window.HTMLDialogElement.prototype.isPrototypeOf(warningDialog)) {
-        components.warn = warningHandler(warningDialog);
-    } else {
-        components.warn = () => Promise.resolve(true);
-    }
+    components.warn = warningHandler(components.warningEmitter.target);
+    components.lang = components.store.getValue("_game_", "lang");
     function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         const found = Object.values(lettersFound).reduce((a, v) => a + v, 0);
@@ -180,20 +201,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             throw new Error("you should provide a valid Element to disable");
         }
         target.setAttribute("aria-disabled", true);
-        target.setAttribute("aria-labelledby", target.dataset.tooltip);
-    }
-    function getPoints(store, maxPoints) {
-        let points;
-        const category = decodeURI(new URL(document.URL).hash).replace("#", "");
-        if (category.length === 0) {
-            return maxPoints;
-        }
-        points = store.getValue("_game_", category) ?? "";
-        points = Number.parseInt(points, 10);
-        if (Number.isFinite(points)) {
-            return points;
-        }
-        return maxPoints;
+        target.setAttribute("aria-describedby", target.dataset.tooltip);
     }
     function setPoints(store, points) {
         const category = decodeURI(new URL(document.URL).hash).replace("#", "");
@@ -214,15 +222,16 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         const {store} = components;
         let activeElement;
         element.addEventListener("input", function ({target}) {
+            const val = target.dataset.reminder;
             if (target.id !== "o-reminder") {
                 return;
             }
-            store.setValue("_warn_", "remind", !target.checked);
+            store.setValue("_warn_", `remind-${val}`, !target.checked);
         });
         utils.trapFocus(element);
-        return function () {
-            const remind = store.getValue("_warn_", "remind") ?? "true";
-
+        return function (val) {
+            const remind = store.getValue("_warn_", `remind-${val}`) ?? "true";
+            element.dataset.purpose = val;
             if (remind === "true") {
                 return new Promise(function (res) {
                     activeElement = document.activeElement;
@@ -237,7 +246,6 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
                     }, {once: true});
                 });
             }
-
             return Promise.resolve(true);
         };
     }
@@ -255,12 +263,12 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         components.lettersFound = Object.create(null);
         Object.assign(components, data);
         components.headerEmitter.dispatch("title-updated", {
+            level: data.level,
             title: data.category,
             titleClass: "nil"
         });
         components.headerEmitter.dispatch("heart-updated", {
-            hearts: data.hearts,
-            percentage: "100%"
+            hearts: data.hearts
         });
         components.letterEmitter.target.textContent = "";
         components.letterEmitter.target.insertAdjacentHTML(
@@ -304,15 +312,15 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         const {tooltip} = target.dataset;
         if (
             !utils.isButton(target) ||
-            !target.classList.contains("letter") ||
+            target.dataset.type !=="letter" ||
             target.getAttribute("aria-disabled") !== null ||
-            (tooltip === "gift-tooltip" && components.hearts < 2) ||
+            (tooltip === "letter-reveal-tooltip" && components.hearts < 2) ||
             components.hearts <= 0
         ) {
             return;
         }
-        if (tooltip === "gift-tooltip") {
-            letter = await components.warn();
+        if (tooltip === "letter-reveal-tooltip") {
+            letter = await components.warn("letter-reveal");
             if (!letter) {
                 return;
             }
@@ -324,6 +332,14 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             disableButton(rootElement.querySelector(
                 "button[data-tooltip='" + letter + "' i]"
             ));
+        }  else if (tooltip === "answer-reveal-tooltip") {
+            letter = utils.dict.answer_reveal_warning[components.lang];
+            components.warningEmitter.dispatch("answer-reveal-intended", {
+                points: "-60",
+                desc: letter.replace("{x}", "60")
+            });
+            letter = await components.warn("answer-reveal");
+            return;
         } else {
             letter = target.textContent.trim();
             indexes = utils.getIndexes(

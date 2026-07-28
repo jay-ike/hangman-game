@@ -3,6 +3,11 @@ import utils from "./utils.js";
 const store = utils.jsonStorage();
 const api = new utils.ApiHandler();
 
+function removeAccents(val) {
+    const res = String(val).normalize("NFD").toLowerCase();
+    return res.replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "-");
+}
+
 async function getProgress() {
     let tmp = store.getValue("_game_", "category");
     tmp = await api.getProgress(encodeURI(tmp));
@@ -32,9 +37,9 @@ async function getProgress() {
 
 (function initialize() {
     const opts = {};
-    let url = new URL(window.location.href);
-    opts.category = decodeURIComponent(url.hash.replace("#", ""));
-    opts.lang = decodeURIComponent(url.pathname).split("/")[1];
+    let tmp = new URL(window.location.href);
+    opts.category = decodeURIComponent(tmp.hash.replace("#", ""));
+    opts.lang = decodeURIComponent(tmp.pathname).split("/")[1];
     if (!opts.category) {
         console.warn(`Missing category ${opts.category}. redirecting ...`);
         window.location.assign(`/${opts.lang}/categories`);
@@ -44,5 +49,7 @@ async function getProgress() {
     store.setValue("_game_", "category", opts.category);
     document.getElementById("current-category").innerText = opts.category;
     getProgress();
-    window.history.replaceState(null, "", url.pathname);
+    window.history.replaceState(null, "", tmp.pathname);
+    tmp = document.querySelector(".heading > a");
+    tmp.style.viewTransitionName = removeAccents(opts.category);
 }())

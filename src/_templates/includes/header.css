@@ -1,33 +1,20 @@
 .heading {
     --wrap: wrap;
     --r-space: min(2lvi, 1.5em);
+    --gutter: min(3lvi, 1.5em);
 
     color: var(--system-color-white);
-
-    & > h1 {
-        text-transform: capitalize;
-        flex: 2 1 auto;
-    }
-
-    &:where([data-variant="title-only"], [data-variant="with-sub"]) > h1 {
-        text-align: end;
-    }
 
     &[data-variant="with-sub"] {
         --r-space: 0 min(2lvi, 1.5em);
     }
 
-    .heading-sub {
-        flex: 2 1 auto;
-        text-align: end;
-    }
-
-    @media screen and (width > 26.7em) {
-        &[data-variant="title-only"] > h1 {
+    @media screen and (width > 32.7em) {
+        &[data-variant="title-only"] > .heading-title {
             text-align: center;
         }
 
-        &[data-variant="with-sub"] > h1 {
+        &[data-variant="with-sub"] > .heading-title {
             text-align: start;
         }
 
@@ -36,5 +23,36 @@
         }
     }
 }
+
+    .heading-sub {
+        flex: 2 1 100%;
+        text-align: end;
+
+        &:where([data-variant="with-sub"] *) {
+            --i-alignment: end;
+            --r-space: 1em;
+        }
+
+        &[data-variant="box"] {
+            margin-block-start: .5em;
+        }
+    }
+
+
+    .heading-title {
+        text-align: end;
+        text-transform: capitalize;
+        flex: 2 1 auto;
+    }
+
+    [data-icon="heart"]:where(:is(.heading, .modal) *) {
+        font-weight: bold;
+        font-size: 1.15em;
+        color: var(--system-color-dark-blue);
+        aspect-ratio: 1.08;
+        inline-size: var(--heart-size, min(13vi, 4rem));
+        clip-path: url("#heart");
+        background: var(--pinky-gradient);
+    }
 
 

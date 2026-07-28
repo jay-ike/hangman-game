@@ -47,6 +47,82 @@
             --color-fill: var(--light-pinky-gradient);
         }
     }
+
+    &[data-theme="white"] {
+        --color-fill: var(--system-color-white);
+        --color-text: var(--system-color-dark-navy);
+        --shadow: 0 2px 4px rgb(0 0 0 / 30%);
+
+        &:where([aria-disabled], :disabled) {
+            opacity: 0.4;
+        }
+
+        &:is(button, a):where(:focus-visible, :hover):not([aria-disabled]) {
+            --color-fill: oklch(65% 0.105 286deg);
+            --color-text: var(--system-color-white);
+        }
+    }
+
+    &[data-type="letter"] {
+        --min-padding: min(5vi, .5rem);
+        --radius: min(25%, .75rem);
+
+        font-size: clamp(1.44rem, 1.3169rem + 0.821 * var(--font-unit, 1vw), 1.9531rem);
+        min-inline-size: clamp(5vi, 10cqi, 88px);
+        aspect-ratio: var(--letter-ratio, 112 / 128);
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        transition: background 0.35s cubic-bezier(0.2, 0.3, 0.5, 1.5),
+        opacity 0.35s 0.35s cubic-bezier(0.49, 1.19, 1, 0.18),
+        color 0.35s 0.25s ease-out,
+        box-shadow 0.35s ease;
+    }
+}
+
+[aria-disabled="true"]:focus~.tooltip {
+    font-size: 0.85em;
+    text-wrap: balance;
+    letter-spacing: 0.1em;
+    text-transform: capitalize;
+    color: var(--tt-clr, var(--system-color-white));
+    position: absolute;
+    inset-block-end: calc(100% + 1em);
+    inset-inline: -50% auto;
+    margin-inline: auto;
+    padding: 0.5rem;
+    min-inline-size: 8em;
+    max-block-size: 100vb;
+    clip-path: polygon(0 100%, 0 0, 100% 0, 100% 100%,
+            min(100%, 50% + 1em) 100%, 50% calc(100% + 1em), max(0%, 50% - 1em) 100%);
+    border-image: var(--tt-img, var(--pinky-gradient)) fill 1/auto/1em;
+}
+
+@supports (anchor-name: --btn) {
+    div:has(> .tooltip) {
+        anchor-name: --btn;
+        anchor-scope: all;
+        position: static;
+    }
+
+    [aria-disabled="true"]:focus ~ .tooltip {
+        position-anchor: --btn;
+        inline-size: calc(anchor-size(width) + min(10vi, 8em));
+        inset-block-end: calc(anchor(top) + 1em);
+        position-area: block-start center;
+        position-try: flip-block flip-inline;
+        inset-inline: auto;
+    }
+}
+
+@container (inline-size > 48rem) {
+    [data-type="letter"] {
+        min-inline-size: min(8cqb, 88px);
+    }
+}
+
+
+[data-dimmed] {
+    opacity: 0.4;
 }
 
 [data-size="xl"] {
@@ -59,4 +135,8 @@
     --min-padding: min(3vi, 1em);
 
     min-inline-size: min(8vi, 3em);
+}
+
+[data-radius="sm"] {
+    --radius: .75em;
 }

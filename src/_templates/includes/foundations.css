@@ -23,7 +23,7 @@ body {
     color: var(--system-color-black);
     font-size: 100%;
     min-inline-size: 98vi;
-    min-block-size: 100lvb;
+    min-block-size: 85lvb;
     background: url("/assets/images/sprites.svg#game-bg") 50% / cover no-repeat;
 }
 
@@ -32,9 +32,23 @@ body {
         text-transform: capitalize;
     }
 
+    .relative {
+        position: relative;
+    }
+
     .rounded {
         aspect-ratio: 1;
         border-radius: 50%;
+    }
+
+    .content-center {
+        place-content: center;
+    }
+
+    .wrap {
+        --wrap: wrap;
+
+        flex-wrap: wrap;
     }
 
     :where(header, .contain) {
@@ -178,7 +192,7 @@ body {
         --s-space: 2.5rem;
 
         color: var(--system-color-white);
-        padding-block: 32px 16px;
+        padding-block: 32px min(2lvb, 16px);
         border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
 
         &[data-type="play"] {
@@ -211,6 +225,18 @@ body {
         --spacing: var(--c-space);
 
         flex-flow: var(--col-dir, column) var(--wrap, nowrap);
+    }
+
+    .i-flex {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--r-space, .5rem);
+        flex-flow: row wrap;
+        place-content: center;
+
+        &>* {
+            flex-shrink: 2;
+        }
     }
 
     :is(.center) {
@@ -270,13 +296,31 @@ body {
     }
 
     .scrollview {
-        max-block-size: 78lvb;
+        max-block-size: min(65lvb, 960px);
         overflow: hidden auto;
+
+        &[data-layout="keyboard"] {
+            --m-col-s: 9;
+            --m-col-w: min(10vi, 84px);
+            --m-row-h: auto;
+            --c-gap: min(3cqi, 1rem);
+            --min-padding: min(3lvi, 1.5em);
+        }
+    }
+
+    @container (inline-size < 18.5rem) {
+        .scrollview[data-layout="keyboard"] {
+            --m-col-w: max(13cqi, 2.5rem);
+        }
     }
 
     @media screen and (height >=48em) {
         .main-wrapper {
             --s-space: min(10lvb, 4rem);
+        }
+
+        [data-layout="keyboard"] {
+            --c-space: min(10lvb, 4rem);
         }
     }
 }
@@ -325,6 +369,7 @@ body {
         --outline-style: dashed;
 
         display: inline-block;
+        text-align: var(--link-text-align, inherit);
 
         &:where([class]) {
             text-decoration: none;

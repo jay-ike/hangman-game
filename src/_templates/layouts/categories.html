@@ -29,7 +29,7 @@ og_imageAlt: "A screenshot of the category selection where you can choose betwee
         <h2 aria-hidden="true" class="visually-hidden" id="categories-list">{{ "available_categories" | i18n }}</h2>
         <ul class="responsive-grid categories" style="view-transition-name: main-content;">
             {%for category in categories%}
-            <li class="contain"><a href="/{{locale}}/levels#{{category | encode_uri}}" class="center shadowed btn">{{category}}</a></li>
+            <li class="contain"><a href="/{{locale}}/levels#{{category | encode_uri}}" class="center shadowed btn" style="view-transition-name: {{category | downcase | remove_accent}};">{{category}}</a></li>
             {%endfor%}
         </ul>
     </nav>

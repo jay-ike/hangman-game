@@ -612,24 +612,6 @@ async function parseParams(req, ctx, next) {
     return next(req, Object.assign(ctx, meta));
 }
 
-async function word(req, ctx, next) {
-    let title;
-    let tmp;
-    if (!ctx.path.startsWith("/api/word")) {
-        return next(req, ctx);
-    }
-    if (!ctx.params?.cat) {
-        return createResponse(400, {message: "Missing category value"});
-    }
-    title = String(ctx.params.cat ?? "");
-    if (title.trim().length === 0) {
-        title = config.db.getStores();
-        title = title[getRandomIndex(title.length)];
-    }
-    tmp = await ctx.db.getRandomQuestion(title, ctx.params.level);
-    return createResponse(200, {title, word: tmp});
-}
-
 async function found(req, ctx, next) {
     let tmp;
     if (!ctx.path.startsWith("/api/found")) {
@@ -725,7 +707,7 @@ async function guess(req, ctx, next) {
 async function handleAPI(request) {
     let chain;
     if (request.method === "GET") {
-        chain = [parseParams, word, hearts, progress, badges];
+        chain = [parseParams, hearts, progress, badges];
     } else {
         chain = [parseParams, found, addBadge, guess, setHearts];
     }
@@ -779,6 +761,9 @@ async function sendMessage(msg) {
 }
 
 async function handleMessage({data, ports}) {
+    let res;
+    let db;
+    let opts;
     if (data === "SKIP_WAITING") {
         await self.skipWaiting();
         return;
@@ -790,6 +775,12 @@ async function handleMessage({data, ports}) {
         config.isOnline = data.connectionRequest.isOnline;
         ports[0].onmessage = handleMessage;
         ports[0].postMessage({connectionAcknowledged: true});
+    }
+    if (data.randomWordRequest) {
+        opts = data.randomWordRequest;
+        db = await getDb();
+        res = await db.getRandomQuestion(opts.category, opts.level);
+        ports[0].postMessage({wordResponse: {title: opts.category, word: res}});
     }
 }
 

@@ -45,9 +45,9 @@ module.exports = Object.freeze({
         en: "Gameplay rules",
         fr: "Règles du jeu"
     },
-    gift_unavailable: {
-        en: "you cannot use this feature you need at least 2 hearts",
-        fr: "vous devez avoir au moins 2 points de vie pour dévoiler une lettre"
+    letter_reveal_unavailable: {
+        en: "You need at least 2 hearts to reveal a letter.",
+        fr: "Tu as besoin d’au moins 2 cœurs pour révéler une lettre."
     },
     hearts_left: {
         en: "hearts remaining",
@@ -148,6 +148,14 @@ module.exports = Object.freeze({
     return_home: {
         en: "return to main menu",
         fr: "retourner au menu principal"
+    },
+    reveal: {
+        en: "reveal",
+        fr: "devoiler"
+    },
+    reveal_answer: {
+        en: "reveal answer",
+        fr: "dévoiler la réponse"
     },
     start: {
         en: "play now",

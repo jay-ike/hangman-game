@@ -36,6 +36,10 @@ const syntax = /\{([^{}:\s]+)\}/g;
 const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
 const dateOpts = {day: "numeric", month: "short", year: "numeric"};
 const dict = {
+    answer_reveal_warning: {
+        en: "You'll lose {x} points and won't earn any for this answer, but it will still count toward your progress",
+        fr: "Tu vas perdre {x} points. Cette réponse ne te rapportera pas de points, mais elle compte pour ta progression."
+    },
     earned: {
         en: "Earned {x} time{y}",
         fr: "Obtenu {x} fois"
@@ -243,7 +247,7 @@ function getRandomLetter(sentence, foundLetters) {
     return result;
 }
 function letterTemplate(index) {
-    return "<span class='center letter shadowed btn' data-listen=" +
+    return "<span class='center shadowed btn' data-type='letter' data-listen=" +
     "'letter" + (index + 1) + "-changed' data-attributes=" +
     "'data-dimmed:{dimmed}' data-property='{letter}' data-dimmed></span>";
 
@@ -392,8 +396,6 @@ function ApiHandler() {
     self.getBadges = (l) => get(`/api/badges?lang=${l}`, (r) => r.badges);
     /** @method getHearts */
     self.getHearts = () => get(`/api/hearts`, (r) => r.hearts);
-    /** @method getWord */
-    self.getWord = (c, lev) => get(`/api/word?cat=${c}&level=${lev}`);
     return Object.freeze(self);
 }
 

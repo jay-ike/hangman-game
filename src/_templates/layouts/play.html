@@ -14,104 +14,128 @@ og_imageH: 630
 og_imageAlt: "A screenshot of the game play of the hangman game having a keyboard and the letters U, N and A revealed"
 ---
 {%assign placeholder = ".....|......" | split: '|'%}
-<style>{%cssmin "includes/in-game.css" %}</style>
+<style>{%cssmin "includes/header.css" %}</style>
 <div class="no-script center box-red" role="region" aria-labelledby="error-content">
     <p id="error-content">{{"js_error_content" | i18n}}</p>
 </div>
-<dialog aria-labelledby="dialog-title" id="menu-dialog" class="menu-wrapper" data-emit="dialog-updated" role="dialog" tabindex="0" autofocus>
-    <h2 class="capitalized dilated-effect sky-text-bg" id="dialog-title">
-        <span class="paused">{{ "paused" | i18n }}</span><span class="won">{{ "won" | i18n }}</span><span
-            class="lost">{{ "lost" | i18n }}</span>
+<main aria-labelledby="guess main-title" aria-describedby="main-desc" class="contain stack main-wrapper" data-emit="heading-change">
+    <div class="row heading" data-variant="with-sub">
+        <button aria-labelledby="menu-title" class="center rounded shadowed btn" data-theme="secondary" data-size="sm" aria-controls="menu-dialog">
+            <svg width="24" height="24">
+                <title id="menu-title">Menu</title>
+                <use href="/assets/images/sprites.svg#hamburger">
+            </svg>
+        </button>
+        <div class="stack heading-title" data-space="sm">
+            <h1 id="main-title" class="box-letter-load box-placeholder" data-listen="title-updated" data-attributes="class:{titleClass}" data-property="{title}" aria-labelledby="guess main-title">
+                <span class="visually-hidden">{{"loading_failed" | i18n}}</span>
+            </h1>
+            <p id="main-desc" class="h4">
+            <span>{{"level" | i18n | capitalize}}</span>: <span data-listen="title-updated" data-property="{level}"></span>
+            </p>
+        </div>
+        <div class="row heading-sub" data-variant="box">
+            <div class="center" data-icon="heart" data-listen="heart-updated" data-property="{hearts}"></div>
+            <div class="visually-hidden" data-listen="heart-updated" data-property="{{'hearts_remaining' | i18n}}" aria-live="polite"></div>
+            <div class="relative">
+                <button class="shadowed" data-type="letter" aria-labelledby="answer-reveal-title" data-size="sm" data-radius="sm" data-tooltip="answer-reveal-tooltip">
+                    <svg width="24" height="24">
+                        <title id="answer-reveal-title">Reveal Answer</title>
+                        <use href="/assets/images/sprites.svg#gift">
+                    </svg>
+                </button>
+                <span class="tooltip visually-hidden" id="answer-reveal-tooltip" aria-hidden="true" data-listen="reveal-intent-emitted" data-property="{answerTooltip}">
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="column scrollview" data-layout="keyboard">
+        <div class="row content-center letter-wrapper wrap" data-emit="letter-found">
+            {%for word in placeholder%}
+            <div class="i-flex">
+                {%assign dots = word | split: ''%}
+                {%for dot in dots%}
+                <span class="box-letter-load center letter"></span>
+                {%endfor%}
+            </div>
+            {%endfor%}
+        </div>
+        <div id="keyboard-title" hidden>{{"available_letters" | i18n}}</div>
+        <section class="responsive-grid box content-center" aria-labelledby="keyboard-title">
+            <span id="key" hidden>{{"key" | i18n}}</span>
+            {%for key in site.keyboard%}
+            <div class="relative">
+                <button data-type="letter" data-theme="white" class="shadowed" aria-keyshortcuts="{{key.letter | upcase}} Shift+{{key.letter | upcase}}" data-tooltip="{{key.letter}}" id="key_{{key.letter}}" aria-labelledby="key key_{{key.letter}}">{{key.letter}}</button>
+                <span class="tooltip visually-hidden" id="{{key.letter}}" aria-hidden="true">{{"letter_selected" | i18n:
+                    key}}</span>
+            </div>
+            {%endfor%}
+            <div class="relative">
+                <button aria-controls="warning-dialog" aria-labelledby="letter-reveal-title" data-type="letter" class="center shadowed" data-theme="secondary" data-tooltip="letter-reveal-tooltip" data-listen="bonus-updated" data-attributes="aria-disabled:{preventTrigger}">
+                    <svg width="48" height="48">
+                        <title id="letter-reveal-title">{{"letter_reveal" | i18n}}</title>
+                        <use href="/assets/images/sprites.svg#idea">
+                    </svg>
+                </button>
+                <span class="tooltip visually-hidden" id="letter-reveal-tooltip" aria-hidden="true">
+                    {{"letter_reveal_unavailable" | i18n}}
+                </span>
+            </div>
+        </section>
+    </div>
+    <span id="guess" hidden>{{"hidden_item_category" | i18n}}</span>
+</main>
+<style>{%cssmin "includes/modals.css" %}</style>
+<dialog aria-labelledby="dialog-title" id="menu-dialog" data-variant="menu" class="modal transition-all" data-emit="dialog-updated" role="dialog" tabindex="0" autofocus>
+    <h2 class="capitalized dilated-effect sky-text-bg modal-title" id="dialog-title">
+        <span data-label="paused">{{ "paused" | i18n }}</span>
+        <span data-label="won">{{ "won" | i18n }}</span>
+        <span data-label="lost">{{ "lost" | i18n }}</span>
     </h2>
-    <div class="menu shadowed column box">
+    <div class="modal-menu shadowed column btn">
         <button class="shadowed btn continue-btn" data-listen="title-changed"
             data-attributes="data-action:{action}" data-action="continue">
-            <span class="action-continue">{{"continue" | i18n}}</span><span class="action-replay">{{"replay" |
-                i18n}}</span>
+            <span data-action-label="continue">{{"continue" | i18n}}</span><span data-action-label="replay">{{"replay" | i18n}}</span>
         </button>
         <a class="shadowed btn" href="/{{locale}}/categories">{{ "new_category" | i18n }}</a>
         <a class="shadowed btn" data-theme="secondary" href="/{{locale}}" style="view-transition-name: play-button;">{{
             "quit_game" | i18n }}</a>
     </div>
 </dialog>
-<dialog aria-labelledby="warning-title" id="warning-dialog" class="menu-wrapper" role="dialog" tabindex="0" autofocus>
-    <h2 class="capitalized dilated-effect sky-text-bg" id="warning-title">{{"warning" | i18n}}</h2>
-    <form method="dialog"  class="menu shadowed column box">
-        <p>{{"point_deduction_warning" | i18n}}</p>
-        <div class="row self-start">
+<dialog aria-labelledby="warning-title" id="warning-dialog" data-purpose="letter-reveal" class="modal" data-emit="reveal-intended" data-variant="menu" role="dialog" tabindex="0" autofocus aria-describedby="warning-desc">
+    <h2 class="modal-title capitalized dilated-effect sky-text-bg" id="warning-title">
+        <span data-label="letter-reveal"> {{"warning" | i18n}} </span>
+        <span data-label="answer-reveal">{{"reveal" | i18n}} ?</span>
+    </h2>
+    <form method="dialog"  class="modal-menu shadowed column btn">
+        <p class="i-flex" data-label="answer-reveal" >
+            <span class="h2" data-listen="answer-reveal-intended" data-property="{points}"></span>
+            <span data-icon="heart"></span>
+        </p>
+        <p id="warning-desc">
+            <span data-label="letter-reveal"> {{"point_deduction_warning" | i18n}} </span>
+            <span data-label="answer-reveal" data-listen="answer-reveal-intended" data-property="{desc}"></span>
+        </p>
+        <div class="row">
             <div class="check-wrapper">
                 <input id="o-reminder" type="checkbox" name="remind"/>
-                <svg width="12" height="9" viewBox="0 0 12 9" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" class="transition-all" width="12" height="9" viewBox="0 0 12 9" aria-hidden="true">
                     <path fill="none" pathLength="1" stroke-width="2" d="m1 4 3.433 3.433L10.866 1" />
                 </svg>
             </div>
             <label for="o-reminder">{{"cancel_popup" | i18n}}</label>
         </div>
-        <div class="row" data-wrap="">
-            <button value="cancel" class="shadowed btn">{{"cancel" | i18n}}</button>
-            <button value="proceed" class="shadowed btn" data-theme="secondary">{{"deduct_points" | i18n}}</button>
+        <div class="row modal-actions" data-wrap="">
+            <button value="cancel" class="shadowed btn" data-theme="secondary">
+                {{"cancel" | i18n}}
+            </button>
+            <button value="proceed" class="shadowed btn">
+                <span data-label="letter-reveal">{{"deduct_points" | i18n}}</span>
+                <span data-label="answer-reveal">
+                    {{"reveal" | i18n}} (<span data-listen="answer-reveal-intended" data-property="{points}"></span>)
+                </span>
+            </button>
         </div>
     </form>
 </dialog>
-<main aria-labelledby="main-title guess" class="contain column main-box" data-emit="heading-change">
-    <span id="guess" hidden>{{"hidden_item_category" | i18n}}</span>
-    <div class="repel heading-box">
-        <div class="i-flex">
-            <button aria-labelledby="menu-title" class="center rounded shadowed btn" data-theme="secondary" aria-controls="menu-dialog">
-                <svg width="24" height="24">
-                    <title id="menu-title">Menu</title>
-                    <use href="/assets/images/sprites.svg#hamburger">
-                </svg>
-            </button>
-            <h1 id="main-title" class="box-letter-load box-placeholder" data-listen="title-updated"
-                data-attributes="class:{titleClass}" data-property="{title}" aria-labelledby="main-title guess">
-                <span class="visually-hidden">{{"loading_failed" | i18n}}</span>
-            </h1>
-        </div>
-        <div class="i-flex">
-            <div>
-                <label for="time-progress" class="visually-hidden">{{"hearts_left" | i18n}}</label>
-                <progress id="time-progress" max="8" value="8" data-listen="heart-updated"
-                    data-attributes="value:{hearts}" data-property="{percentage}">100%</progress>
-            </div>
-            <div class="center heart" data-listen="heart-updated" data-property="{hearts}"></div>
-            <div class="visually-hidden" data-listen="heart-updated" data-property="{{'hearts_remaining' | i18n}}"
-                aria-live="polite"></div>
-        </div>
-    </div>
-    <div class="repel content-center letter-wrapper" data-emit="letter-found">
-        {%for word in placeholder%}
-        <div class="i-flex">
-            {%assign dots = word | split: ''%}
-            {%for dot in dots%}
-            <span class="box-letter-load center letter"></span>
-            {%endfor%}
-        </div>
-        {%endfor%}
-    </div>
-    <div id="keyboard-title" hidden>{{"available_letters" | i18n}}</div>
-    <section class="responsive-grid letter-wrapper keyboard" aria-labelledby="keyboard-title">
-        <span id="key" hidden>{{"key" | i18n}}</span>
-        {%for key in site.keyboard%}
-        <div class="center relative">
-            <button class="letter" aria-keyshortcuts="{{key.letter | upcase}} Shift+{{key.letter | upcase}}"
-                data-tooltip="{{key.letter}}" id="key_{{key.letter}}" aria-labelledby="key key_{{key.letter}}">{{key.letter}}</button>
-            <span class="tooltip visually-hidden" id="{{key.letter}}" aria-hidden="true">{{"letter_selected" | i18n:
-                key}}</span>
-        </div>
-        {%endfor%}
-        <div class="center relative gift-box">
-            <button aria-controls="warning-dialog" aria-labelledby="gift-title" class="letter center box"
-                data-tooltip="gift-tooltip" data-listen="bonus-updated"
-                data-attributes="aria-disabled:{preventTrigger}">
-                <svg width="48" height="48" class="gift-icon">
-                    <title id="gift-title">{{"letter_reveal" | i18n}}</title>
-                    <use href="/assets/images/sprites.svg#idea">
-                </svg>
-            </button>
-            <span class="tooltip visually-hidden" id="gift-tooltip" aria-hidden="true">{{"gift_unavailable" |
-                i18n}}</span>
-        </div>
-    </section>
-</main>
 <script type="module" src="/assets/scripts/game.js" defer></script>
