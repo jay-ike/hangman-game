@@ -656,8 +656,13 @@ async function progress(req, ctx, next) {
     if (!ctx.params?.cat) {
         return createResponse(400, {message: "Missing category value"});
     }
+    ctx.params.level = Number.parseInt(ctx.params.level, 10);
     db = await getDb();
-    tmp = await db.getCategoryProgress(ctx.params.cat);
+    if (Number.isFinite(ctx.params.level)) {
+        tmp = await db.getProgress(ctx.params.cat, ctx.params.level);
+    } else {
+        tmp = await db.getCategoryProgress(ctx.params.cat);
+    }
     return createResponse(200, {result: tmp});
 }
 

@@ -88,48 +88,6 @@ body {
         clip-path: inset(50%);
     }
 
-    [popover] {
-        border: none;
-        isolation: isolate;
-
-        &::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-        }
-
-        &,
-        &::backdrop {
-            transition: display .35s allow-discrete,
-                overlay .35s allow-discrete,
-                transform 0.35s .35s ease-in,
-                opacity .35s;
-            opacity: 0;
-
-        }
-
-        &:popover-open {
-            opacity: 1;
-            transform: none;
-
-            &:popover-open::backdrop {
-                opacity: 0.5;
-            }
-        }
-
-        @starting-style {
-            &:popover-open,
-            &:popover-open::backdrop {
-                opacity: 0;
-            }
-
-            &:popover-open {
-                transform: var(--initial-transform, scale(2));
-            }
-        }
-    }
-
     .repel {
         display: flex;
         justify-content: space-between;
@@ -488,11 +446,12 @@ body {
         --pinky-gradient: linear-gradient(in oklch to bottom, oklch(75% 0.213 321deg), oklch(70% 0.158 278deg));
         --light-pinky-gradient: linear-gradient(in oklch to bottom, oklch(81% 0.173 325deg), oklch(77.8% 0.116 283deg));
         --sky-gradient: linear-gradient(in oklch to bottom, oklch(75% 0.132 248deg), var(--system-color-white));
+        --elastic-timing: cubic-bezier(.25, .1, .3, 1.5);
     }
 }
 
 @layer typography {
-    :is(a, p, dt, dd, legend, .fluid-type) {
+    :is(a, p, dt, dd, button, legend, .fluid-type) {
         font-size: clamp(var(--f-size, 1.25rem) * clamp(0.5, 1 - var(--f-size-diff, 0.2), 0.9),
                 var(--f-size-fluid, 0.94rem + (0.4 * var(--font-unit, 1vw))),
                 var(--f-size, 1.25rem));

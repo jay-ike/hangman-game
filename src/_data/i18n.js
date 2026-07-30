@@ -29,6 +29,10 @@ module.exports = Object.freeze({
         en: "Don't prompt me again",
         fr: "Ne plus afficher ce message"
     },
+    choose_level: {
+        en: "choose level",
+        fr: "autre niveau"
+    },
     close: {
         en: "close",
         fr: "fermer"
@@ -93,6 +97,10 @@ module.exports = Object.freeze({
         en: "level",
         fr: "niveau"
     },
+    level_up: {
+        en: "level up !",
+        fr: "tu avances !"
+    },
     level_selection: {
         en: "Pick your difficulty",
         fr: "Choisis ta difficulté"
@@ -106,16 +114,20 @@ module.exports = Object.freeze({
         fr: "débloque pour jouer"
     },
     lost: {
-        en: "you lose",
-        fr: "Perdu !!!"
+        en: "so close !",
+        fr: "Presque !"
     },
     new_category: {
-        en: "switch category",
+        en: "change category",
         fr: "autre catégorie"
     },
     paused: {
         en: "Paused",
         fr: "en pause"
+    },
+    perfect: {
+        en: "perfect !!",
+        fr: "parfait !!"
     },
     pick_category: {
         en: "pick your category",
@@ -138,8 +150,8 @@ module.exports = Object.freeze({
         fr: "quitter le jeu"
     },
     replay: {
-        en: "play again",
-        fr: "Rejouer"
+        en: "Next puzzle",
+        fr: "Prochaine Énigme"
     },
     return_category: {
         en: "change category",
@@ -166,7 +178,7 @@ module.exports = Object.freeze({
         fr: "Attention !!!"
     },
     won: {
-        en: "you win",
-        fr: "Trouvé !!!"
+        en: "you got it",
+        fr: "Trouvé !"
     }
 });

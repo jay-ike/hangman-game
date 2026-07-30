@@ -30,6 +30,7 @@
 * @property {number} level
 * @property {number} streak
 * @property {string} word
+* @property {{totalWords: number, uncovered: number}} progress
 */
 const {Element} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
@@ -40,17 +41,27 @@ const dict = {
         en: "You'll lose {x} points and won't earn any for this answer, but it will still count toward your progress",
         fr: "Tu vas perdre {x} points. Cette réponse ne te rapportera pas de points, mais elle compte pour ta progression."
     },
-    earned: {
-        en: "Earned {x} time{y}",
-        fr: "Obtenu {x} fois"
+    answer_reveal_insufficient: {
+        en: "Need 50 hearts to reveal the answer. Keep guessing!",
+        fr: "Besoin de 50 points de vie pour révéler. Continue !"
     },
-    level: {
-        en: "Level",
-        fr: "Niveau"
+    earned: {en: "Earned {x} time{y}", fr: "Obtenu {x} fois"},
+    level: {en: "Level", fr: "Niveau"},
+    level_up_title: {
+        en: "You unlocked level {x} of category {y}",
+        fr: "Niveau {x} débloqué en {y}."
+    },
+    level_up_desc: {
+        en: "You've uncovered {x} of {y} answers. {z} more to master level {a}",
+        fr: "Tu as deviné {x} réponses sur {y}. Encore {z} pour maîtriser le niveau {a}"
     },
     locked: {
         en: "Guess 3 answers in Level {x} to unlock",
         fr: "Devine 3 réponses dans le niveau {x} pour le débloquer."
+    },
+    mastered: {
+        en: "You've guessed every answers in {x}",
+        fr: "Toutes les réponses devinées en {x}"
     },
     not_earned: {
         en: "Not earned yet",
@@ -60,9 +71,13 @@ const dict = {
         en: "You've guessed every answer perfectly!",
         fr: "Toutes les réponses ont été devinées à la perfection !"
     },
+    progress_level_desc: {
+        en: "You've guessed {x} of {y} answers. {z} more to unlock the next level !",
+        fr: "Tu as deviné {x} réponses sur {y}. Encore {z} pour débloquer le prochain niveau !"
+    },
     unlocked: {
         en: "You've guessed {x} of {y} answers - keep it up!",
-        fr: "{x} réponse{z} sur {y} dévoilée{z} — continue comme ça !"
+        fr: "Tu as deviné {x} réponse{z} sur {y} — continue comme ça !"
     }
 };
 
@@ -391,12 +406,89 @@ function ApiHandler() {
     }
 
     /** @method getProgress */
-    self.getProgress = (c) => get(`/api/progress?cat=${c}`, (r) => r.result);
+    self.getProgress = function (cat, level) {
+        let url = `/api/progress?cat=${cat}`;
+        if (level) {
+            url += `&level=${level}`;
+        }
+        return get(url, (r) => r.result);
+    }
     /** @method getBadges */
     self.getBadges = (l) => get(`/api/badges?lang=${l}`, (r) => r.badges);
     /** @method getHearts */
     self.getHearts = () => get(`/api/hearts`, (r) => r.hearts);
     return Object.freeze(self);
+}
+
+function removeAccents(val) {
+    const res = String(val).normalize("NFD").toLowerCase();
+    return res.replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "-");
+}
+
+function eventData(status, gameData) {
+        let res = {action: "replay", status};
+        const {category, lang, level: lev, progress: p, puzzleReq} = gameData;
+        let tmp = {y: puzzleReq, z: puzzleReq - p.uncovered};
+        res.levStyle = `view-transition-name: level${lev};`;
+        res.levelLink = `/${lang}/levels#${encodeURIComponent(category)}`;
+        res.levLabel = "paused";
+        res.catStyle = `view-transition-name: ${removeAccents(category)};`;
+        res.catLabel = "paused";
+        if (p.uncovered >= puzzleReq) {
+            tmp.y = p.totalWords;
+            tmp.z = p.totalWords - p.uncovered;
+            tmp.desc = dict.level_up_desc[lang].replace(
+                "{x}",
+                p.uncovered
+            ).replace("{y}", tmp.y).replace("{z}", tmp.z).replace("{a}", lev+1);
+        } else {
+            tmp.desc = dict.progress_level_desc[lang].replace(
+                "{x}",
+                p.uncovered
+            ).replace("{y}", tmp.y).replace("{z}", tmp.z);
+        }
+        res.description = tmp.desc;
+        res.progress = Array.from({length: puzzleReq}, (_, i) => i).reduce(
+            function (acc, v) {
+                if (p.uncovered > v) {
+                    acc[`level${v+1}`] = "";
+                }
+                return acc;
+            },
+            Object.create(null)
+        );
+        if (status === "lost") {
+            res.levTheme = "secondary";
+            res.levLabel = "lost";
+            res.contentLabel = "lost";
+        }
+        if (status === "won") {
+            res.starLabel = "won";
+            res.titleLabel = "lost";
+        }
+        if (status === "won" && puzzleReq === p.uncovered) {
+            res.status = "level-up";
+            res.titleLabel = "level-up";
+            res.levLabel = "level-up";
+            res.levTheme = "secondary";
+            res.contentTitle = dict.level_up_title[lang].replace(
+                "{x}",
+                lev + 1
+            ).replace("{y}", category);
+        }
+        if (status === "won" && p.uncovered >= p.totalWords) {
+            res.status = "perfect";
+            res.catLabel = "perfect";
+            res.catTheme = "nil";
+            res.description = dict.mastered[lang].replace("{x}", category);
+        }
+        if (status ==="paused") {
+            res.action = "continue";
+            res.contentLabel = "won";
+        } else {
+            res.contentLabel = res.status;
+        }
+        return res;
 }
 
 export default Object.freeze({
@@ -405,6 +497,7 @@ export default Object.freeze({
     createDOMSentence,
     dict,
     formatDate,
+    eventData,
     getFallBack,
     getFocusableChildren,
     getIndexes,
@@ -412,6 +505,7 @@ export default Object.freeze({
     getWords,
     isButton,
     jsonStorage,
+    removeAccents,
     trapFocus
 });
 export {};

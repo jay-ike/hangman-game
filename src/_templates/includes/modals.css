@@ -15,7 +15,7 @@ dialog:focus-visible {
     font-size: clamp(3.7994rem, 2.5557rem + 1.6245 * var(--font-unit, 1vw), 4.8147rem);
     text-transform: capitalize;
     white-space: nowrap;
-    margin-block-end: -2rem;
+    margin-block-end: max(-5cqb, -1.5rem);
     z-index: 2;
     align-self: center;
 }
@@ -75,6 +75,35 @@ svg:where(input[type="checkbox"] + *) {
     inset-block-start: .5em;
 }
 
+.modal-content:where(.modal[data-variant="menu"] *) {
+    --col-align: center;
+    --p-align: center;
+    --actions-i-align: center;
+}
+
+[data-icon="star"] {
+    --color-fill: var(--star-icon-fill, oklch(92% 0.015 277deg));
+    --min-padding: min(10cqi, 1.5em);
+
+    clip-path: url("#star");
+    aspect-ratio: 1;
+    min-inline-size: var(--icon-size, min(5cqi, 4em));
+
+    &:where([data-filled]) {
+        --star-icon-fill: linear-gradient( 135deg  in oklch,
+        oklch(62% 0.11 75deg) 0%,
+        oklch(82% 0.14 85deg) 25%,
+        oklch(96% 0.08 90deg) 50%,
+        oklch(76% 0.15 82deg) 75%,
+        oklch(55% 0.12 70deg) 100%
+        );
+    }
+}
+
+div:has(> [data-icon="star"]) {
+    filter: url("#dilated");
+}
+
 .check-wrapper:where(.modal[data-purpose] *) {
     position: relative;
     inline-size: 2rem;
@@ -110,10 +139,10 @@ div:has(> .check-wrapper) {
     --r-space: .5rem;
 }
 
-.modal-actions:where(.modal[data-purpose] *) {
+.modal-actions {
     --r-space: 1rem;
     --row-dir: column;
-    --row-align: stretch;
+    --row-align: var(--actions-row-align, stretch);
 }
 
 .modal {
@@ -121,19 +150,36 @@ div:has(> .check-wrapper) {
     margin: auto;
     display: flex;
     flex-flow: column;
-    transform: scale(0.1);
+    transform: scale(1);
     inline-size: min(85vi, 500px);
     background: transparent;
     overflow: clip auto;
     overflow: clip / auto; /* for safari */
     max-block-size: min(75lvb, 480px);
 
+    &, &::backdrop {
+        transition: display .35s allow-discrete,
+        overlay .35s allow-discrete,
+        transform 0.35s .35s var(--elastic-timing),
+        opacity .35s;
+    }
+
+    @starting-style {
+        &[open]::backdrop {
+            opacity: 0;
+        }
+
+        &[open] {
+            transform: var(--initial-transform, scale(0));
+        }
+    }
+
     &:not([open]) {
         display: none;
     }
 
     &[open] {
-        transform: none;
+        opacity: 1;
     }
 
     &::backdrop {
@@ -142,22 +188,45 @@ div:has(> .check-wrapper) {
     }
 }
 
+[data-align="center"]:where(.modal *) {
+    text-align: center;
+    white-space: var(--p-space, collapse balance);
+}
+
 
 :where(
 [data-label="paused"]:not(.modal[data-status="paused"] *),
 [data-label="won"]:not(.modal[data-status="won"] *),
 [data-label="lost"]:not(.modal[data-status="lost"] *),
+[data-label="perfect"]:not(.modal[data-status="perfect"] *),
+[data-label="level-up"]:not(.modal[data-status="level-up"] *),
 [data-label="letter-reveal"]:not(.modal[data-purpose="letter-reveal"] *),
 [data-label="answer-reveal"]:not(.modal[data-purpose="answer-reveal"] *),
 [data-action-label="replay"]:not([data-action="replay"] > *),
+.continue-btn:where([data-status="perfect"] *),
 [data-action-label="continue"]:not([data-action="continue"] > *)
 ) {
     display: none;
 }
 
 @media screen and (width > 28em){
-    .modal-actions:where(.modal[data-purpose] *) {
+    .modal-actions {
         --row-dir: row;
-        --i-alignment: end;
+        --i-alignment: var(--actions-i-align, end);
+
+        &:where([data-status="paused"] *) {
+            --row-dir: column;
+            --i-alignment: center;
+
+            padding-inline: min(5cqi, 4em);
+        }
+
+        &:where(.modal[data-status]:not([data-status="paused"]) *) {
+            --i-alignment: center;
+        }
+
+        &:where(.modal[data-status="level-up"] *) {
+            --row-dir: row-reverse;
+        }
     }
 }

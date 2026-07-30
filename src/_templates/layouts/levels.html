@@ -38,10 +38,10 @@ og_imageAlt: "A screenshot of the Hangman difficulty level selection where you c
                             <h3 id="level_{{index}}">{{"level" | i18n}} {{index}}</h3>
                             <div><div class="card-icon"></div></div>
                         </div>
-                        <a href="/{{locale}}/play#{{index}}" class="card-action shadowed btn extend-click" data-label="unlocked">
+                        <a href="/{{locale}}/play#{{index}}" class="card-action shadowed btn extend-click" data-label="unlocked" style="view-transition-name: level{{index}}">
                             {{"start" | i18n}}
                         </a>
-                        <p class="card-desc" id="level_{{index}}-desc">Guessed 0 of 10 words </p>
+                        <p class="card-desc" id="level_{{index}}-desc"></p>
                         <span class="card-action btn shadowed h5" aria-disabled="true" data-label="locked"> {{"locked" | i18n | capitalize}} </span>
                     </article>
                     {%endfor%}

@@ -3,11 +3,6 @@ import utils from "./utils.js";
 const store = utils.jsonStorage();
 const api = new utils.ApiHandler();
 
-function removeAccents(val) {
-    const res = String(val).normalize("NFD").toLowerCase();
-    return res.replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "-");
-}
-
 async function getProgress() {
     let tmp = store.getValue("_game_", "category");
     tmp = await api.getProgress(encodeURI(tmp));
@@ -51,5 +46,5 @@ async function getProgress() {
     getProgress();
     window.history.replaceState(null, "", tmp.pathname);
     tmp = document.querySelector(".heading > a");
-    tmp.style.viewTransitionName = removeAccents(opts.category);
+    tmp.style.viewTransitionName = utils.removeAccents(opts.category);
 }())

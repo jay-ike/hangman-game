@@ -3,7 +3,8 @@
 import utils from "./utils.js";
 
 const {Audio, DOMException, URL, document, navigator} = window;
-const api = new utils.ApiHandler();
+const {eventData, ApiHandler} = utils;
+const api = new ApiHandler();
 let engine;
 let workerPort;
 let refreshed;
@@ -108,12 +109,18 @@ async function getGameData(store) {
     opts.hearts = tmp.data;
     tmp = await getAnswer(opts.category, opts.level, opts.lang);
     opts.word = tmp.word;
+    tmp = await api.getProgress(opts.category, opts.level);
+    if (!tmp.ok) {
+        console.error("Failed to retrieve the current level progress !!!");
+        return;
+    }
+    opts.progress = tmp.data;
     return opts;
 }
 
 function dialogHandler(emitter) {
     const {dispatch, target} = emitter;
-    const allowedStatus = ["won", "lost", "paused"];
+    const allowedStatus = ["won", "lost", "paused", "level-up", "perfect"];
     let activeElement;
 
     if (typeof dispatch !== "function") {
@@ -122,6 +129,15 @@ function dialogHandler(emitter) {
     if (typeof target.close !== "function") {
         throw new DOMException("The emitter target should be a Dialog !!!");
     }
+    target.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape") {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+    });
+    target.addEventListener("cancel", function (evt) {
+        evt.preventDefault();
+    });
     target.addEventListener("close", function () {
         if (activeElement) {
             activeElement.focus();
@@ -139,25 +155,19 @@ function dialogHandler(emitter) {
             target.close();
         }
     });
-    function showDialog(status) {
-        let data = {};
-        if (!allowedStatus.includes(status)) {
+    function showDialog(data) {
+        if (!allowedStatus.includes(data.status)) {
             return;
         }
         activeElement = document.activeElement;
         utils.getFocusableChildren(target)[0].focus();
-        target.dataset.status = status;
-        if (status === "paused") {
-            data.action = "continue";
-        } else {
-            data.action = "replay";
-        }
+        target.dataset.status = data.status;
         dispatch("title-changed", data);
         target.showModal();
-        if (status === "won") {
+        if (data.status === "won") {
             new Audio("/assets/win-sound.wav").play();
         }
-        if (status === "lost") {
+        if (data.status === "lost") {
             new Audio("/assets/lose-sound.wav").play();
             if (typeof navigator.vibrate === "function") {
                 navigator.vibrate([100, 30, 200]);
@@ -184,24 +194,30 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     components.warningEmitter = dispatcher.emitterOf("reveal-intended");
     showDialog = dialogHandler(components.dialogEmitter);
     components.warn = warningHandler(components.warningEmitter.target);
-    components.lang = components.store.getValue("_game_", "lang");
+    components.puzzleReq = 3;
     function verifyGameEnd({category, hearts, lettersFound, word}) {
         const wordLetters = utils.getWords(word).join("").length;
         const found = Object.values(lettersFound).reduce((a, v) => a + v, 0);
         if (hearts < 1) {
-            setTimeout(() => showDialog("lost"), 2000);
+            setTimeout(() => showDialog(eventData("lost", components)), 2000);
         }
         if (wordLetters === found) {
             notifyWorker({wordFound: {category, word}});
-            setTimeout(() => showDialog("won"), 2000);
         }
     }
-    function disableButton(target) {
-        if (!window.HTMLElement.prototype.isPrototypeOf(target)) {
-            throw new Error("you should provide a valid Element to disable");
+
+    function disableButton(target, disable = true) {
+        const action = disable ? "disable" : "enable";
+        if (!HTMLButtonElement.prototype.isPrototypeOf(target)) {
+            throw new Error(`you should provide a valid Button to ${action}`);
         }
-        target.setAttribute("aria-disabled", true);
-        target.setAttribute("aria-describedby", target.dataset.tooltip);
+        if (disable) {
+            target.setAttribute("aria-disabled", true);
+            target.setAttribute("aria-describedby", target.dataset.tooltip);
+        } else {
+            target.removeAttribute("aria-disabled");
+            target.removeAttribute("aria-describedby");
+        }
     }
     function setPoints(store, points) {
         const category = decodeURI(new URL(document.URL).hash).replace("#", "");
@@ -275,12 +291,9 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             "beforeend",
             utils.createDOMSentence(components.word).join("")
         );
-        rootElement.querySelectorAll("button.letter[aria-disabled]").forEach(
-            function (elt) {
-                elt.removeAttribute("aria-disabled");
-                elt.removeAttribute("aria-labelledby");
-            }
-        );
+        rootElement.querySelectorAll(
+            ".responsive-grid button[data-type='letter][aria-disabled]"
+        ).forEach((elt) => disableButton(elt, false));
     }
 
     function listenKeyboard(event) {
@@ -309,10 +322,10 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         let indexes;
         let letter;
         const {target} = event;
-        const {tooltip} = target.dataset;
+        const {tooltip, type} = target.dataset;
         if (
             !utils.isButton(target) ||
-            target.dataset.type !=="letter" ||
+            type !=="letter" && tooltip !== "answer-reveal-tooltip" ||
             target.getAttribute("aria-disabled") !== null ||
             (tooltip === "letter-reveal-tooltip" && components.hearts < 2) ||
             components.hearts <= 0
@@ -382,7 +395,7 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         "button[aria-controls='menu-dialog']"
     ).addEventListener("click", function (event) {
         event.preventDefault();
-        showDialog("paused");
+        showDialog(eventData("paused", components));
     });
     return self;
 }

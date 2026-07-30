@@ -63,7 +63,7 @@
         }
     }
 
-    &[data-type="letter"] {
+    &:where([data-type="letter"]) {
         --min-padding: min(5vi, .5rem);
         --radius: min(25%, .75rem);
 
@@ -115,7 +115,7 @@
 }
 
 @container (inline-size > 48rem) {
-    [data-type="letter"] {
+    [data-type="letter"]:not([data-size]) {
         min-inline-size: min(8cqb, 88px);
     }
 }
