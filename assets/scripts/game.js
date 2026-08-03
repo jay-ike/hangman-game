@@ -1,10 +1,12 @@
 /*jslint browser, this*/
-/** @import {GameData} from "./utils.js" */
+/** @import {GameData} from "./type.js" */
 import utils from "./utils.js";
-
+import pointing from "./badges.js";
 const {Audio, DOMException, URL, document, navigator} = window;
-const {eventData, ApiHandler} = utils;
+const {ApiHandler, eventData, getWords} = utils;
+const {PointManager} = pointing;
 const api = new ApiHandler();
+const board = new PointManager(api);
 let engine;
 let workerPort;
 let refreshed;
@@ -57,6 +59,23 @@ function handleMessage({data, ports}) {
     }
 }
 
+function queryWorker(port, input, fn) {
+    return function (res) {
+        const chan = new MessageChannel();
+        port.postMessage(
+            input
+            [chan.port2]
+        );
+        chan.port1.onmessage = function ({data}) {
+            let val = data;
+            if (typeof fn === "function") {
+                val = fn(data);
+            }
+            res(val);
+        };
+    }
+}
+
 /**
 * Utility for retrieving a hidden item based
 * @param {number} level
@@ -68,21 +87,27 @@ function getAnswer(category, level, lang = "en") {
     if (typeof workerPort?.postMessage !== "function") {
         return utils.getFallBack(lang);
     }
-    return new Promise(function (res) {
-        const chan = new MessageChannel();
-        workerPort.postMessage(
-            {randomWordRequest: {category, level}},
-            [chan.port2]
-        );
-        chan.port1.onmessage = function ({data}) {
-            const {wordResponse} = data;
-            if (wordResponse.title && wordResponse.word) {
-                res(data.wordResponse);
+    return new Promise(queryWorker(
+        workerPort,
+        {itemRequest: {category, level}},
+        function ({data}) {
+            const {itemResponse: res} = data;
+            if (res.title && res.word) {
+                return res;
             } else {
-                res(utils.getFallBack(lang));
+                return utils.getFallBack(lang);
             }
-        };
-    });
+    }));
+}
+
+function setHearts(val) {
+    if (typeof workerPort?.postMessage !== "function") {
+        return;
+    }
+    return new Promise(queryWorker(
+        workerPort,
+        {heartUpdateRequest: {hearts: val}}
+    ));
 }
 
 /**
@@ -149,6 +174,7 @@ function dialogHandler(emitter) {
 
         if (utils.isButton(btn) && btn.classList.contains("continue-btn")) {
             if (allowedStatus.includes(status) && status !== "paused") {
+                //TODO: handle game restart
                 engine.saveHearts(8);
                 wakeupWorker();
             }
@@ -179,7 +205,7 @@ function dialogHandler(emitter) {
 
 function Engine(rootElement, dispatcher, maxHearts = 8) {
     const self = Object.create(this);
-    const components = Object.create(null);
+    const context = Object.create(null);
     let showDialog;
 
     if (typeof dispatcher?.emitterOf !== "function") {
@@ -187,19 +213,21 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             "the dispatcher should implement the emitterOf function !!!"
         );
     }
-    components.store = utils.jsonStorage();
-    components.letterEmitter = dispatcher.emitterOf("letter-found");
-    components.headerEmitter = dispatcher.emitterOf("heading-change");
-    components.dialogEmitter = dispatcher.emitterOf("dialog-updated");
-    components.warningEmitter = dispatcher.emitterOf("reveal-intended");
-    showDialog = dialogHandler(components.dialogEmitter);
-    components.warn = warningHandler(components.warningEmitter.target);
-    components.puzzleReq = 3;
-    function verifyGameEnd({category, hearts, lettersFound, word}) {
-        const wordLetters = utils.getWords(word).join("").length;
+    context.store = utils.jsonStorage();
+    context.letterEmitter = dispatcher.emitterOf("letter-found");
+    context.headerEmitter = dispatcher.emitterOf("heading-change");
+    context.dialogEmitter = dispatcher.emitterOf("dialog-updated");
+    context.warningEmitter = dispatcher.emitterOf("reveal-intended");
+    showDialog = dialogHandler(context.dialogEmitter);
+    context.warn = warningHandler(context.warningEmitter.target);
+    context.puzzleReq = 3;
+
+    async function verifyGameEnd({category, hearts, lettersFound, word}) {
+        const wordLetters = getWords(word).join("").length;
         const found = Object.values(lettersFound).reduce((a, v) => a + v, 0);
+        //TODO: handle game end detection
         if (hearts < 1) {
-            setTimeout(() => showDialog(eventData("lost", components)), 2000);
+            setTimeout(() => showDialog(eventData("lost", context)), 2000);
         }
         if (wordLetters === found) {
             notifyWorker({wordFound: {category, word}});
@@ -219,23 +247,13 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
             target.removeAttribute("aria-describedby");
         }
     }
-    function setPoints(store, points) {
-        const category = decodeURI(new URL(document.URL).hash).replace("#", "");
-        if (category.length > 0) {
-            store.setValue("_game_", category, points);
-        }
-    }
-    function updateHearts(updater) {
-        components.hearts = updater(components.hearts ?? maxHearts);
-        components.headerEmitter.dispatch("heart-updated", {
-            hearts: components.hearts,
-            percentage: (
-                Math.floor(components.hearts / maxHearts) * 100
-            ) + "%"
-        });
+    async function updateHearts(updater) {
+        let hearts = updater(context.hearts ?? maxHearts);
+        await setHearts(hearts);
+        context.headerEmitter.dispatch("heart-updated", {hearts});
     }
     function warningHandler(element) {
-        const {store} = components;
+        const {store} = context;
         let activeElement;
         element.addEventListener("input", function ({target}) {
             const val = target.dataset.reminder;
@@ -274,22 +292,22 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         if (gameData) {
             data = gameData;
         } else {
-            data = await getGameData(components.store);
+            data = await getGameData(context.store);
         }
-        components.lettersFound = Object.create(null);
-        Object.assign(components, data);
-        components.headerEmitter.dispatch("title-updated", {
+        context.lettersFound = Object.create(null);
+        Object.assign(context, data);
+        context.headerEmitter.dispatch("title-updated", {
             level: data.level,
             title: data.category,
             titleClass: "nil"
         });
-        components.headerEmitter.dispatch("heart-updated", {
+        context.headerEmitter.dispatch("heart-updated", {
             hearts: data.hearts
         });
-        components.letterEmitter.target.textContent = "";
-        components.letterEmitter.target.insertAdjacentHTML(
+        context.letterEmitter.target.textContent = "";
+        context.letterEmitter.target.insertAdjacentHTML(
             "beforeend",
-            utils.createDOMSentence(components.word).join("")
+            utils.createDOMSentence(context.word).join("")
         );
         rootElement.querySelectorAll(
             ".responsive-grid button[data-type='letter][aria-disabled]"
@@ -323,79 +341,84 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
         let letter;
         const {target} = event;
         const {tooltip, type} = target.dataset;
+        const deductor = board.getDeduction(context.level);
         if (
             !utils.isButton(target) ||
             type !=="letter" && tooltip !== "answer-reveal-tooltip" ||
             target.getAttribute("aria-disabled") !== null ||
-            (tooltip === "letter-reveal-tooltip" && components.hearts < 2) ||
-            components.hearts <= 0
+            (
+                tooltip === "letter-reveal-tooltip"
+                && context.hearts < deductor.letter
+            ) || context.hearts <= 0
         ) {
             return;
         }
         if (tooltip === "letter-reveal-tooltip") {
-            letter = await components.warn("letter-reveal");
+            letter = await context.warn("letter-reveal");
             if (!letter) {
                 return;
             }
             [letter, indexes] = utils.getRandomLetter(
-                components.word,
-                Object.keys(components.lettersFound)
+                context.word,
+                Object.keys(context.lettersFound)
             );
-            updateHearts((heart) => heart - 2);
+            await updateHearts((heart) => heart - deductor.letter);
             disableButton(rootElement.querySelector(
                 "button[data-tooltip='" + letter + "' i]"
             ));
         }  else if (tooltip === "answer-reveal-tooltip") {
-            letter = utils.dict.answer_reveal_warning[components.lang];
-            components.warningEmitter.dispatch("answer-reveal-intended", {
+            letter = utils.dict.answer_reveal_warning[context.lang];
+            context.warningEmitter.dispatch("answer-reveal-intended", {
                 points: "-60",
                 desc: letter.replace("{x}", "60")
             });
-            letter = await components.warn("answer-reveal");
+            letter = await context.warn("answer-reveal");
             return;
         } else {
             letter = target.textContent.trim();
             indexes = utils.getIndexes(
-                utils.getWords(components.word ?? "").join(""),
+                utils.getWords(context.word ?? "").join(""),
                 letter
             );
             disableButton(target);
         }
         if (indexes.length < 1) {
-            updateHearts((heart) => heart - 1);
+            await updateHearts((heart) => heart - deductor.guess);
         } else {
-            components.lettersFound[letter] = indexes.length;
+            context.lettersFound[letter] = indexes.length;
         }
-        if (components.hearts < 2) {
-            components.headerEmitter.dispatch(
+        if (context.hearts < deductor.letter) {
+            context.headerEmitter.dispatch(
                 "bonus-updated",
                 {preventTrigger: true}
             );
         }
-        indexes.forEach((index) => components.letterEmitter.dispatch(
+        indexes.forEach((index) => context.letterEmitter.dispatch(
             "letter" + (index + 1) + "-changed",
             {dimmed: "nil", letter}
         ));
         target.blur();
-        verifyGameEnd(components);
+        verifyGameEnd(context);
     }
 
     self.init = initialize;
-    self.saveHearts = function (bonus = 0) {
-        if (!Number.isFinite(bonus)) {
-            throw new Error("the bonus should be a number !!!");
+    self.saveHearts = async function (val = 0) {
+        let points = val;
+        if (!Number.isFinite(val)) {
+            points = 9; /** The default points */
         }
-        setPoints(components.store, components.hearts + bonus);
+        await setHearts(points);
+        context.hearts = points;
     };
     rootElement.addEventListener("click", listenLetterClick);
     rootElement.addEventListener("keydown", listenKeyboard);
-    utils.trapFocus(components.dialogEmitter.target);
+    utils.trapFocus(context.dialogEmitter.target);
 
     document.querySelector(
         "button[aria-controls='menu-dialog']"
     ).addEventListener("click", function (event) {
         event.preventDefault();
-        showDialog(eventData("paused", components));
+        showDialog(eventData("paused", context));
     });
     return self;
 }
@@ -417,9 +440,6 @@ window.addEventListener("online", function () {
 });
 window.addEventListener("offline", function () {
     notifyWorker({statusUpdate: {isOnline: false}});
-});
-window.addEventListener("beforeunload", function () {
-    engine.saveHearts();
 });
 window.addEventListener("DOMContentLoaded", async function () {
     document.querySelectorAll(".no-script").forEach(function (node) {

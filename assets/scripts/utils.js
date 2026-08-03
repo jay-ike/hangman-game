@@ -1,37 +1,5 @@
 /*jslint browser, this*/
-/**
-* @template T
-* @typedef {Object} ApiResponse
-* @property {boolean} ok
-* @property {T} data
-*/
-/**
-* A Progress Indicator
-* @typedef {Object} Progress
-* @property {string} store
-* @property {number} level
-* @property {number} totalWords
-* @property {number} uncovered
-*/
-/**
-* An achievement Event
-* @typedef {Object} AchievementEvent
-* @property {string} achievementId
-* @property {string} category
-* @property {Number} level
-* @property {string} playerId
-* @property {Number} unlockedAt
-*/
-/**
-* Game user data
-* @typedef {Object} GameData
-* @property {number} hearts
-* @property {string} category
-* @property {number} level
-* @property {number} streak
-* @property {string} word
-* @property {{totalWords: number, uncovered: number}} progress
-*/
+/** @import {ApiHandlerInstance, GameData} from './types.js' */
 const {Element} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
 const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
@@ -385,6 +353,7 @@ function jsonStorage() {
 /**
 * Utility for handling API calls
 * @constructor
+* @returns {ApiHandlerInstance}
 */
 function ApiHandler() {
     const defaultHeaders = {"Content-Type": "application/json"};
@@ -394,8 +363,8 @@ function ApiHandler() {
             return {body, headers: defaultHeaders, method: "POST"};
         }
     };
+    /** @type {ApiHandlerInstance} */
     const self = Object.create(null);
-
     async function get(path, fn) {
         const opts = {};
         let res = await fetch(path, headers.get);
@@ -404,8 +373,14 @@ function ApiHandler() {
         opts.data = typeof fn === "function" ? fn(res): res;
         return opts;
     }
-
-    /** @method getProgress */
+    async function post(path, body, fn) {
+        const opts = {};
+        let res = await fetch(path, headers.post(body));
+        opts.ok = res.ok;
+        res = await res.json();
+        opts.data = typeof fn === "function" ? fn(res): res;
+        return opts;
+    }
     self.getProgress = function (cat, level) {
         let url = `/api/progress?cat=${cat}`;
         if (level) {
@@ -413,10 +388,10 @@ function ApiHandler() {
         }
         return get(url, (r) => r.result);
     }
-    /** @method getBadges */
     self.getBadges = (l) => get(`/api/badges?lang=${l}`, (r) => r.badges);
-    /** @method getHearts */
     self.getHearts = () => get(`/api/hearts`, (r) => r.hearts);
+    self.markFound = (b) => post(`/api/found`, b, (r) => r.progress);
+    self.addBadge = (b) => post(`/api/new-badge`, b, (r) => r.message);
     return Object.freeze(self);
 }
 
@@ -425,9 +400,14 @@ function removeAccents(val) {
     return res.replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "-");
 }
 
-function eventData(status, gameData) {
+/**
+* Utility for generating the event data based on the game status and data
+* @param {string} status
+* @param {GameData} data
+*/
+function eventData(status, data) {
         let res = {action: "replay", status};
-        const {category, lang, level: lev, progress: p, puzzleReq} = gameData;
+        const {category, lang, level: lev, progress: p, puzzleReq} = data;
         let tmp = {y: puzzleReq, z: puzzleReq - p.uncovered};
         res.levStyle = `view-transition-name: level${lev};`;
         res.levelLink = `/${lang}/levels#${encodeURIComponent(category)}`;
@@ -508,4 +488,3 @@ export default Object.freeze({
     removeAccents,
     trapFocus
 });
-export {};

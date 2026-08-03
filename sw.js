@@ -1,34 +1,7 @@
 /*jslint browser*/
 /*global self, idb*/
-/** @import {Progress} from './assets/scripts/utils.js' */
+/** @import {Item, Progress, Question, QuestionData, Source} from './assets/scripts/types.js' */
 importScripts("./assets/scripts/idb-min.js");
-
-/**
- * An item with a name.
- * @typedef {Object} Item
- * @property {string} name
- */
-/**
- * A collection of items grouped under a dynamic sub‑key.
- * @typedef {Record<string, Item[]>} SubCategories
- */
-/**
- * A data source from the API
- * @typedef {Object} Source
- * @property {Record<string, SubCategories>} categories
- */
-/**
-* @typedef {Object} QuestionData
-* @property {string} name
-* @property {number} level
-* @property {"not-selected"|"selected"} status
-*/
-/**
-* @typedef {Object} Question
-* @property {string} store
-* @property {QuestionData[]} datas
-*/
-
 const {caches, clients, crypto} = self;
 const config = {isOnline: true, version: 9};
 const cachableUrls = {
@@ -355,19 +328,22 @@ async function gameStorage({
         }
         return decryptEntry(res).name;
     };
-    result.markFound = async function ({category, word}) {
+    result.markFound = async function ({category, level, word}) {
         let res = await db.get(category, cipher.encrypt(word));
-        if (res) {
-            await db.put(category, Object.assign(res, {status: "selected"}));
+        if (!res || res?.level !== level) {
+            return {ok:false, error: "item not found"};
         }
-    };
-    result.incrementUncovered = async function (store, level) {
-        let res = await db.get("progress", [store, level]);
-        if (res) {
-            res.uncovered += 1;
-            await db.put("progress", res);
+        await db.put(category, Object.assign(res, {status: "selected"}));
+        res = await db.get("progress", [category, level]);
+        if (!res) {
+            return {
+                ok: false,
+                error: `Progress not found for ${category} on level ${level}`
+            };
         }
-        console.error(`Cannot increment progress for ${store} level ${level}`);
+        res.uncovered += 1;
+        await db.put("progress", res);
+        return {ok: true, progress: res};
     };
     result.getProgress = async function (store, level) {
         let res = await db.get("progress", [store, level]);
@@ -617,14 +593,21 @@ async function found(req, ctx, next) {
     if (!ctx.path.startsWith("/api/found")) {
         return next(req, ctx);
     }
-    if (!tmp.category || !tmp.word) {
-        return createResponse(400, {message: "Missing category or word"});
+    tmp = await req.json();
+    tmp.level = Number.parseInt(tmp.level, 10);
+    if (!tmp.category || !tmp.word || !Number.isFinite(tmp.level)) {
+        return createResponse(400, {
+            message: "Missing category or word or invalid level provided"
+        });
     }
-    await ctx.db.markFound(tmp);
-    return createResponse(200, {message: "Word marked successfully found!!"});
+    tmp = await ctx.db.markFound(tmp);
+    if (!tmp.ok) {
+        return createResponse(400, {message: tmp.error});
+    }
+    return createResponse(200, {progress: tmp.progress});
 }
 
-async function badges(req, ctx, next) {
+async function achievement(req, ctx, next) {
     let tmp;
     if (!ctx.path.startsWith("/api/badges")) {
         return next(req, ctx);
@@ -649,7 +632,6 @@ async function hearts(req, ctx, next) {
 
 async function progress(req, ctx, next) {
     let tmp;
-    let db;
     if (!ctx.path.startsWith("/api/progress")) {
         return next(req, ctx);
     }
@@ -657,26 +639,12 @@ async function progress(req, ctx, next) {
         return createResponse(400, {message: "Missing category value"});
     }
     ctx.params.level = Number.parseInt(ctx.params.level, 10);
-    db = await getDb();
     if (Number.isFinite(ctx.params.level)) {
-        tmp = await db.getProgress(ctx.params.cat, ctx.params.level);
+        tmp = await ctx.db.getProgress(ctx.params.cat, ctx.params.level);
     } else {
-        tmp = await db.getCategoryProgress(ctx.params.cat);
+        tmp = await ctx.db.getCategoryProgress(ctx.params.cat);
     }
     return createResponse(200, {result: tmp});
-}
-
-async function setHearts(req, ctx, next) {
-    let tmp;
-    if (!ctx.path.startsWith("/api/set-hearts")) {
-        return next(req, ctx);
-    }
-    tmp = await req.json();
-    if (!tmp.hearts) {
-        return createResponse(400, {message: "Missing new hearts value"});
-    }
-    await ctx.db.setHearts(tmp.hearts);
-    return createResponse(200, {message: "Hearts updated successfully !!"});
 }
 
 async function addBadge(req, ctx, next) {
@@ -694,27 +662,12 @@ async function addBadge(req, ctx, next) {
     return createResponse(200, {message: "Badge added successfully !!"});
 }
 
-async function guess(req, ctx, next) {
-    let tmp;
-    if (!ctx.path.startsWith("/api/new-guess")) {
-        return next(req, ctx);
-    }
-    tmp = await req.json();
-    if (!tmp.category || !tmp.level) {
-        return createResponse(400, {
-            message: "Missing category or level in new guess"
-        });
-    }
-    await ctx.db.incrementUncovered(tmp.category, tmp.level);
-    return createResponse(200, {message: "New guess saved successfully !!"});
-}
-
 async function handleAPI(request) {
     let chain;
     if (request.method === "GET") {
-        chain = [parseParams, hearts, progress, badges];
+        chain = [parseParams, hearts, progress, achievement];
     } else {
-        chain = [parseParams, found, addBadge, guess, setHearts];
+        chain = [parseParams, found, addBadge];
     }
     return createHandler(unsupported, chain)(request, {});
 }
@@ -781,11 +734,17 @@ async function handleMessage({data, ports}) {
         ports[0].onmessage = handleMessage;
         ports[0].postMessage({connectionAcknowledged: true});
     }
-    if (data.randomWordRequest) {
+    if (data.itemRequest) {
         opts = data.randomWordRequest;
         db = await getDb();
         res = await db.getRandomQuestion(opts.category, opts.level);
-        ports[0].postMessage({wordResponse: {title: opts.category, word: res}});
+        ports[0].postMessage({itemResponse: {title: opts.category, word: res}});
+    }
+    if (data.heartUpdateRequest) {
+        opts = data.heartUpdateRequest;
+        db = await getDb();
+        res = await db.setHearts(opts.hearts);
+        ports[0].postMessage({heartUpdateResponse: {ok: true}});
     }
 }
 
