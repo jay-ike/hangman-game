@@ -79,6 +79,27 @@
     }
 }
 
+button[data-tooltip="answer-reveal-tooltip"] {
+    position: relative;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset-inline-end: -4px;
+        inset-block-start: -4px;
+        inline-size: min(4vi, 16px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--pinky-gradient);
+        transition: transform 0.35s 0.35s cubic-bezier(0.2, 0.3, 0.5, 1.5);
+        transform: scale(0);
+    }
+
+    &:where(:not([aria-disabled="true"]))::before {
+        transform: scale(1);
+    }
+}
+
 .tooltip:where([data-position="bottom"]) {
     --tt-clip: polygon(0 0, 0 100%, 100% 100%, 100% 0, min(100%, 50% + 1em) 0, 50% -1em, max(0%, 50% - 1em) 0);
     --tt-inset-block: calc(100 + 1em) auto;

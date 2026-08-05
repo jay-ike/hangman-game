@@ -14,6 +14,10 @@ const dict = {
         fr: "Besoin de {x} points de vie pour révéler. Continue !"
     },
     earned: {en: "Earned {x} time{y}", fr: "Obtenu {x} fois"},
+    letter_reveal_warning: {
+        en: "Revealing a letter will use up {x} of your hearts. Once it's shown, you can't hide it again but sometimes a little help goes a long way. Ready to do it?",
+        fr: "Dévoiler une lettre te coûtera {x} cœurs. Une fois affichée, tu ne pourras plus la cacher — mais parfois, un petit coup de pouce peut faire la différence. Prêt à le faire ?"
+    },
     level: {en: "Level", fr: "Niveau"},
     level_up_title: {
         en: "You unlocked level {x} of category {y}",

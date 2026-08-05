@@ -190,7 +190,6 @@ function dialogHandler(emitter) {
     target.addEventListener("click", function (event) {
         const btn = event.target;
         let {status} = target.dataset;
-
         if (utils.isButton(btn) && btn.classList.contains("continue-btn")) {
             if (allowedStatus.includes(status) && status !== "paused") {
                 engine.init(null, true);
@@ -320,10 +319,11 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
                     element.addEventListener("close", function (event) {
                         if (event.target.returnValue === "proceed") {
                             res(true);
+                        } else {
+                            event.target.returnValue = "";
+                            activeElement.focus();
+                            res(false);
                         }
-                        event.target.returnValue = "";
-                        activeElement.focus();
-                        res(false);
                     }, {once: true});
                 });
             }
@@ -386,11 +386,14 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         const {tooltip} = target.dataset;
         const deductor = board.getDeduction(context.level);
         const reveal = {data: [], deduction: deductor.guess};
-        event.preventDefault();
         if (!shouldListen(target, deductor, context.hearts)) {
             return;
         }
         if (tooltip === "letter-reveal-tooltip") {
+            tmp = utils.dict.letter_reveal_warning[context.lang];
+            context.warningEmitter.dispatch("letter-reveal-intended", {
+                desc: tmp.replace("{x}", deductor.letter)
+            });
             tmp = await context.warn("letter-reveal");
             if (!tmp) {
                 return;
