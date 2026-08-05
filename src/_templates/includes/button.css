@@ -79,21 +79,27 @@
     }
 }
 
+.tooltip:where([data-position="bottom"]) {
+    --tt-clip: polygon(0 0, 0 100%, 100% 100%, 100% 0, min(100%, 50% + 1em) 0, 50% -1em, max(0%, 50% - 1em) 0);
+    --tt-inset-block: calc(100 + 1em) auto;
+}
+
 [aria-disabled="true"]:focus~.tooltip {
     font-size: 0.85em;
-    text-wrap: balance;
+    text-wrap: pretty;
     letter-spacing: 0.1em;
     text-transform: capitalize;
+    text-align: center;
     color: var(--tt-clr, var(--system-color-white));
     position: absolute;
-    inset-block-end: calc(100% + 1em);
-    inset-inline: -50% auto;
+    inset-block: var(--tt-inset-block, auto calc(100% + 1em));
+    inset-inline: var(--tt-inset-inline, -50% auto);
     margin-inline: auto;
-    padding: 0.5rem;
-    min-inline-size: 8em;
-    max-block-size: 100vb;
-    clip-path: polygon(0 100%, 0 0, 100% 0, 100% 100%,
-            min(100%, 50% + 1em) 100%, 50% calc(100% + 1em), max(0%, 50% - 1em) 100%);
+    padding: 0.5em;
+    min-inline-size: var(--tt-inline-size, 8em);
+    max-block-size: 100lvb;
+    clip-path: var(--tt-clip, polygon(0 100%, 0 0, 100% 0, 100% 100%,
+            min(100%, 50% + 1em) 100%, 50% calc(100% + 1em), max(0%, 50% - 1em) 100%));
     border-image: var(--tt-img, var(--pinky-gradient)) fill 1/auto/1em;
 }
 
@@ -104,13 +110,19 @@
         position: static;
     }
 
+    .tooltip:where([data-position="bottom"]) {
+        --tt-anchored-area: block-end center;
+        --tt-anchored-block: calc(anchor(bottom) + 1em) auto;
+    }
+
     [aria-disabled="true"]:focus ~ .tooltip {
+        --tt-inset-block: var(--tt-anchored-block, auto calc(anchor(top) + 1em));
+        --tt-inset-inline: var(--tt-anchored-inline, auto);
+        --tt-inline-size: calc(anchor-size(width) + min(20vi, 8em));
+
         position-anchor: --btn;
-        inline-size: calc(anchor-size(width) + min(10vi, 8em));
-        inset-block-end: calc(anchor(top) + 1em);
-        position-area: block-start center;
-        position-try: flip-block flip-inline;
-        inset-inline: auto;
+        position-area: var(--tt-anchored-area, block-start center);
+        position-try-fallbacks: flip-block flip-inline;
     }
 }
 
@@ -126,13 +138,13 @@
 }
 
 [data-size="xl"] {
-    --min-padding: min(10vi, 3em);
+    --min-padding: min(10vi, 3rem);
 
     min-inline-size: min(30vi, 5em);
 }
 
 [data-size="sm"] {
-    --min-padding: min(3vi, 1em);
+    --min-padding: min(3vi, 1rem);
 
     min-inline-size: min(8vi, 3em);
 }

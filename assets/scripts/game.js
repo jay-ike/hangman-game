@@ -1,11 +1,13 @@
 /*jslint browser, this*/
-/** @import {GameData} from "./type.js" */
+/** @import {GameData, ApiHandlerInstance, PointManagerInstance} from "./types.js" */
 import utils from "./utils.js";
 import pointing from "./badges.js";
 const {Audio, DOMException, URL, document, navigator} = window;
 const {ApiHandler, eventData, getWords} = utils;
 const {PointManager} = pointing;
+/** @type {ApiHandlerInstance} */
 const api = new ApiHandler();
+/** @type {PointManagerInstance} */
 const board = new PointManager(api);
 let engine;
 let workerPort;
@@ -48,6 +50,20 @@ function notifyWorker(data) {
         workerPort.postMessage(data);
     }
 }
+function disableButton(target, disable = true) {
+    const action = disable ? "disable" : "enable";
+    if (!HTMLButtonElement.prototype.isPrototypeOf(target)) {
+        throw new Error(`you should provide a valid Button to ${action}`);
+    }
+    if (disable) {
+        target.blur();
+        target.setAttribute("aria-disabled", true);
+        target.setAttribute("aria-describedby", target.dataset.tooltip);
+    } else {
+        target.removeAttribute("aria-disabled");
+        target.removeAttribute("aria-describedby");
+    }
+}
 function handleMessage({data, ports}) {
     if (data.statusUpdateRequest) {
         workerPort = ports[0];
@@ -62,10 +78,7 @@ function handleMessage({data, ports}) {
 function queryWorker(port, input, fn) {
     return function (res) {
         const chan = new MessageChannel();
-        port.postMessage(
-            input
-            [chan.port2]
-        );
+        port.postMessage(input, [chan.port2]);
         chan.port1.onmessage = function ({data}) {
             let val = data;
             if (typeof fn === "function") {
@@ -90,8 +103,8 @@ function getAnswer(category, level, lang = "en") {
     return new Promise(queryWorker(
         workerPort,
         {itemRequest: {category, level}},
-        function ({data}) {
-            const {itemResponse: res} = data;
+        function (val) {
+            const {itemResponse: res} = val;
             if (res.title && res.word) {
                 return res;
             } else {
@@ -114,18 +127,24 @@ function setHearts(val) {
 * Utility for retrieving user game data
 * @returns {Promise<GameData>}
 */
-async function getGameData(store) {
+async function getGameData(store, replay=false) {
     const url = new URL(document.URL);
+    /** @type {GameData} */
     const opts = {lang: decodeURI(url.pathname).split("/")[1]};
     let tmp;
-    opts.level = Number.parseInt(decodeURI(url.hash).replace("#", ""), 10);
-    opts.category = store.getValue("_game_", "category");
     tmp = Number.parseInt(store.getValue("_game_", "streak"), 10);
     opts.streak = Number.isFinite(tmp) ? tmp : 0;
+    opts.category = store.getValue("_game_", "category");
+    if (replay) {
+        opts.level = Number.parseInt(store.getValue("_game_", "level"), 10);
+    } else {
+        opts.level = Number.parseInt(decodeURI(url.hash).replace("#", ""), 10);
+    }
     if (!opts.category || !Number.isFinite(opts.level)) {
         window.location.assign(`/${opts.lang}/categories`);
         return;
     }
+    store.setValue("_game_", "level", opts.level);
     tmp = await api.getHearts();
     if (!tmp.ok) {
         console.error("Failed to retrieve user hearts !!!");
@@ -174,9 +193,7 @@ function dialogHandler(emitter) {
 
         if (utils.isButton(btn) && btn.classList.contains("continue-btn")) {
             if (allowedStatus.includes(status) && status !== "paused") {
-                //TODO: handle game restart
-                engine.saveHearts(8);
-                wakeupWorker();
+                engine.init(null, true);
             }
             target.close();
         }
@@ -203,7 +220,25 @@ function dialogHandler(emitter) {
     return Object.freeze(showDialog);
 }
 
-function Engine(rootElement, dispatcher, maxHearts = 8) {
+/**
+ * Utility to verify if we can listen to a click event
+ * @param {HTMLElement} target
+ * @param {{guess: number, item: number, letter: number}} deductor
+ */
+function shouldListen(target, deductor, hearts) {
+    const {tooltip, type} = target.dataset;
+    const checks = [
+        !utils.isButton(target),
+        type !=="letter" && tooltip !== "answer-reveal-tooltip",
+        target.getAttribute("aria-disabled") !== null,
+        tooltip === "letter-reveal-tooltip" && hearts < deductor.letter,
+        tooltip === "answer-reveal-tooltip" && hearts < deductor.item,
+        hearts < 1
+    ];
+    return !checks.some(Boolean);
+}
+
+function Engine(rootElement, dispatcher, minHearts = 9) {
     const self = Object.create(this);
     const context = Object.create(null);
     let showDialog;
@@ -222,34 +257,46 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     context.warn = warningHandler(context.warningEmitter.target);
     context.puzzleReq = 3;
 
-    async function verifyGameEnd({category, hearts, lettersFound, word}) {
-        const wordLetters = getWords(word).join("").length;
-        const found = Object.values(lettersFound).reduce((a, v) => a + v, 0);
-        //TODO: handle game end detection
-        if (hearts < 1) {
-            setTimeout(() => showDialog(eventData("lost", context)), 2000);
+    async function verifyGameEnd(ctx) {
+        const wordLetters = getWords(ctx.word).join("").length;
+        const found = Object.values(ctx.lettersFound).reduce((a, v) => a + v, 0);
+        if (ctx.hearts < 1) {
+            setTimeout(async function () {
+                showDialog(eventData("lost", ctx));
+                await setHearts(minHearts);
+            }, 2000);
         }
         if (wordLetters === found) {
-            notifyWorker({wordFound: {category, word}});
+            let res = await board.handleItemFound(ctx);
+            await updateHearts((heart) => heart + res.points)
+            context.progress = res.progress;
+        //TODO: handle badge earned in the notification payload
+            setTimeout(() => showDialog(eventData("won", context)), 2000);
         }
     }
-
-    function disableButton(target, disable = true) {
-        const action = disable ? "disable" : "enable";
-        if (!HTMLButtonElement.prototype.isPrototypeOf(target)) {
-            throw new Error(`you should provide a valid Button to ${action}`);
+    function handleRevealVisibility() {
+        const {headerEmitter, hearts, level} = context;
+        const deductor = board.getDeduction(level);
+        const payload = {item: {disable: "nil"}, letter: {disable: "nil"}};
+        let tmp;
+        if (hearts < deductor.letter) {
+            payload.letter.disable = true;
         }
-        if (disable) {
-            target.setAttribute("aria-disabled", true);
-            target.setAttribute("aria-describedby", target.dataset.tooltip);
-        } else {
-            target.removeAttribute("aria-disabled");
-            target.removeAttribute("aria-describedby");
+        if (hearts < deductor.item) {
+            payload.item.disable = true;
+            tmp = utils.dict.answer_reveal_insufficient[context.lang].replace(
+                "{x}",
+                deductor.item
+            );
+            payload.item.answerTooltip = tmp;
         }
+        headerEmitter.dispatch("bonus-updated", payload.letter);
+        headerEmitter.dispatch("reveal-updated", payload.item);
     }
     async function updateHearts(updater) {
-        let hearts = updater(context.hearts ?? maxHearts);
+        let hearts = updater(context.hearts ?? minHearts);
         await setHearts(hearts);
+        context.hearts = hearts;
         context.headerEmitter.dispatch("heart-updated", {hearts});
     }
     function warningHandler(element) {
@@ -287,44 +334,41 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     * Utility for initializing the game engine
     * @param {GameData} gameData
     */
-    async function initialize(gameData) {
+    async function initialize(gameData, replay=false) {
         let data;
         if (gameData) {
             data = gameData;
         } else {
-            data = await getGameData(context.store);
+            data = await getGameData(context.store, replay);
         }
         context.lettersFound = Object.create(null);
         Object.assign(context, data);
+        context.hearts = Math.max(minHearts, context.hearts);
         context.headerEmitter.dispatch("title-updated", {
             level: data.level,
             title: data.category,
             titleClass: "nil"
         });
-        context.headerEmitter.dispatch("heart-updated", {
-            hearts: data.hearts
-        });
+        context.headerEmitter.dispatch("heart-updated", {hearts: data.hearts});
         context.letterEmitter.target.textContent = "";
         context.letterEmitter.target.insertAdjacentHTML(
             "beforeend",
             utils.createDOMSentence(context.word).join("")
         );
+        handleRevealVisibility();
         rootElement.querySelectorAll(
-            ".responsive-grid button[data-type='letter][aria-disabled]"
+            ".responsive-grid button[data-type='letter'][aria-disabled]"
         ).forEach((elt) => disableButton(elt, false));
     }
 
-    function listenKeyboard(event) {
-        let isLetter = (
-            event.key.match(/[a-z]/i) ||
-            event.code.match(/key[a-z]/i)
-        );
+    function listenKeyboard(evt) {
+        let isLetter = (evt.key.match(/[a-z]/i) || evt.code.match(/key[a-z]/i));
         let btn;
         if (!isLetter) {
             return;
         }
         btn = rootElement.querySelector(
-            `[aria-keyshortcuts="${event.key} Shift+${event.key}" i]`
+            `[aria-keyshortcuts="${evt.key} Shift+${evt.key}" i]`
         );
         if (utils.isButton(btn)) {
             if (btn.getAttribute("aria-disabled") === "true") {
@@ -337,79 +381,73 @@ function Engine(rootElement, dispatcher, maxHearts = 8) {
     }
 
     async function listenLetterClick(event) {
-        let indexes;
-        let letter;
+        let tmp;
         const {target} = event;
-        const {tooltip, type} = target.dataset;
+        const {tooltip} = target.dataset;
         const deductor = board.getDeduction(context.level);
-        if (
-            !utils.isButton(target) ||
-            type !=="letter" && tooltip !== "answer-reveal-tooltip" ||
-            target.getAttribute("aria-disabled") !== null ||
-            (
-                tooltip === "letter-reveal-tooltip"
-                && context.hearts < deductor.letter
-            ) || context.hearts <= 0
-        ) {
+        const reveal = {data: [], deduction: deductor.guess};
+        event.preventDefault();
+        if (!shouldListen(target, deductor, context.hearts)) {
             return;
         }
         if (tooltip === "letter-reveal-tooltip") {
-            letter = await context.warn("letter-reveal");
-            if (!letter) {
+            tmp = await context.warn("letter-reveal");
+            if (!tmp) {
                 return;
             }
-            [letter, indexes] = utils.getRandomLetter(
+            reveal.data.push(utils.getRandomLetter(
+                context.word,
+                Object.keys(context.lettersFound)
+            ));
+            reveal.deduction = deductor.letter;
+        }  else if (tooltip === "answer-reveal-tooltip") {
+            tmp = await context.warn("answer-reveal");
+            if (!tmp) {
+                return;
+            }
+            reveal.deduction = deductor.item;
+            tmp = utils.dict.answer_reveal_warning[context.lang];
+            context.warningEmitter.dispatch("answer-reveal-intended", {
+                points: `-${deductor.item}`,
+                desc: tmp.replace("{x}", deductor.item)
+            });
+            reveal.data = utils.getAllLetters(
                 context.word,
                 Object.keys(context.lettersFound)
             );
-            await updateHearts((heart) => heart - deductor.letter);
-            disableButton(rootElement.querySelector(
-                "button[data-tooltip='" + letter + "' i]"
-            ));
-        }  else if (tooltip === "answer-reveal-tooltip") {
-            letter = utils.dict.answer_reveal_warning[context.lang];
-            context.warningEmitter.dispatch("answer-reveal-intended", {
-                points: "-60",
-                desc: letter.replace("{x}", "60")
-            });
-            letter = await context.warn("answer-reveal");
-            return;
         } else {
-            letter = target.textContent.trim();
-            indexes = utils.getIndexes(
+            tmp = utils.getIndexes(
                 utils.getWords(context.word ?? "").join(""),
-                letter
+                target.textContent.trim()
             );
+            if (tmp.length > 0) {
+                reveal.data.push({
+                    letter: target.textContent.trim(),
+                    indexes: tmp
+                });
+            }
             disableButton(target);
         }
-        if (indexes.length < 1) {
-            await updateHearts((heart) => heart - deductor.guess);
+        if (reveal.data.length < 1) {
+            await updateHearts((heart) => heart - reveal.deduction);
         } else {
-            context.lettersFound[letter] = indexes.length;
+            reveal.data.forEach(function (val) {
+                context.lettersFound[val.letter] = val.indexes;
+                val.indexes.forEach((index) => context.letterEmitter.dispatch(
+                    "letter" + (index + 1) + "-changed",
+                    {dimmed: "nil", letter: val.letter}
+                ));
+                disableButton(rootElement.querySelector(
+                    "button[data-tooltip='" + val.letter + "' i]"
+                ));
+            });
         }
-        if (context.hearts < deductor.letter) {
-            context.headerEmitter.dispatch(
-                "bonus-updated",
-                {preventTrigger: true}
-            );
-        }
-        indexes.forEach((index) => context.letterEmitter.dispatch(
-            "letter" + (index + 1) + "-changed",
-            {dimmed: "nil", letter}
-        ));
+        handleRevealVisibility();
         target.blur();
         verifyGameEnd(context);
     }
 
     self.init = initialize;
-    self.saveHearts = async function (val = 0) {
-        let points = val;
-        if (!Number.isFinite(val)) {
-            points = 9; /** The default points */
-        }
-        await setHearts(points);
-        context.hearts = points;
-    };
     rootElement.addEventListener("click", listenLetterClick);
     rootElement.addEventListener("keydown", listenKeyboard);
     utils.trapFocus(context.dialogEmitter.target);

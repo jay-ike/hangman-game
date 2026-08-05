@@ -10,8 +10,8 @@ const dict = {
         fr: "Tu vas perdre {x} points. Cette réponse ne te rapportera pas de points, mais elle compte pour ta progression."
     },
     answer_reveal_insufficient: {
-        en: "Need 50 hearts to reveal the answer. Keep guessing!",
-        fr: "Besoin de 50 points de vie pour révéler. Continue !"
+        en: "Need {x} hearts to reveal the answer. Keep guessing!",
+        fr: "Besoin de {x} points de vie pour révéler. Continue !"
     },
     earned: {en: "Earned {x} time{y}", fr: "Obtenu {x} fois"},
     level: {en: "Level", fr: "Niveau"},
@@ -207,14 +207,11 @@ function getIndexes(word, letter) {
     );
 
 }
-function getRandomLetter(sentence, foundLetters) {
-    const word = getWords(sentence).join("").toLowerCase();
-    let availableLetters;
-    let result;
-    if (!Array.isArray(foundLetters)) {
-        throw new Error("the foundLetters should be an array");
+function letterOccurrences(word, foundLetters) {
+    if (typeof word !== "string" || !Array.isArray(foundLetters)) {
+        return {};
     }
-    availableLetters = word.split("").reduce(function (acc, letter) {
+    return word.split("").reduce(function (acc, letter) {
         if (foundLetters.includes(letter)) {
             return acc;
         }
@@ -225,9 +222,20 @@ function getRandomLetter(sentence, foundLetters) {
         }
         return acc;
     }, Object.create(null));
-    result = Object.entries(availableLetters).sort((a, b) => a[1] - b[1])[0];
-    result[1] = getIndexes(word, result[0]);
-    return result;
+}
+function getRandomLetter(sentence, foundLetters) {
+    const word = getWords(sentence).join("").toLowerCase();
+    let tmp;
+    let occurrences = letterOccurrences(word, foundLetters);
+    tmp = Object.entries(occurrences).sort((a, b) => a[1] - b[1])[0];
+    return {letter: tmp[0], indexes: getIndexes(word, tmp[0])};
+}
+function getAllLetters(sentence, foundLetters) {
+    const word = getWords(sentence).join("").toLowerCase();
+    const tmp = letterOccurrences(word, foundLetters);
+    return Object.entries(tmp).map(function (entry) {
+        return {letter: entry[0], indexes: getIndexes(word, entry[0])};
+    });
 }
 function letterTemplate(index) {
     return "<span class='center shadowed btn' data-type='letter' data-listen=" +
@@ -478,6 +486,7 @@ export default Object.freeze({
     dict,
     formatDate,
     eventData,
+    getAllLetters,
     getFallBack,
     getFocusableChildren,
     getIndexes,

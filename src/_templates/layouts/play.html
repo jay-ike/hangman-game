@@ -38,13 +38,13 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
             <div class="center" data-icon="heart" data-listen="heart-updated" data-property="{hearts}"></div>
             <div class="visually-hidden" data-listen="heart-updated" data-property="{{'hearts_remaining' | i18n}}" aria-live="polite"></div>
             <div class="relative">
-                <button class="shadowed" aria-labelledby="answer-reveal-title" data-size="sm" data-radius="sm" data-tooltip="answer-reveal-tooltip">
-                    <svg width="24" height="24">
-                        <title id="answer-reveal-title">Reveal Answer</title>
+                <button class="shadowed center" aria-labelledby="answer-reveal-title" data-size="sm" data-radius="sm" data-tooltip="answer-reveal-tooltip" data-listen="reveal-updated" data-attributes="aria-disabled:{disable}">
+                    <svg width="32" height="32">
+                        <title id="answer-reveal-title">{"reveal_answer" | i18n}</title>
                         <use href="/assets/images/sprites.svg#gift">
                     </svg>
                 </button>
-                <span class="tooltip visually-hidden" id="answer-reveal-tooltip" aria-hidden="true" data-listen="reveal-intent-emitted" data-property="{answerTooltip}">
+                <span class="tooltip visually-hidden" id="answer-reveal-tooltip" aria-hidden="true" data-position="bottom" data-listen="reveal-updated" data-property="{answerTooltip}">
                 </span>
             </div>
         </div>
@@ -66,12 +66,11 @@ og_imageAlt: "A screenshot of the game play of the hangman game having a keyboar
             {%for key in site.keyboard%}
             <div class="relative">
                 <button data-type="letter" data-theme="white" class="shadowed" aria-keyshortcuts="{{key.letter | upcase}} Shift+{{key.letter | upcase}}" data-tooltip="{{key.letter}}" id="key_{{key.letter}}" aria-labelledby="key key_{{key.letter}}">{{key.letter}}</button>
-                <span class="tooltip visually-hidden" id="{{key.letter}}" aria-hidden="true">{{"letter_selected" | i18n:
-                    key}}</span>
+                <span class="tooltip visually-hidden" id="{{key.letter}}" aria-hidden="true">{{"letter_selected" | i18n: key}}</span>
             </div>
             {%endfor%}
             <div class="relative">
-                <button aria-controls="warning-dialog" aria-labelledby="letter-reveal-title" data-type="letter" class="center shadowed" data-theme="secondary" data-tooltip="letter-reveal-tooltip" data-listen="bonus-updated" data-attributes="aria-disabled:{preventTrigger}">
+                <button aria-controls="warning-dialog" aria-labelledby="letter-reveal-title" data-type="letter" class="center shadowed" data-theme="secondary" data-tooltip="letter-reveal-tooltip" data-listen="bonus-updated" data-attributes="aria-disabled:{disable}">
                     <svg width="48" height="48">
                         <title id="letter-reveal-title">{{"letter_reveal" | i18n}}</title>
                         <use href="/assets/images/sprites.svg#idea">

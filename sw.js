@@ -735,7 +735,7 @@ async function handleMessage({data, ports}) {
         ports[0].postMessage({connectionAcknowledged: true});
     }
     if (data.itemRequest) {
-        opts = data.randomWordRequest;
+        opts = data.itemRequest;
         db = await getDb();
         res = await db.getRandomQuestion(opts.category, opts.level);
         ports[0].postMessage({itemResponse: {title: opts.category, word: res}});
