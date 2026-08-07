@@ -34,11 +34,12 @@
     margin-inline: auto;
     inline-size: max-content;
     filter: url("#dilated-shadow");
+    letter-spacing: 0.2em;
 
     &>span:nth-of-type(2) {
         font-size: 1.5em;
         margin-block-start: -.45em;
-        letter-spacing: 1px;
+        letter-spacing: 0.08em;
 
         &::first-letter {
             text-transform: uppercase;

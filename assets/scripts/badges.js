@@ -1,5 +1,5 @@
 /*jslint browser, this*/
-/** @import {ApiHandlerInstance, PointManagerInstance} from './types.js' */
+/** @import {ApiHandlerInstance, PointManagerInstance, PointListenerInstance} from './types.js' */
 
 const badges = [
     {
@@ -175,6 +175,26 @@ function getEarnedBadges(context) {
 }
 
 /**
+ * Utility for listening mutations
+ * @param {MutationRecord} record
+ */
+function listener(record) {
+    const {action, diff} = record.target.dataset;
+    let particle;
+    if (record.attributeName === "data-action" && action) {
+        particle = document.createElement("span");
+        particle.classList.add("point", action ?? "deduct")
+        particle.textContent = diff;
+        record.target.appendChild(particle);
+        particle.addEventListener("animationend", function (evt) {
+            evt.target.remove();
+        });
+        delete record.target.dataset.diff;
+        delete record.target.dataset.action;
+    }
+}
+
+/**
 * Utility for managing points in the game
 * @constructor
 * @param {ApiHandlerInstance} api
@@ -226,4 +246,27 @@ function PointManager(api) {
     return Object.freeze(self);
 }
 
-export default Object.freeze({PointManager});
+/**
+* Utility for listening to points update in the game
+* @constructor
+* @param {string[]} filter
+* @returns {PointListenerInstance}
+*/
+function AttributeListener(filter) {
+    let observer= new MutationObserver((records) => records.forEach(listener));
+    /** @type {PointListenerInstance} */
+    let self = Object.create(null);
+    self.listen = function (selector) {
+        const elt = document.querySelector(selector);
+        if (!elt) {
+            return false;
+        }
+        observer.observe(elt, {attributes: true, attributeFilter: filter});
+    }
+    self.release = function () {
+        observer.disconnect();
+    }
+    return Object.freeze(self);
+}
+
+export default Object.freeze({AttributeListener, PointManager});

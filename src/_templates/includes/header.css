@@ -45,14 +45,43 @@
         flex: 2 1 auto;
     }
 
-    [data-icon="heart"]:where(:is(.heading, .modal) *) {
+    .heading-icon {
         font-weight: bold;
-        font-size: 1.15em;
+        font-size: 1.3em;
+        position: relative
+    }
+
+    [data-icon="heart"]:where(:is(.heading, .modal) *) {
         color: var(--system-color-dark-blue);
         aspect-ratio: 1.08;
         inline-size: var(--heart-size, min(13vi, 4rem));
         clip-path: url("#heart");
         background: var(--pinky-gradient);
+    }
+
+    .point:where(.heading-icon *) {
+        position: absolute;
+        color: var(--point-clr, oklch(62.17% 0.23 26deg));
+        place-self: center;
+        opacity: 0.7;
+        font-size: 1.2em;
+        animation: point-animation .35s var(--elastic-timing) .5s backwards;
+    }
+
+    .add:where(.point) {
+        --point-clr: oklch(83.23% 0.2317 145deg);
+        --translation: -1.5em;
+    }
+
+    @keyframes point-animation {
+        99% {
+            opacity: 1;
+            transform: translateY(var(--translation, 1.5em));
+        }
+
+        100% {
+            opacity: 0;
+        }
     }
 
 

@@ -1,14 +1,16 @@
 /*jslint browser, this*/
-/** @import {GameData, ApiHandlerInstance, PointManagerInstance} from "./types.js" */
+/** @import {GameData, ApiHandlerInstance, PointManagerInstance, PointListenerInstance} from "./types.js" */
 import utils from "./utils.js";
 import pointing from "./badges.js";
 const {Audio, DOMException, URL, document, navigator} = window;
 const {ApiHandler, eventData, getWords} = utils;
-const {PointManager} = pointing;
+const {AttributeListener, PointManager} = pointing;
 /** @type {ApiHandlerInstance} */
 const api = new ApiHandler();
 /** @type {PointManagerInstance} */
 const board = new PointManager(api);
+/** @type {PointListenerInstance} */
+const heartListener = new AttributeListener(["data-action"]);
 let engine;
 let workerPort;
 let refreshed;
@@ -294,9 +296,13 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
     }
     async function updateHearts(updater) {
         let hearts = updater(context.hearts ?? minHearts);
+        let diff = context.hearts - hearts;
+        let action = diff < 0 ? "add": "deduct";
+        const abs = Math.abs(diff);
+        diff = diff < 0 ? `+${abs}` : `-${abs}`;
         await setHearts(hearts);
         context.hearts = hearts;
-        context.headerEmitter.dispatch("heart-updated", {hearts});
+        context.headerEmitter.dispatch("heart-updated", {action, hearts, diff});
     }
     function warningHandler(element) {
         const {store} = context;
@@ -341,6 +347,9 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         } else {
             data = await getGameData(context.store, replay);
         }
+        if (!replay) {
+            heartListener.listen(".heading-sub > .heading-icon");
+        }
         context.lettersFound = Object.create(null);
         Object.assign(context, data);
         context.hearts = Math.max(minHearts, context.hearts);
@@ -349,7 +358,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             title: data.category,
             titleClass: "nil"
         });
-        context.headerEmitter.dispatch("heart-updated", {hearts: data.hearts});
+        context.headerEmitter.dispatch("heart-updated", {hearts: context.hearts});
         context.letterEmitter.target.textContent = "";
         context.letterEmitter.target.insertAdjacentHTML(
             "beforeend",
@@ -385,7 +394,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         const {target} = event;
         const {tooltip} = target.dataset;
         const deductor = board.getDeduction(context.level);
-        const reveal = {data: [], deduction: deductor.guess};
+        const reveal = {data: [], deduction: 0};
         if (!shouldListen(target, deductor, context.hearts)) {
             return;
         }
@@ -428,23 +437,24 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
                     letter: target.textContent.trim(),
                     indexes: tmp
                 });
+            } else {
+                reveal.deduction = deductor.guess;
             }
             disableButton(target);
         }
-        if (reveal.data.length < 1) {
+        if (reveal.deduction > 0) {
             await updateHearts((heart) => heart - reveal.deduction);
-        } else {
-            reveal.data.forEach(function (val) {
-                context.lettersFound[val.letter] = val.indexes;
-                val.indexes.forEach((index) => context.letterEmitter.dispatch(
-                    "letter" + (index + 1) + "-changed",
-                    {dimmed: "nil", letter: val.letter}
-                ));
-                disableButton(rootElement.querySelector(
-                    "button[data-tooltip='" + val.letter + "' i]"
-                ));
-            });
         }
+        reveal.data.forEach(function (val) {
+            context.lettersFound[val.letter] = val.indexes;
+            val.indexes.forEach((index) => context.letterEmitter.dispatch(
+                "letter" + (index + 1) + "-changed",
+                {dimmed: "nil", letter: val.letter}
+            ));
+            disableButton(rootElement.querySelector(
+                "button[data-tooltip='" + val.letter + "' i]"
+            ));
+        });
         handleRevealVisibility();
         target.blur();
         verifyGameEnd(context);
@@ -496,4 +506,7 @@ window.addEventListener("DOMContentLoaded", async function () {
         ));
     }
     wakeupWorker();
+});
+window.addEventListener("beforeunload", function () {
+    heartListener.release();
 });
