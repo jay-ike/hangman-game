@@ -106,6 +106,26 @@ module.exports = Object.freeze({
         }
     },
     categories: categoryList.fr,
+    credit_sections: [
+        {
+            content: "<p>Ce petit jeu du Pendu a été conçu par un développeur solo qui aime les jeux de lettres et le web ouvert. Il est né d’un défi Frontend Mentor et a grandi avec quelques touches personnelles.</p>",
+            desc: "intro-content",
+            id: "intro",
+            title: "Introduction"
+        },
+        {
+            content: "<p>Développé avec soin par Ndimah Tchougoua (jay-ike). J’espère qu’il t’apportera un peu de plaisir ou au moins une façon sympa de passer le temps.</p>",
+            desc: "author-content",
+            id: "author",
+            title: "À propos de l'auteur"
+        },
+        {
+            content: "<p>Merci à la communauté open source et à tous ceux qui partagent des ressources gratuites. Vous rendez le web plus chaleureux.</p>",
+            desc: "thanks-content",
+            id: "thanks",
+            title: "Remercients"
+        }
+    ],
     locale: "fr",
     levels: [
         {

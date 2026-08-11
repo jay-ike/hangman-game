@@ -23,7 +23,7 @@ body {
     color: var(--system-color-black);
     font-size: 100%;
     min-inline-size: 98vi;
-    min-block-size: 85lvb;
+    min-block-size: 100lvb;
     background: url("/assets/images/sprites.svg#game-bg") 50% / cover no-repeat;
 }
 
@@ -60,7 +60,7 @@ body {
     }
 
     :is(main:not(.main-content):where(body > *)) {
-        max-inline-size: min(90vi, 1110px);
+        max-inline-size: min(90vi, var(--main-max-size, 1110px));
         margin-inline: auto;
     }
 
@@ -142,6 +142,10 @@ body {
         --s-space: .25em;
     }
 
+    [data-r-space="sm"] {
+        --r-space: .25em;
+    }
+
     [data-space="md"] {
         --s-space: 1em;
     }
@@ -157,6 +161,10 @@ body {
             --c-space: min(8lvb, 4.5rem);
 
             padding-block: 32px 48px;
+        }
+
+        &[data-type="credit"] {
+            --main-max-size: 720px;
         }
     }
 
@@ -254,8 +262,8 @@ body {
     }
 
     .scrollview {
-        max-block-size: min(65lvb, 960px);
-        overflow: hidden auto;
+        max-block-size: min(73lvb, 960px);
+        overflow: clip auto;
 
         &[data-layout="keyboard"] {
             --m-col-s: 9;

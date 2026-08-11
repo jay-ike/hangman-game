@@ -19,9 +19,6 @@ async function getBadges(emitter) {
         //TODO: Handle error Case in the UI
         return;
     }
-    res.data = [
-        {id: "quill", events: [{unlockedAt: Date.now(), category: "Countries", level: 3}]}
-    ];
     tags.forEach(function (el) {
         const {tag} = el.dataset;
         const badge = res.data.filter((t) => t.id === tag)[0];

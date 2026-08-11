@@ -48,6 +48,12 @@
         }
     }
 
+    &[data-theme="purple"] {
+        --color-fill: var(--system-color-dark-navy);
+        --shadow: inset 0 -2px 0 3px var(--system-color-deep-blue),
+                  inset 0 1px 0 6px oklch(47% 0.1257 273deg);
+    }
+
     &[data-theme="white"] {
         --color-fill: var(--system-color-white);
         --color-text: var(--system-color-dark-navy);
@@ -162,6 +168,10 @@ button[data-tooltip="answer-reveal-tooltip"] {
     --min-padding: min(10vi, 3rem);
 
     min-inline-size: min(30vi, 5em);
+}
+
+[data-size="md"] {
+    --min-padding: min(6vi, 1.5em);
 }
 
 [data-size="sm"] {

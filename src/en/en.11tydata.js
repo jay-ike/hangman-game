@@ -105,6 +105,26 @@ module.exports = Object.freeze({
         }
     },
     categories: categoryList.en,
+    credit_sections: [
+        {
+            content: "<p id='intro-content'>This little hangman game was crafted by a solo developer who loves word puzzles and the open web. It started as a Frontend Mentor challenge and grew into something personal — with a few extra twists along the way.</p>",
+            desc: "intro-content",
+            id: "intro",
+            title: "Introduction"
+        },
+        {
+            content: "<p id='author-content'>Built with care by Ndimah Tchougoua (jay-ike). I hope it brings you a bit of joy or at least a fun way to kill a few minutes.</p>",
+            desc: "author-content",
+            id: "author",
+            title: "About the author"
+        },
+        {
+            content: "<p id='thanks-content'>Thanks to the open‑source community and everyone who shares free resources. You make the web a warmer place.</p>",
+            desc: "thanks-content",
+            id: "thanks",
+            title: "Acknowledgements"
+        }
+    ],
     locale: "en",
     levels: [
         {

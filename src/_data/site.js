@@ -16,5 +16,10 @@ module.exports = Object.freeze({
         width: 75
     },
     gameName: {name: "hangman"},
-    keyboard: generateLetters()
+    keyboard: generateLetters(),
+    contacts: {
+        email: "ndimah22@protonmail.com",
+        issues: "https://github.com/jay-ike/hangman-game/issues",
+        masto: "https://mastodon.social/@ndimah22"
+    }
 });

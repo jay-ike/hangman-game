@@ -9,37 +9,44 @@ module.exports = Object.freeze({
         en: "available categories",
         fr: "catégories disponibles"
     },
-    available_letters: {
-        en: "available keys",
-        fr: "touches disponibles"
-    },
-    badge_earned: {
-        en: "badges earned",
-        fr: "badges obtenus"
-    },
-    category: {
-        en: "category",
-        fr: "catégorie"
-    },
-    cancel: {
-        en: "cancel",
-        fr: "annuler"
-    },
+    available_letters: {en: "available keys", fr: "touches disponibles"},
+    badge_earned: {en: "badges earned", fr: "badges obtenus"},
+    category: {en: "category", fr: "catégorie"},
+    cancel: {en: "cancel", fr: "annuler"},
     cancel_popup: {
         en: "Don't prompt me again",
         fr: "Ne plus afficher ce message"
     },
-    choose_level: {
-        en: "choose level",
-        fr: "autre niveau"
-    },
-    close: {
-        en: "close",
-        fr: "fermer"
-    },
-    continue: {
-        en: "continue",
-        fr: "Reprendre"
+    choose_level: {en: "choose level", fr: "autre niveau"},
+    close: {en: "close", fr: "fermer"},
+    continue: {en: "continue", fr: "Reprendre"},
+    credits: {
+        code_used: {
+            en: "Code: HTML, CSS, and JavaScript without frameworks, just the good old web.",
+            fr: "Code: HTML, CSS et JavaScript sans frameworks, juste le bon vieux web."
+        },
+        contact_links: {en: "contact links", fr: "liens de contact"},
+        deployment: {
+            en: "Deployment: Vercel, with continuous delivery from GitHub.",
+            fr: "Déploiement : Vercel, avec intégration continue depuis GitHub."
+        },
+        follow: {en: "follow me on mastodon", fr: "me suivre sur mastodon"},
+        hello: {en: "say hello", fr: "dire bonjour"},
+        illustration: {
+            en: "Illustrations: Made in Inkscape, tweaked with love.",
+            fr: "Illustrations : Dessinées sous Inkscape, ajustées avec amour."
+        },
+        report: {en: "report a bug", fr: "signaler une défaut"},
+        sound: {
+            en: "Sounds: Sourced from Pixabay (royalty‑free).",
+            fr: "Sons : Provenant de Pixabay (libres de droits)."
+        },
+        tech_used: {
+            en: "Technologies and tools used",
+            fr: "Technologies et outils utilisés"
+        },
+        title: {en: "behind the words", fr: "derrière les mots"},
+        tools: {en: "Tech & Tools", fr: "Technos & Outils"}
     },
     deduct_points: {
         en: "deduct points",

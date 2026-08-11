@@ -1,0 +1,67 @@
+---
+layout: "layouts/base.html"
+title: "Your Hangman Badge Collection – Achievements"
+path: "en/achievements"
+site_name: "Hangman game, achievements"
+site_title: "View the badges you've earned so far in the hangman game."
+og_locale: "en"
+og_description: "Check out the badges you’ve earned while playing Hangman. From flawless guesses to mastering whole categories, each badge tells a story. Can you get them all?"
+og_image: "https://ike-hangman-game.vercel.app/assets/images/category-og-image.png"
+og_imageW: 1200
+og_imageH: 630
+og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of them yet earned"
+
+---
+<style>{%cssmin "includes/header.css"%}</style>
+<main aria-labelledby="main-title" class="stack main-wrapper" data-type="credit">
+    <div class="row heading" data-variant="title-only">
+        <a href="/{{locale}}/" class="shadowed rounded btn" data-theme="secondary" data-size="sm" aria-labelledby="return">
+            <svg width="25" height="24">
+                <title id="return">{{ "return_home" | i18n }}</title>
+                <use href="/assets/images/sprites.svg#back"/>
+            </svg>
+        </a>
+        <h1 class="dilated-effect sky-text-bg capitalize" id="main-title">{{ "credits.title" | i18n}}</h1>
+    </div>
+    <div class="btn shadowed" style="view-transition-name: credits;" data-size="md" data-theme="purple">
+        <div class="column scrollview">
+            {% for section in credit_sections %}
+            <section class="stack" data-space="sm" aria-labelledby="{{section.id}}" {%if section.desc %} aria-describedby="{{section.desc}}"{% endif %}>
+                <h2 id="{{section.id}}">{{section.title}}</h2>
+                {{section.content}}
+            </section>
+            {%endfor%}
+            <section class="stack" data-space="sm" aria-labelledby="tools">
+                <p id="tools-desc" hidden>{{"credits.tech_used" | i18n}}</p>
+                <h2 id="tools">{{"credits.tools" | i18n}}</h2>
+                <ul class="stack" aria-labelledby="tools-desc" data-r-space="sm">
+                    <li class="row" aria-labelledby="code">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#code">
+                        </svg>
+                        <span id="code">{{"credits.code_used" | i18n}}</span>
+                    </li>
+                    <li class="row" aria-labelledby="deployment" data-space="md">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#deploy">
+                        </svg>
+                        <span id="deployment">{{"credits.deployment" | i18n}}</span>
+                    </li>
+                    <li class="row" aria-labelledby="illustration" data-space="md">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#pen">
+                        </svg>
+                        <span id="illustration">{{"credits.illustration" | i18n}}</span>
+                    </li>
+                    <li class="row" aria-labelledby="sounds" data-space="md">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#music">
+                        </svg>
+                        <span id="sounds">{{"credits.sound" | i18n}}</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+</main>
+
