@@ -13,6 +13,10 @@ const dict = {
         en: "Need {x} hearts to reveal the answer. Keep guessing!",
         fr: "Besoin de {x} points de vie pour révéler. Continue !"
     },
+    badge_earned: {
+        en: "Badge Earned",
+        fr: "Badge Obtenu"
+    },
     earned: {en: "Earned {x} time{y}", fr: "Obtenu {x} fois"},
     letter_reveal_warning: {
         en: "Revealing a letter will use up {x} of your hearts. Once it's shown, you can't hide it again but sometimes a little help goes a long way. Ready to do it?",
@@ -372,7 +376,8 @@ function ApiHandler() {
     const headers = {
         get: {headers: defaultHeaders, method: "GET"},
         post: function (body) {
-            return {body, headers: defaultHeaders, method: "POST"};
+            const val= JSON.stringify(body);
+            return {body: val, headers: defaultHeaders, method: "POST"};
         }
     };
     /** @type {ApiHandlerInstance} */
@@ -418,69 +423,77 @@ function removeAccents(val) {
 * @param {GameData} data
 */
 function eventData(status, data) {
-        let res = {action: "replay", status};
-        const {category, lang, level: lev, progress: p, puzzleReq} = data;
-        let tmp = {y: puzzleReq, z: puzzleReq - p.uncovered};
-        res.levStyle = `view-transition-name: level${lev};`;
-        res.levelLink = `/${lang}/levels#${encodeURIComponent(category)}`;
-        res.levLabel = "paused";
-        res.catStyle = `view-transition-name: ${removeAccents(category)};`;
-        res.catLabel = "paused";
-        if (p.uncovered >= puzzleReq) {
-            tmp.y = p.totalWords;
-            tmp.z = p.totalWords - p.uncovered;
-            tmp.desc = dict.level_up_desc[lang].replace(
-                "{x}",
-                p.uncovered
-            ).replace("{y}", tmp.y).replace("{z}", tmp.z).replace("{a}", lev+1);
-        } else {
-            tmp.desc = dict.progress_level_desc[lang].replace(
-                "{x}",
-                p.uncovered
-            ).replace("{y}", tmp.y).replace("{z}", tmp.z);
+    let res = {action: "replay", status};
+    const {category, lang, level: lev, progress: p, puzzleReq} = data;
+    let tmp = {y: puzzleReq, z: puzzleReq - p.uncovered};
+    res.levStyle = `view-transition-name: level${lev};`;
+    res.levelLink = `/${lang}/levels#${encodeURIComponent(category)}`;
+    res.levLabel = "paused";
+    res.catStyle = `view-transition-name: ${removeAccents(category)};`;
+    res.catLabel = "paused";
+    if (p.uncovered >= puzzleReq) {
+        tmp.y = p.totalWords;
+        tmp.z = p.totalWords - p.uncovered;
+        tmp.desc = dict.level_up_desc[lang].replace(
+            "{x}",
+            p.uncovered
+        ).replace("{y}", tmp.y).replace("{z}", tmp.z).replace("{a}", lev);
+    } else {
+        tmp.desc = dict.progress_level_desc[lang].replace(
+            "{x}",
+            p.uncovered
+        ).replace("{y}", tmp.y).replace("{z}", tmp.z);
+    }
+    res.description = tmp.desc;
+    res.progress = Array.from({length: puzzleReq}, (_, i) => i).reduce(
+        function (acc, v) {
+            if (p.uncovered > v) {
+                acc[`level${v+1}`] = "";
+            }
+            return acc;
+        },
+        Object.create(null)
+    );
+    if (status === "lost") {
+        res.levTheme = "secondary";
+        res.levLabel = "lost";
+        res.contentLabel = "lost";
+    }
+    if (status === "won") {
+        res.starLabel = "won";
+        res.titleLabel = "lost";
+        if (puzzleReq < p.uncovered && p.uncovered < p.totalWords) {
+            res.starLabel = "lost";
         }
-        res.description = tmp.desc;
-        res.progress = Array.from({length: puzzleReq}, (_, i) => i).reduce(
-            function (acc, v) {
-                if (p.uncovered > v) {
-                    acc[`level${v+1}`] = "";
-                }
-                return acc;
-            },
-            Object.create(null)
-        );
-        if (status === "lost") {
-            res.levTheme = "secondary";
-            res.levLabel = "lost";
-            res.contentLabel = "lost";
-        }
-        if (status === "won") {
-            res.starLabel = "won";
-            res.titleLabel = "lost";
-        }
-        if (status === "won" && puzzleReq === p.uncovered) {
-            res.status = "level-up";
-            res.titleLabel = "level-up";
-            res.levLabel = "level-up";
-            res.levTheme = "secondary";
-            res.contentTitle = dict.level_up_title[lang].replace(
-                "{x}",
-                lev + 1
-            ).replace("{y}", category);
-        }
-        if (status === "won" && p.uncovered >= p.totalWords) {
-            res.status = "perfect";
-            res.catLabel = "perfect";
-            res.catTheme = "nil";
-            res.description = dict.mastered[lang].replace("{x}", category);
-        }
-        if (status ==="paused") {
-            res.action = "continue";
-            res.contentLabel = "won";
-        } else {
-            res.contentLabel = res.status;
-        }
-        return res;
+    }
+    if (status === "won" && puzzleReq === p.uncovered) {
+        res.status = "level-up";
+        res.titleLabel = "level-up";
+        res.levLabel = "level-up";
+        res.levTheme = "secondary";
+        res.contentTitle = dict.level_up_title[lang].replace(
+            "{x}",
+            lev + 1
+        ).replace("{y}", category);
+    }
+    if (status === "won" && p.uncovered >= p.totalWords) {
+        res.status = "perfect";
+        res.catLabel = "perfect";
+        res.catTheme = "nil";
+        res.description = dict.mastered[lang].replace("{x}", category);
+    }
+    if (status ==="paused") {
+        res.action = "continue";
+        res.contentLabel = "won";
+    } else {
+        res.contentLabel = res.status;
+    }
+    if (Array.isArray(data.badges) && data.badges?.length > 0) {
+        res.description += `\n${dict.badge_earned[data.lang]}: ${data.badges.map(
+            (b) => "\n- " + b.title + " (+" + b.points + ") hearts"
+        ).join("\n")}`;
+    }
+    return res;
 }
 
 export default Object.freeze({

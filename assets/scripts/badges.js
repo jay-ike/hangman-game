@@ -36,9 +36,6 @@ const badges = [
         title: {en: "Untouchable", fr: "Intouchable"}, },
     {
         evaluate: function (ctx) {
-            if (!Array.isArray(ctx.progression) || !Array.isArray(ctx.badges)) {
-                return false;
-            }
             if (hasAchieved(ctx.badges, ctx.category, "shield")) {
                 return false;
             }
@@ -105,7 +102,8 @@ const badges = [
     },
     {
         evaluate: function (ctx) {
-            return ctx.guesses === 1;
+            const costs = getActionCost(ctx.level);
+            return ctx.hearts > 0 && ctx.hearts <= costs.guess;
         },
         id: "clutch",
 		points: 8,
@@ -133,6 +131,15 @@ const badges = [
         title: {en: "Giant Slayer", fr: "Tueur de géants"},
     }
 ];
+
+/**
+* Utility for getting the points deduction based on the current level
+* @param {number} level - The given level
+* @return {{item: number, guess: number, letter: number}}
+*/
+function getActionCost(level) {
+    return {guess: level, letter: 2 * level, item: 10 * level};
+}
 
 function hasAchieved(badges, category, id) {
     let res = Array.isArray(badges) ? badges : [];

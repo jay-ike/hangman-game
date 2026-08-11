@@ -217,6 +217,12 @@ function dialogHandler(emitter) {
                 navigator.vibrate([100, 30, 200]);
             }
         }
+        if (data.status === "level-up") {
+            new Audio("/assets/level-up.mp3").play();
+        }
+        if (data.status === "perfect") {
+            new Audio("/assets/perfect-sound.mp3").play();
+        }
     }
     return Object.freeze(showDialog);
 }
@@ -258,21 +264,33 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
     context.warn = warningHandler(context.warningEmitter.target);
     context.puzzleReq = 3;
 
+    function setStreak(val) {
+        context.store.setValue("_game_", "streak", val)
+        context.streak = val;
+    }
     async function verifyGameEnd(ctx) {
         const wordLetters = getWords(ctx.word).join("").length;
-        const found = Object.values(ctx.lettersFound).reduce((a, v) => a + v, 0);
+        const found = Object.values(ctx.lettersFound).reduce(
+            (a, v) => a + v.length,
+            0
+        );
+        let res;
         if (ctx.hearts < 1) {
             setTimeout(async function () {
                 showDialog(eventData("lost", ctx));
                 await setHearts(minHearts);
+                setStreak(0);
             }, 2000);
         }
         if (wordLetters === found) {
-            let res = await board.handleItemFound(ctx);
+            res = Object.assign({streak: ctx.streak + 1}, ctx);
+            res = await board.handleItemFound(res);
             await updateHearts((heart) => heart + res.points)
             context.progress = res.progress;
-        //TODO: handle badge earned in the notification payload
-            setTimeout(() => showDialog(eventData("won", context)), 2000);
+            setTimeout(function () {
+                showDialog(eventData("won", Object.assign(res, ctx)));
+                setStreak((ctx.streak + 1) % 3); /** The streak reinitialize at 3 */
+            }, 2000)
         }
     }
     function handleRevealVisibility() {
@@ -364,12 +382,12 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             "beforeend",
             utils.createDOMSentence(context.word).join("")
         );
+        context.mistakes = 0;
         handleRevealVisibility();
         rootElement.querySelectorAll(
             ".responsive-grid button[data-type='letter'][aria-disabled]"
         ).forEach((elt) => disableButton(elt, false));
     }
-
     function listenKeyboard(evt) {
         let isLetter = (evt.key.match(/[a-z]/i) || evt.code.match(/key[a-z]/i));
         let btn;
@@ -388,7 +406,6 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             btn.click();
         }
     }
-
     async function listenLetterClick(event) {
         let tmp;
         const {target} = event;
@@ -413,16 +430,16 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             ));
             reveal.deduction = deductor.letter;
         }  else if (tooltip === "answer-reveal-tooltip") {
-            tmp = await context.warn("answer-reveal");
-            if (!tmp) {
-                return;
-            }
-            reveal.deduction = deductor.item;
             tmp = utils.dict.answer_reveal_warning[context.lang];
             context.warningEmitter.dispatch("answer-reveal-intended", {
                 points: `-${deductor.item}`,
                 desc: tmp.replace("{x}", deductor.item)
             });
+            tmp = await context.warn("answer-reveal");
+            if (!tmp) {
+                return;
+            }
+            reveal.deduction = deductor.item;
             reveal.data = utils.getAllLetters(
                 context.word,
                 Object.keys(context.lettersFound)
@@ -439,6 +456,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
                 });
             } else {
                 reveal.deduction = deductor.guess;
+                context.mistakes += 1;
             }
             disableButton(target);
         }
@@ -459,12 +477,10 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         target.blur();
         verifyGameEnd(context);
     }
-
     self.init = initialize;
     rootElement.addEventListener("click", listenLetterClick);
     rootElement.addEventListener("keydown", listenKeyboard);
     utils.trapFocus(context.dialogEmitter.target);
-
     document.querySelector(
         "button[aria-controls='menu-dialog']"
     ).addEventListener("click", function (event) {
@@ -473,7 +489,6 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
     });
     return self;
 }
-
 function wakeupWorker() {
     let channel;
     if (navigator.serviceWorker && navigator.serviceWorker.controller) {

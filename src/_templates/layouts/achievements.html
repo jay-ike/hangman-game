@@ -22,9 +22,9 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
                 <use href="/assets/images/sprites.svg#back"/>
             </svg>
         </a>
-        <h1 class="dilated-effect sky-text-bg" id="main-title">{{ "badge_earned" | i18n }}</h1>
+        <h1 class="dilated-effect sky-text-bg capitalize" id="main-title">{{ "badge_earned" | i18n}}</h1>
     </div>
-    <div class="column scrollview" style="view-transition-name: play;">
+    <div class="column scrollview" style="view-transition-name: achievements;">
         {%for progress in achievements%}
         {% assign section_name = progress.type | replace: ' ', '_' %}
         <section class="stack" data-space="sm" data-tier="" aria-labelledby="{{section_name}}" aria-describedby="{{section_name}}-desc">

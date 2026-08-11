@@ -1,8 +1,15 @@
 ---
 layout: "layouts/base.html"
-bodyClass: "center"
+bodyClass: "center relative"
 ---
 <style>{%cssmin "includes/main-menu.css"%}</style>
+<nav class="menu-nav">
+    <ul class="row">
+        <li>
+            <a href="/{{locale}}/achievements" class="btn shadowed" data-theme="play" style="view-transition-name: achievements;">{{"badge_earned" | i18n}}</a>
+        </li>
+    </ul>
+</nav>
 <main aria-labelledby="main-title" class="box shadowed menu-wrapper relative">
     <h1 id="main-title" class="sky-text-bg brand grid" translate="no"><span>the</span> <span class="h-content">Hangman</span> <span>game</span></h1>
     <div class="menu column">
@@ -14,7 +21,7 @@ bodyClass: "center"
         </a>
         <div class="row" data-wrap="">
             <a class="shadowed btn" href="/{{locale}}/rules" style="view-transition-name: play;">{{ "how_to_play" | i18n }}</a>
-            <a class="shadowed btn" href="/">{{ "lang_switch" | i18n }}</a>
+            <a class="shadowed btn" href="/" style="view-transition-name: language-{{locale}};">{{ "lang_switch" | i18n }}</a>
         </div>
     </div>
 </main>

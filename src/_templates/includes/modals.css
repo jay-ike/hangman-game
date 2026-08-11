@@ -79,6 +79,7 @@ svg:where(input[type="checkbox"] + *) {
     --col-align: center;
     --p-align: center;
     --actions-i-align: center;
+    --p-space: pre-wrap balance;
 }
 
 [data-icon="star"] {
