@@ -30,13 +30,17 @@ module.exports = Object.freeze({
             en: "Deployment: Vercel, with continuous delivery from GitHub.",
             fr: "Déploiement : Vercel, avec intégration continue depuis GitHub."
         },
-        follow: {en: "follow me on mastodon", fr: "me suivre sur mastodon"},
-        hello: {en: "say hello", fr: "dire bonjour"},
+        follow: {en: "Follow me on mastodon", fr: "Me suivre sur mastodon"},
+        get_in_touch: {
+            en: "Ways to get in touch with me",
+            fr: "Moyens d'entrer en contact avec moi"
+        },
+        hello: {en: "Say hello", fr: "Dire bonjour"},
         illustration: {
             en: "Illustrations: Made in Inkscape, tweaked with love.",
             fr: "Illustrations : Dessinées sous Inkscape, ajustées avec amour."
         },
-        report: {en: "report a bug", fr: "signaler une défaut"},
+        report: {en: "Report a bug", fr: "Signaler un bug"},
         sound: {
             en: "Sounds: Sourced from Pixabay (royalty‑free).",
             fr: "Sons : Provenant de Pixabay (libres de droits)."

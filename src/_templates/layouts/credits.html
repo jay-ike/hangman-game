@@ -32,8 +32,8 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
             </section>
             {%endfor%}
             <section class="stack" data-space="sm" aria-labelledby="tools">
-                <p id="tools-desc" hidden>{{"credits.tech_used" | i18n}}</p>
                 <h2 id="tools">{{"credits.tools" | i18n}}</h2>
+                <p id="tools-desc" hidden>{{"credits.tech_used" | i18n}}</p>
                 <ul class="stack" aria-labelledby="tools-desc" data-r-space="sm">
                     <li class="row" aria-labelledby="code">
                         <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
@@ -58,6 +58,30 @@ og_imageAlt: "A screenshot of the Hangman achievements with 11 badges none of th
                             <use href="/assets/images/sprites.svg#music">
                         </svg>
                         <span id="sounds">{{"credits.sound" | i18n}}</span>
+                    </li>
+                </ul>
+            </section>
+            <section aria-labelledby="contacts" class="stack" data-space="md">
+                <h2 id="contacts">{{"credits.contact_links" | i18n}}</h2>
+                <p id="get_in_touch" hidden>{{"credits.get_in_touch" | i18n }}</p>
+                <ul aria-labelledby="get_in_touch" class="stack" data-r-space="sm">
+                    <li aria-labelledby="greating" class="row">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#mail">
+                        </svg>
+                        <span id="greating">{{"credits.hello" | i18n}}: <a href="mailto:{{site.contacts.email}}" data-no-transform>{{site.contacts.email}}</a></span>
+                    </li>
+                    <li aria-labelledby="follow" class="row">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#mastodon">
+                        </svg>
+                        <span id="follow">{{"credits.follow" | i18n}}: <a href="{{site.contacts.masto}}" data-no-transform>@ndimah22</a></span>
+                    </li>
+                    <li aria-labelledby="bug" class="row">
+                        <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                            <use href="/assets/images/sprites.svg#bug">
+                        </svg>
+                        <span id="bug">{{"credits.report" | i18n}}: <a href="{{site.contacts.issues}}" data-no-transform>{{site.contacts.issues}}</a></span>
                     </li>
                 </ul>
             </section>

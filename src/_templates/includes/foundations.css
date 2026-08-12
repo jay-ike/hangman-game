@@ -350,7 +350,7 @@ body {
             color: var(--link-clr, inherit);
 
             &:not(:disabled):where(:focus-visible, :hover) {
-                --icon-fill: oklch(92% 48% 35deg);
+                --icon-fill: oklch(85.58% 0.091 74deg);
 
                 color: var(--fill-hover, var(--icon-fill));
                 text-decoration: currentcolor wavy underline;
@@ -378,7 +378,7 @@ body {
         font-weight: 700;
     }
 
-    button, a {
+    :is(button, a):where(:not([data-no-transform])) {
         text-transform: capitalize;
         font: inherit;
     }
