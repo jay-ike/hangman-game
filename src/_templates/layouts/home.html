@@ -3,13 +3,6 @@ layout: "layouts/base.html"
 bodyClass: "center relative"
 ---
 <style>{%cssmin "includes/main-menu.css"%}</style>
-<nav class="menu-nav">
-    <ul class="row">
-        <li>
-            <a href="/{{locale}}/achievements" class="btn shadowed" data-theme="play" style="view-transition-name: achievements;">{{"badge_earned" | i18n}}</a>
-        </li>
-    </ul>
-</nav>
 <main aria-labelledby="main-title" class="box shadowed menu-wrapper relative">
     <h1 id="main-title" class="sky-text-bg brand grid" translate="no"><span>the</span> <span class="h-content">Hangman</span> <span>game</span></h1>
     <div class="menu column">
@@ -25,3 +18,26 @@ bodyClass: "center relative"
         </div>
     </div>
 </main>
+<nav class="menu-nav" aria-labelledby="nav-title">
+    <p id="nav-title" hidden>{{"more" | i18n}}</p>
+    <p id="nav-list-label" hidden>{{"other_links" | i18n}}</p>
+    <ul class="row" aria-labelledby="nav-list-label">
+        <li aria-labelledby="achievements" data-r-space="sm">
+            <a href="/{{locale}}/achievements" class="btn shadowed row " id="achievements" data-theme="secondary" style="view-transition-name: achievements;">
+                <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                    <use href="/assets/images/sprites.svg#award">
+                </svg>
+                <span class="visually-hidden">{{"view" | i18n}}</span>
+                <span> {{"my_badges" | i18n}}</span>
+            </a>
+        </li>
+        <li aria-labelledby="credits" data-r-space="sm">
+            <a href="/{{locale}}/credits" id="credits" class="btn shadowed row" data-theme="purple" style="view-transition-name: credits;">
+                <svg width="24" height="24" style="filter: drop-shadow(0 1px 2px rgb(0 0 0 / 30%))" aria-hidden="true">
+                    <use href="/assets/images/sprites.svg#info">
+                </svg>
+                {{"credits.name" | i18n}}
+            </a>
+        </li>
+    </ul>
+</nav>

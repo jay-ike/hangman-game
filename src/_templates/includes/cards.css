@@ -99,7 +99,7 @@ div:has(> .card-icon) {
 
 .card-desc {
     grid-area: area3;
-    text-align: center;
+    text-align: var(--desc-align, center);
 }
 
 [data-tier="normal"], .card[data-variant="achievement-tile"] {
@@ -120,6 +120,7 @@ div:has(> .card-icon) {
 .card[data-variant="rule"] {
     --g-template: "area2 area1" "area3 area3" / max-content 1fr;
     --container-name: rule;
+    --desc-align: start;
 
     color: oklch(45% 0.14 287deg);
 }
@@ -172,6 +173,7 @@ div:has(> .card-icon) {
     .card[data-variant="rule"] {
         --g-template: "area2 area1" "area2 area3" / max-content 1fr;
         --g-gap: .75rem 2rem;
+        --desc-align: start;
     }
 }
 
@@ -179,6 +181,7 @@ div:has(> .card-icon) {
     .card[data-variant="rule"] {
         --g-template: "area2 " "area1" " area3" 1fr;
         --f-size: 1.5rem;
+        --desc-align: center;
 
         place-items: start center;
     }
@@ -192,9 +195,15 @@ div:has(> .card-icon) {
 @media screen and (width >= 48em) {
     .contain:has(> .card:not([data-variant="level"])) {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(100%, max(215px, (25% - 1rem))), 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, max(var(--max-col-width, 215px), ((100% / var(--max-cols, 4)) - var(--g-gap, 1rem)))), 1fr));
         grid-auto-rows: auto;
-        gap: 1rem;
+        gap: var(--g-gap, 1rem);
+    }
+
+    .contain:has(> .card[data-variant="rule"]) {
+        --max-col-width: 300px;
+        --max-cols: 2;
+        --g-gap: 1.5rem;
     }
 
     .card[data-variant="level"]:where([data-tier="hard"] *) {

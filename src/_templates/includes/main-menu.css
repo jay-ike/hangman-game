@@ -20,7 +20,7 @@
 
 .menu-nav {
     position: absolute;
-    inset-block: auto 1.5em;
+    inset: auto min(5vi, 1.5em) min(5lvb, 1.5em) auto;
 }
 
 .brand:where(.grid) {
