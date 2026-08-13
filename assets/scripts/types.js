@@ -49,7 +49,7 @@
 /**
 * @typedef {Object} PointManagerInstance
 * @property {(level: number) => {letter: number, item: number, guess: number}} getDeduction - get point deduction rule for the current level
-* @property {(context: any) => Promise<{badges: Array<{title: string, points: number}>, points: number, progress: {uncovered: number, totalWords: number}}> handleItemFound - handle the user progression when an item is found
+* @property {(context: any, revealed: boolean) => Promise<{badges: Array<{title: string, points: number}>, points: number, progress: {uncovered: number, totalWords: number}}> handleItemFound - handle the user progression when an item is found
 */
 /**
 * @typedef {Object} PointListenerInstance

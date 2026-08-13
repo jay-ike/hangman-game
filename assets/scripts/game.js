@@ -268,7 +268,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         context.store.setValue("_game_", "streak", val)
         context.streak = val;
     }
-    async function verifyGameEnd(ctx) {
+    async function verifyGameEnd(ctx, revealed) {
         const wordLetters = getWords(ctx.word).join("").length;
         const found = Object.values(ctx.lettersFound).reduce(
             (a, v) => a + v.length,
@@ -283,9 +283,12 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             }, 2000);
         }
         if (wordLetters === found) {
-            res = Object.assign({streak: ctx.streak + 1}, ctx);
-            res = await board.handleItemFound(res);
-            await updateHearts((heart) => heart + res.points)
+            res = Object.assign({}, ctx);
+            res.streak += 1;
+            res = await board.handleItemFound(res, revealed);
+            if (!revealed) {
+                await updateHearts((heart) => heart + res.points)
+            }
             context.progress = res.progress;
             setTimeout(function () {
                 showDialog(eventData("won", Object.assign(res, ctx)));
@@ -411,7 +414,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         const {target} = event;
         const {tooltip} = target.dataset;
         const deductor = board.getDeduction(context.level);
-        const reveal = {data: [], deduction: 0};
+        const reveal = {data: [], deduction: 0, itemRevealed: false};
         if (!shouldListen(target, deductor, context.hearts)) {
             return;
         }
@@ -444,6 +447,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
                 context.word,
                 Object.keys(context.lettersFound)
             );
+            reveal.itemRevealed = true;
         } else {
             tmp = utils.getIndexes(
                 utils.getWords(context.word ?? "").join(""),
@@ -475,7 +479,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         });
         handleRevealVisibility();
         target.blur();
-        verifyGameEnd(context);
+        verifyGameEnd(context, reveal.itemRevealed);
     }
     self.init = initialize;
     rootElement.addEventListener("click", listenLetterClick);

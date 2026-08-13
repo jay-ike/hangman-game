@@ -1,16 +1,5 @@
 ---
 layout: "layouts/base.html"
-title: "Explore the available categories of word to guess - Hangman game"
-path: "en/category"
-site_name: "Hangman game, categories"
-site_title: "Select hidden item's category"
-og_locale: "en"
-og_description: "Choose the category you are most comfortable with, guess the item and enjoy the game."
-og_image: "https://ike-hangman-game.vercel.app/assets/images/category-og-image.png"
-og_imageW: 1200
-og_imageH: 630
-og_imageAlt: "A screenshot of the category selection where you can choose between movies, TV shows, countries, capital cities and animals"
-
 ---
 
 <style>{%cssmin "includes/category.css"%}</style>
@@ -23,7 +12,7 @@ og_imageAlt: "A screenshot of the category selection where you can choose betwee
                 <use href="/assets/images/sprites.svg#back" />
             </svg>
         </a>
-        <h1 class="dilated-effect sky-text-bg" id="main-title">{{ "pick_category" | i18n }}</h1>
+        <h1 class="dilated-effect sky-text-bg capitalize" id="main-title">{{ "pick_category" | i18n }}</h1>
     </div>
     <nav aria-labelledby="categories-list">
         <h2 aria-hidden="true" class="visually-hidden" id="categories-list">{{ "available_categories" | i18n }}</h2>

@@ -8,21 +8,28 @@
     <meta name="description" content="{{page_description}}">
     <meta name="color-scheme" content="only dark">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    {%if robots %}
+    <meta name="robots" content="{{robots}}">
+    {%endif%}
     <title>{{title}}</title>
     <!-- Preloads -->
     <link rel="preload" href="/assets/mouse-memoirs.regular.woff2" as="font" crossorigin="anonymous">
     <link rel="icon" sizes="32x32" href="/assets/images/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="/assets/images/icon.svg">
+    {% if locale == "fr" %}
+    <link rel="manifest" href="/assets/app-fr.webmanifest">
+    {% else %}
     <link rel="manifest" href="/assets/app.webmanifest">
+    {% endif %}
     <style>{%cssmin "includes/foundations.css" %}</style>
     <style>{%cssmin "includes/button.css" %}</style>
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ike-hangman-game.vercel.app{%if path%}/{{path}}{%endif%}">
-    <meta property="og:site_name" content="{%if site_name%}{{site_name}}{%else%}{{site_image.name}}{%endif%}">
+    <meta property="og:site_name" content="{{site_image.name}}">
     <meta property="og:locale" content="{%if og_locale%}{{og_locale}}{%else%}{{locale}}{%endif%}">
-    <meta property="og:title" content="{%if site_title%}{{site_title}}{%else%}{{site_image.title}}{%endif%}">
-    <meta property="og:description" content="{%if og_description%}{{og_description}}{%else%}{{site_image.description}}{%endif%}">
+    <meta property="og:title" content="{%if og_title%}{{og_title}}{%else%}{{title}}{%endif%}">
+    <meta property="og:description" content="{%if og_description%}{{og_description}}{%else%}{{page_description}}{%endif%}">
     <meta property="og:image" content="{%if og_image%}{{og_image}}{%else%}{{site_image.src}}{%endif%}">
     <meta property="og:image:width" content="{%if og_imageW%}{{og_imageW}}{%else%}{{site_image.width}}{%endif%}">
     <meta property="og:image:height" content="{%if og_imageH%}{{og_imageH}}{%else%}{{site_image.height}}{%endif%}">

@@ -58,7 +58,7 @@ module.exports = Object.freeze({
         fr: "Il vous reste {hearts} vies"
     },
     hidden_item_category: {en: "item to guess", fr: "élément à deviner"},
-    how_to_play: {en: "how to play", fr: "comment jouer"},
+    how_to_play: {en: "how to play ?", fr: "comment jouer ?"},
     js_error_content: {
         en: "It seems that scripting is not enabled. If you you have disabled" +
         " Javascript, please consider enabling it. If not consider reporting " +

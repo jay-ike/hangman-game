@@ -172,10 +172,10 @@ module.exports = Object.freeze({
     site_image: {
         alt: "une capture d'écran de la page d'accueil du jeu du pendu montrant comment jouer",
         description: "Essayez de deviner ce qui est caché jusqu'à ce que vous n'ayez plus de cœurs. N'ayez pas peur, je sais que vous pouvez y arriver.",
-        height: 630,
+        height: 718,
         name: "Jeu du pendu",
-        src: "https://ike-hangman-game.vercel.app/assets/images/menu-fr-og-image.png",
+        src: "https://ike-hangman-game.vercel.app/assets/images/screenshots/opengraph/fr/home-page.png",
         title: "Le jeu du pendu. Sauras-tu le deviner ?",
-        width: 1200
+        width: 1024
     }
 });

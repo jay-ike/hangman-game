@@ -210,10 +210,8 @@ function listener(record) {
 function PointManager(api) {
     /** @type {PointManagerInstance} */
     const self = Object.create(null);
-    self.getDeduction = function (lev) {
-        return {guess: lev, letter: 2 * lev, item: 10 * lev};
-    };
-    self.handleItemFound = async function (ctx) {
+    self.getDeduction = getActionCost;
+    self.handleItemFound = async function (ctx, revealed) {
         const res = {points: (ctx.level * 5) + 2};
         let badges;
         let progression;
@@ -234,8 +232,8 @@ function PointManager(api) {
             throw new Error("An error occured while retrieving earned badges");
         }
         badges = tmp.data;
-        tmp = getEarnedBadges(Object.assign({badges, progression}, ctx));
-        res.badges = tmp;
+        tmp = getEarnedBadges(Object.assign({badges, progression}, ctx)) ?? [];
+        res.badges = !revealed ? tmp : [];
         res.points += tmp.reduce((a, v) => a + v.points, 0);
         await Promise.all(tmp.map(async function (badge) {
             const result = await api.addBadge({

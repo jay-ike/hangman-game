@@ -1,0 +1,95 @@
+{
+    "background_color": "#2463ff",
+    "id": "/",
+    "icons": [
+        {
+            "purpose": "maskable",
+            "src": "/assets/images/hangman-icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/images/hangman-icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "display": "standalone",
+    "name": "Jeu du pendu. Sauve tes cœurs !",
+    "short_name": "Hangman",
+    "scope": "/",
+    "screenshots": [
+        {
+            "form_factor": "wide",
+            "label": "Jeu de devinettes gratuit",
+            "src": "/assets/images/screenshots/desktop/fr/home-page.webp",
+            "sizes": "1024x718",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "Choisis ton thème",
+            "src": "/assets/images/screenshots/desktop/fr/categories.webp",
+            "sizes": "1024x718",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "Choisis ton défi",
+            "src": "/assets/images/screenshots/desktop/fr/levels.webp",
+            "sizes": "1024x718",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "Découvre les réponses cachées",
+            "src": "/assets/images/screenshots/desktop/fr/play.webp",
+            "sizes": "1024x718",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "Gagne des badges",
+            "src": "/assets/images/screenshots/desktop/fr/achievements.webp",
+            "sizes": "1024x718",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Jeu de devinettes gratuit",
+            "src": "/assets/images/screenshots/mobile/fr/home-page.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Choisis ton thème",
+            "src": "/assets/images/screenshots/mobile/fr/categories.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Choisis ton défi",
+            "src": "/assets/images/screenshots/mobile/fr/levels.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Découvre les réponses cachées",
+            "src": "/assets/images/screenshots/mobile/fr/play.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Gagne des badges",
+            "src": "/assets/images/screenshots/mobile/fr/achievements.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        }
+    ],
+    "start_url": "/",
+    "theme_color": "#2463ff"
+}

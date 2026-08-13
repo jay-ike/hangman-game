@@ -15,43 +15,78 @@
         }
     ],
     "display": "standalone",
-    "name": "The hangman game. try to guess it right",
-    "short_name": "hangman",
+    "name": "The hangman game. Save your Hearts!",
+    "short_name": "Hangman",
     "scope": "/",
     "screenshots": [
         {
             "form_factor": "wide",
-            "label": "get into the main menu",
-            "src": "/assets/images/main-view-screenshot.webp",
-            "sizes": "1024x728",
+            "label": "Free Word Guessing Game",
+            "src": "/assets/images/screenshots/desktop/en/home-page.webp",
+            "sizes": "1024x703",
             "type": "image/webp"
         },
         {
             "form_factor": "wide",
-            "label": "select the category of the item to guess",
-            "src": "/assets/images/category-pick-screenshot.webp",
-            "sizes": "1024x728",
+            "label": "Choose Your Theme",
+            "src": "/assets/images/screenshots/desktop/en/categories.webp",
+            "sizes": "1024x703",
             "type": "image/webp"
         },
         {
             "form_factor": "wide",
-            "label": "play the hangman game",
-            "src": "/assets/images/in-game-screenshot.webp",
-            "sizes": "1024x728",
+            "label": "Pick Your Challenge",
+            "src": "/assets/images/screenshots/desktop/en/levels.webp",
+            "sizes": "1024x703",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "Uncover Hidden Answers",
+            "src": "/assets/images/screenshots/desktop/en/play.webp",
+            "sizes": "1024x703",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "wide",
+            "label": "Earn Badges",
+            "src": "/assets/images/screenshots/desktop/en/achievements.webp",
+            "sizes": "1024x703",
             "type": "image/webp"
         },
         {
             "form_factor": "narrow",
-            "label": "select the category of the item to guess",
-            "src": "/assets/images/category-pick-mobile-screenshot.webp",
-            "sizes": "375x655",
+            "label": "Free Word Guessing Game",
+            "src": "/assets/images/screenshots/mobile/en/home-page.webp",
+            "sizes": "375x771",
             "type": "image/webp"
         },
         {
             "form_factor": "narrow",
-            "label": "play the hangman game",
-            "src": "/assets/images/in-game-mobile-screenshot.webp",
-            "sizes": "375x655",
+            "label": "Choose Your Theme",
+            "src": "/assets/images/screenshots/mobile/en/categories.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Pick Your Challenge",
+            "src": "/assets/images/screenshots/mobile/en/levels.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Uncover Hidden Answers",
+            "src": "/assets/images/screenshots/mobile/en/play.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Earn Badges",
+            "src": "/assets/images/screenshots/mobile/en/achievements.webp",
+            "sizes": "375x771",
             "type": "image/webp"
         }
     ],
