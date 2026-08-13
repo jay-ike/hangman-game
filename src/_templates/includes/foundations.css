@@ -51,6 +51,18 @@ body {
         flex-wrap: wrap;
     }
 
+    .no-script {
+        --p-width: 25em;
+        --min-padding: 1.5em 1em;
+        --color-fill: oklch(56% 0.19 18deg);
+        --color-text: var(--system-color-white);
+
+        position: fixed;
+        inset-inline: 0;
+        inset-block-end: 0;
+        z-index: 2;
+    }
+
     :where(header, .contain) {
         container: var(--container-name, section) / inline-size;
     }

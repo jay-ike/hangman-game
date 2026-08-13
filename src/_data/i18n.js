@@ -1,5 +1,6 @@
 /*jslint node*/
-const link = "<a href='mailto:ndimah22@protonmail.com'>ndimah22@protonmail</a>";
+const link = "<a href='mailto:ndimah22@protonmail.com' data-no-transform=''" +
+    ">ndimah22@protonmail</a>";
 module.exports = Object.freeze({
     achievement_logs: {en: "achievement logs", fr: "historique"},
     available_categories: {

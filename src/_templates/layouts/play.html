@@ -4,7 +4,7 @@ pageRole: "play"
 ---
 {%assign placeholder = ".....|......" | split: '|'%}
 <style>{%cssmin "includes/header.css" %}</style>
-<div class="no-script center box-red" role="region" aria-labelledby="error-content">
+<div class="no-script center box" role="region" aria-labelledby="error-content">
     <p id="error-content">{{"js_error_content" | i18n}}</p>
 </div>
 <main aria-labelledby="guess main-title" aria-describedby="main-desc" class="contain stack main-wrapper" data-emit="heading-change">

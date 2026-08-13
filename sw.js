@@ -3,19 +3,25 @@
 /** @import {Item, Progress, Question, QuestionData, Source} from './assets/scripts/types.js' */
 importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
-const config = {isOnline: true, version: 9};
+const config = {isOnline: true, version: 10};
 const cachableUrls = {
     pages: {
-        // "/": "/index.html",
-        // "/404": "/404.html",
-        // "/en": "/en/index.html",
-        // "/en/categories": "/en/categories/index.html",
-        // "/en/play": "/en/play/index.html",
-        // "/en/rules": "/en/rules/index.html",
-        // "/fr": "/fr/index.html",
-        // "/fr/categories": "/fr/categories/index.html",
-        // "/fr/play": "/fr/play/index.html",
-        // "/fr/rules": "/fr/rules/index.html"
+        "/": "/index.html",
+        "/404": "/404.html",
+        "/en": "/en/index.html",
+        "/en/categories": "/en/categories/index.html",
+        "/en/play": "/en/play/index.html",
+        "/en/rules": "/en/rules/index.html",
+        "/en/levels": "/en/levels/index.html",
+        "/en/achievements": "/en/achievements/index.html",
+        "/en/credits": "/en/credits/index.html",
+        "/fr": "/fr/index.html",
+        "/fr/categories": "/fr/categories/index.html",
+        "/fr/play": "/fr/play/index.html",
+        "/fr/rules": "/fr/rules/index.html",
+        "/fr/levels": "/fr/levels/index.html",
+        "/fr/achievements": "/fr/achievements/index.html",
+        "/fr/credits": "/fr/credits/index.html",
     },
     static: [
         "/assets/mouse-memoirs.regular.woff2",
@@ -27,11 +33,16 @@ const cachableUrls = {
         "assets/data.json",
         "assets/lose-sound.wav",
         "assets/win-sound.wav",
+        "assets/level-up.mp3",
+        "assets/perfect-sound.mp3",
         "assets/scripts/pwacompat.min.js"
     ],
     updatable: [
         "/assets/scripts/utils.js",
-        "/assets/scripts/game.js"
+        "/assets/scripts/game.js",
+        "/assets/scripts/achievements.js",
+        "/assets/scripts/badges.js",
+        "/assets/scripts/levels.js",
     ]
 };
 const headers = {
@@ -487,11 +498,7 @@ function tryFetch(param) { //implemented to avoid safari break on failed request
 
 async function cacheStaticFiles(reload = false) {
     const cache = await caches.open(config.cacheName);
-    const options = {
-        cache: "no-store",
-        credetials: "omit",
-        method: "GET"
-    };
+    const options = {cache: "no-store", credetials: "omit", method: "GET"};
     return Promise.all(
         cachableUrls.static.concat(Object.values(cachableUrls.pages)).concat(
             cachableUrls.updatable
@@ -519,7 +526,7 @@ async function cacheStaticFiles(reload = false) {
 
 async function handleFetch(event) {
     const {request} = event;
-    // const cache = await caches.open(config.cacheName);
+    const cache = await caches.open(config.cacheName);
     const url = new URL(request.url);
     let path = url.pathname.replace(/\/$/, "");
     if (path.length === 0) {
@@ -531,8 +538,7 @@ async function handleFetch(event) {
     if (url.pathname.startsWith("/api")) {
         return handleAPI(request);
     }
-    // return safeFetch({cache, event, path});
-    return fetch(request);
+    return safeFetch({cache, event, path});
 }
 
 async function safeFetch({cache, event, path}) {
