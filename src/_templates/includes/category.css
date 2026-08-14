@@ -3,7 +3,7 @@
     --radius: 1.25rem;
     --min-padding: min(1vi, .5em);
 
-    max-block-size: 78lvb;
+    max-block-size: min(75dvb, 580px);
     overflow-y: auto;
 
     & a {

@@ -23,7 +23,7 @@ body {
     color: var(--system-color-black);
     font-size: 100%;
     min-inline-size: 98vi;
-    min-block-size: 100lvb;
+    min-block-size: 100dvb;
     background: url("/assets/images/sprites.svg#game-bg") 50% / cover no-repeat;
 }
 
@@ -43,6 +43,7 @@ body {
 
     .content-center {
         place-content: center;
+        place-items: center
     }
 
     .wrap {
@@ -163,10 +164,10 @@ body {
     }
 
     .main-wrapper {
-        --s-space: 2.5rem;
+        --s-space: min(3dvb, 2.5rem);
 
         color: var(--system-color-white);
-        padding-block: 32px min(2lvb, 16px);
+        padding-block: min(2dvb, 32px) min(2dvb, 16px);
         border-image: linear-gradient(oklch(20% 0.1 295deg / 65%), oklch(28% 0.17 271deg / 65%) 70%, oklch(31% 0.152 283deg / 65%)) fill 1/ 50vi / 100vmax;
 
         &[data-type="play"] {
@@ -274,15 +275,17 @@ body {
     }
 
     .scrollview {
-        max-block-size: min(73lvb, 960px);
+        max-block-size: min(70dvb, 960px);
         overflow: clip auto;
+        overscroll-behavior: contain;
 
         &[data-layout="keyboard"] {
             --m-col-s: 9;
             --m-col-w: min(10vi, 84px);
             --m-row-h: auto;
-            --c-gap: min(3cqi, 1rem);
-            --min-padding: min(3lvi, 1.5em);
+            --c-gap: min(3cqi, 2rem);
+            --min-padding: min(1dvb, 1.5em) min(2dvb, 1.5em);
+            --c-space: min(3dvb, 1.5em);
         }
     }
 
@@ -294,11 +297,11 @@ body {
 
     @media screen and (height >=48em) {
         .main-wrapper {
-            --s-space: min(10lvb, 4rem);
+            --s-space: min(10dvb, 4rem);
         }
 
         [data-layout="keyboard"] {
-            --c-space: min(10lvb, 4rem);
+            --c-space: min(10dvb, 4rem);
         }
     }
 }
@@ -432,7 +435,7 @@ body {
     }
 
     main:where(body > *) {
-        min-block-size: min(481px, 71lvb);
+        min-block-size: min(481px, 71dvb);
     }
 
     ::-webkit-scrollbar {

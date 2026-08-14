@@ -52,7 +52,7 @@ svg:where(input[type="checkbox"] + *) {
 
 .modal:where([data-variant="menu"]) {
     --alignment: center;
-    --modal-padding: min(15lvb, 3rem) min(10lvi, 2rem) 1.5em;
+    --modal-padding: min(10dvb, 2rem) min(10lvi, 2rem) 1.5em;
     --radius: calc(min(15vi, 4rem) / 2);
     --c-space: 2rem;
     --link-text-align: center;

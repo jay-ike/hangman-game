@@ -10,7 +10,7 @@
     background-image: linear-gradient(in oklch to bottom, oklch(46% 0.178 270deg) 60%, oklch(28% 0.166 265deg / 83%));
     min-inline-size: min(90vi, 592px);
     border-radius: min(2.5em, 72px);
-    padding: 5em min(5vmin, 1.5em) min(5vmin, 1.5em);
+    padding: min(18vmin, 5em) min(5vmin, 1.5em) min(5vmin, 1.5em);
     display: flex;
 
     & > .menu {
@@ -20,7 +20,7 @@
 
 .menu-nav {
     position: absolute;
-    inset: auto min(5vi, 1.5em) min(5lvb, 1.5em) auto;
+    inset: auto min(5vi, 1.5em) min(5dvb, 1.5em) auto;
 }
 
 .brand:where(.grid) {

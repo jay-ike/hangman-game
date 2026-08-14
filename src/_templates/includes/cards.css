@@ -1,7 +1,7 @@
 .contain:not([data-tier] > *):has(> .card) {
     --container-name: card-container;
 
-    max-block-size: 78lvb;
+    max-block-size: min(75dvb, 580px);
     overflow-y: auto;
 }
 
