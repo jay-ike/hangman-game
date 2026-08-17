@@ -3,7 +3,7 @@
 /** @import {Item, Progress, Question, QuestionData, Source} from './assets/scripts/types.js' */
 importScripts("./assets/scripts/idb-min.js");
 const {caches, clients, crypto} = self;
-const config = {isOnline: true, version: 10};
+const config = {isOnline: true, version: 11};
 const cachableUrls = {
     pages: {
         "/": "/index.html",

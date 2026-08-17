@@ -275,7 +275,7 @@ body {
     }
 
     .scrollview {
-        max-block-size: min(78dvb, 960px);
+        max-block-size: min(78dvb, 660px);
         overflow: clip auto;
         overscroll-behavior: contain;
 

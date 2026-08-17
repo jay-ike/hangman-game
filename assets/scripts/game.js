@@ -1,5 +1,13 @@
 /*jslint browser, this*/
-/** @import {GameData, ApiHandlerInstance, PointManagerInstance, PointListenerInstance} from "./types.js" */
+/**
+* @import {
+* GameData,
+* ApiHandlerInstance,
+* PointManagerInstance,
+* PointListenerInstance
+* } from "./types.js"
+*/
+/*global MessageChannel, HTMLButtonElement, console*/
 import utils from "./utils.js";
 import pointing from "./badges.js";
 const {Audio, DOMException, URL, document, navigator} = window;
@@ -53,7 +61,11 @@ function notifyWorker(data) {
     }
 }
 function disableButton(target, disable = true) {
-    const action = disable ? "disable" : "enable";
+    const action = (
+        disable
+        ? "disable"
+        : "enable"
+    );
     if (!HTMLButtonElement.prototype.isPrototypeOf(target)) {
         throw new Error(`you should provide a valid Button to ${action}`);
     }
@@ -88,7 +100,7 @@ function queryWorker(port, input, fn) {
             }
             res(val);
         };
-    }
+    };
 }
 
 /**
@@ -106,13 +118,16 @@ function getAnswer(category, level, lang = "en") {
         workerPort,
         {itemRequest: {category, level}},
         function (val) {
-            const {itemResponse: res} = val;
+            const {
+                itemResponse: res
+            } = val;
             if (res.title && res.word) {
                 return res;
             } else {
                 return utils.getFallBack(lang);
             }
-    }));
+        }
+    ));
 }
 
 function setHearts(val) {
@@ -129,13 +144,17 @@ function setHearts(val) {
 * Utility for retrieving user game data
 * @returns {Promise<GameData>}
 */
-async function getGameData(store, replay=false) {
+async function getGameData(store, replay = false) {
     const url = new URL(document.URL);
     /** @type {GameData} */
     const opts = {lang: decodeURI(url.pathname).split("/")[1]};
     let tmp;
     tmp = Number.parseInt(store.getValue("_game_", "streak"), 10);
-    opts.streak = Number.isFinite(tmp) ? tmp : 0;
+    opts.streak = (
+        Number.isFinite(tmp)
+        ? tmp
+        : 0
+    );
     opts.category = store.getValue("_game_", "category");
     if (replay) {
         opts.level = Number.parseInt(store.getValue("_game_", "level"), 10);
@@ -236,7 +255,7 @@ function shouldListen(target, deductor, hearts) {
     const {tooltip, type} = target.dataset;
     const checks = [
         !utils.isButton(target),
-        type !=="letter" && tooltip !== "answer-reveal-tooltip",
+        type !== "letter" && tooltip !== "answer-reveal-tooltip",
         target.getAttribute("aria-disabled") !== null,
         tooltip === "letter-reveal-tooltip" && hearts < deductor.letter,
         tooltip === "answer-reveal-tooltip" && hearts < deductor.item,
@@ -265,7 +284,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
     context.puzzleReq = 3;
 
     function setStreak(val) {
-        context.store.setValue("_game_", "streak", val)
+        context.store.setValue("_game_", "streak", val);
         context.streak = val;
     }
     async function verifyGameEnd(ctx, revealed) {
@@ -286,7 +305,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             res.streak += 1;
             res = await board.handleItemFound(res, revealed);
             if (!revealed) {
-                await updateHearts((heart) => heart + res.points)
+                await updateHearts((heart) => heart + res.points);
             }
             context.progress = res.progress;
             await utils.wait(2000);
@@ -316,12 +335,20 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
     async function updateHearts(updater) {
         let hearts = updater(context.hearts ?? minHearts);
         let diff = context.hearts - hearts;
-        let action = diff < 0 ? "add": "deduct";
+        let action = (
+            diff < 0
+            ? "add"
+            : "deduct"
+        );
         const abs = Math.abs(diff);
-        diff = diff < 0 ? `+${abs}` : `-${abs}`;
+        diff = (
+            diff < 0
+            ? `+${abs}`
+            : `-${abs}`
+        );
         await setHearts(hearts);
         context.hearts = hearts;
-        context.headerEmitter.dispatch("heart-updated", {action, hearts, diff});
+        context.headerEmitter.dispatch("heart-updated", {action, diff, hearts});
     }
     function warningHandler(element) {
         const {store} = context;
@@ -359,7 +386,7 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
     * Utility for initializing the game engine
     * @param {GameData} gameData
     */
-    async function initialize(gameData, replay=false) {
+    async function initialize(gameData, replay = false) {
         let data;
         if (gameData) {
             data = gameData;
@@ -377,7 +404,9 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             title: data.category,
             titleClass: "nil"
         });
-        context.headerEmitter.dispatch("heart-updated", {hearts: context.hearts});
+        context.headerEmitter.dispatch("heart-updated", {
+            hearts: context.hearts
+        });
         context.letterEmitter.target.textContent = "";
         context.letterEmitter.target.insertAdjacentHTML(
             "beforeend",
@@ -430,11 +459,11 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
                 Object.keys(context.lettersFound)
             ));
             reveal.deduction = deductor.letter;
-        }  else if (tooltip === "answer-reveal-tooltip") {
+        } else if (tooltip === "answer-reveal-tooltip") {
             tmp = utils.dict.answer_reveal_warning[context.lang];
             context.warningEmitter.dispatch("answer-reveal-intended", {
-                points: `-${deductor.item}`,
-                desc: tmp.replace("{x}", deductor.item)
+                desc: tmp.replace("{x}", deductor.item),
+                points: `-${deductor.item}`
             });
             tmp = await context.warn("answer-reveal");
             if (!tmp) {
@@ -453,8 +482,8 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
             );
             if (tmp.length > 0) {
                 reveal.data.push({
-                    letter: target.textContent.trim(),
-                    indexes: tmp
+                    indexes: tmp,
+                    letter: target.textContent.trim()
                 });
             } else {
                 reveal.deduction = deductor.guess;

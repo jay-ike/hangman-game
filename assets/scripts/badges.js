@@ -1,5 +1,9 @@
 /*jslint browser, this*/
-/** @import {ApiHandlerInstance, PointManagerInstance, PointListenerInstance} from './types.js' */
+/** @import {
+ * ApiHandlerInstance,
+ * PointManagerInstance,
+ * PointListenerInstance}
+ * from './types.js' */
 
 const badges = [
     {
@@ -10,8 +14,8 @@ const badges = [
             return hasUnlocked(ctx.progression, ctx.category, 3);
         },
         id: "knot",
-		points: 10,
-        title: {en: "Knot Expert", fr: "Expert des nœuds"},
+        points: 10,
+        title: {en: "Knot Expert", fr: "Expert des nœuds"}
     },
     {
         evaluate: function (ctx) {
@@ -21,8 +25,8 @@ const badges = [
             return hasUnlocked(ctx.progression, ctx.category, 7);
         },
         id: "gallow",
-		points: 15,
-        title: {en: "Gallows Walker", fr: "Marcheur du gibet"},
+        points: 15,
+        title: {en: "Gallows Walker", fr: "Marcheur du gibet"}
     },
     {
         evaluate: function (ctx) {
@@ -32,8 +36,9 @@ const badges = [
             return hasPerfected(ctx.progression, ctx.category, 1);
         },
         id: "level1",
-		points: 5,
-        title: {en: "Untouchable", fr: "Intouchable"}, },
+        points: 5,
+        title: {en: "Untouchable", fr: "Intouchable"}
+    },
     {
         evaluate: function (ctx) {
             if (hasAchieved(ctx.badges, ctx.category, "shield")) {
@@ -42,8 +47,8 @@ const badges = [
             return hasPerfected(ctx.progression, ctx.category, [1, 2, 3]);
         },
         id: "shield",
-		points: 20,
-        title: {en: "Rope Dodger", fr: "Esquiveur de corde"},
+        points: 20,
+        title: {en: "Rope Dodger", fr: "Esquiveur de corde"}
     },
     {
         evaluate: function (ctx) {
@@ -53,8 +58,8 @@ const badges = [
             return hasPerfected(ctx.progression, ctx.category, 5);
         },
         id: "balancing",
-		points: 10,
-        title: {en: "Balancing Act", fr: "Numéro d'équilibriste"},
+        points: 10,
+        title: {en: "Balancing Act", fr: "Numéro d'équilibriste"}
     },
     {
         evaluate: function (ctx) {
@@ -64,8 +69,8 @@ const badges = [
             return hasPerfected(ctx.progression, ctx.category, [4, 5, 6, 7]);
         },
         id: "accrobat",
-		points: 30,
-        title: {en: "Acrobat", fr: "Acrobate"},
+        points: 30,
+        title: {en: "Acrobat", fr: "Acrobate"}
     },
     {
         evaluate: function (ctx) {
@@ -75,12 +80,16 @@ const badges = [
             return hasPerfected(ctx.progression, ctx.category, 9);
         },
         id: "gate",
-		points: 15,
-        title: {en: "Dead End Escape", fr: "Évasion de l'impasse"},
+        points: 15,
+        title: {en: "Dead End Escape", fr: "Évasion de l'impasse"}
     },
     {
         evaluate: function (ctx) {
-            let res = Array.isArray(ctx.progression) ? ctx.progression : [];
+            let res = (
+                Array.isArray(ctx.progression)
+                ? ctx.progression
+                : []
+            );
             if (hasAchieved(ctx.badges, ctx.category, "immortal")) {
                 return false;
             }
@@ -89,16 +98,16 @@ const badges = [
             );
         },
         id: "immortal",
-		points: 50,
-        title: {en: "Immortal", fr: "Immortel"},
+        points: 50,
+        title: {en: "Immortal", fr: "Immortel"}
     },
     {
         evaluate: function (ctx) {
-            return ctx.mistakes === 0
+            return ctx.mistakes === 0;
         },
         id: "quill",
-		points: 5,
-        title: {en: "Flawless Run", fr: "Parcours sans faute"},
+        points: 5,
+        title: {en: "Flawless Run", fr: "Parcours sans faute"}
     },
     {
         evaluate: function (ctx) {
@@ -106,16 +115,16 @@ const badges = [
             return ctx.hearts > 0 && ctx.hearts <= costs.guess;
         },
         id: "clutch",
-		points: 8,
-        title: {en: "Clutch Snap", fr: "Sauvetage in extremis"},
+        points: 8,
+        title: {en: "Clutch Snap", fr: "Sauvetage in extremis"}
     },
     {
         evaluate: function (ctx) {
             return ctx.streak === 3;
         },
         id: "streak",
-		points: 8,
-        title: {en: "Survival Streak", fr: "Série de survie"},
+        points: 8,
+        title: {en: "Survival Streak", fr: "Série de survie"}
     },
     {
         evaluate: function (ctx) {
@@ -127,8 +136,8 @@ const badges = [
             return letters.length >= 10;
         },
         id: "slayer",
-		points: 10,
-        title: {en: "Giant Slayer", fr: "Tueur de géants"},
+        points: 10,
+        title: {en: "Giant Slayer", fr: "Tueur de géants"}
     }
 ];
 
@@ -138,11 +147,15 @@ const badges = [
 * @return {{item: number, guess: number, letter: number}}
 */
 function getActionCost(level) {
-    return {guess: level, letter: 2 * level, item: 10 * level};
+    return {guess: level, item: 10 * level, letter: 2 * level};
 }
 
 function hasAchieved(badges, category, id) {
-    let res = Array.isArray(badges) ? badges : [];
+    let res = (
+        Array.isArray(badges)
+        ? badges
+        : []
+    );
     res = res.find((b) => b.id === id);
     res = res?.events ?? [];
     if (res.some((e) => e.category === category)) {
@@ -152,8 +165,16 @@ function hasAchieved(badges, category, id) {
 }
 
 function hasPerfected(progression, category, level) {
-    let res = Array.isArray(progression) ? progression : [];
-    let range = Array.isArray(level) ? level : [level];
+    let res = (
+        Array.isArray(progression)
+        ? progression
+        : []
+    );
+    let range = (
+        Array.isArray(level)
+        ? level
+        : [level]
+    );
     res = progression.filter(
         (p) => range.includes(p.level) && p.store === category
     );
@@ -164,7 +185,11 @@ function hasPerfected(progression, category, level) {
 }
 
 function hasUnlocked(progression, category, level) {
-    let res = Array.isArray(progression) ? progression : [];
+    let res = (
+        Array.isArray(progression)
+        ? progression
+        : []
+    );
     res = progression.find(
         (p) => p.level === level && p.store === category
     );
@@ -190,7 +215,7 @@ function listener(record) {
     let particle;
     if (record.attributeName === "data-action" && action) {
         particle = document.createElement("span");
-        particle.classList.add("point", action ?? "deduct")
+        particle.classList.add("point", action ?? "deduct");
         particle.textContent = diff;
         record.target.appendChild(particle);
         particle.addEventListener("animationend", function (evt) {
@@ -213,7 +238,7 @@ function PointManager(api) {
     self.getDeduction = getActionCost;
     self.handleItemFound = async function (ctx, revealed) {
         const res = {points: (ctx.level * 5) + 2};
-        let badges;
+        let earned;
         let progression;
         let tmp;
         tmp = await api.markFound(ctx);
@@ -221,7 +246,7 @@ function PointManager(api) {
             throw new Error("An error occure while marking item as found");
         }
         tmp = tmp.data;
-        res.progress = {uncovered: tmp.uncovered, totalWords: tmp.totalWords};
+        res.progress = {totalWords: tmp.totalWords, uncovered: tmp.uncovered};
         tmp = await api.getProgress(ctx.category);
         if (!tmp.ok) {
             throw new Error("An error occured during your progress retrieval");
@@ -231,9 +256,15 @@ function PointManager(api) {
         if (!tmp.ok) {
             throw new Error("An error occured while retrieving earned badges");
         }
-        badges = tmp.data;
-        tmp = getEarnedBadges(Object.assign({badges, progression}, ctx)) ?? [];
-        res.badges = !revealed ? tmp : [];
+        earned = tmp.data;
+        tmp = getEarnedBadges(
+            Object.assign({badges: earned, progression}, ctx)
+        ) ?? [];
+        res.badges = (
+            !revealed
+            ? tmp
+            : []
+        );
         res.points += tmp.reduce((a, v) => a + v.points, 0);
         await Promise.all(tmp.map(async function (badge) {
             const result = await api.addBadge({
@@ -247,7 +278,7 @@ function PointManager(api) {
             }
         }));
         return res;
-    }
+    };
     return Object.freeze(self);
 }
 
@@ -258,7 +289,7 @@ function PointManager(api) {
 * @returns {PointListenerInstance}
 */
 function AttributeListener(filter) {
-    let observer= new MutationObserver((records) => records.forEach(listener));
+    let observer = new MutationObserver((records) => records.forEach(listener));
     /** @type {PointListenerInstance} */
     let self = Object.create(null);
     self.listen = function (selector) {
@@ -266,11 +297,11 @@ function AttributeListener(filter) {
         if (!elt) {
             return false;
         }
-        observer.observe(elt, {attributes: true, attributeFilter: filter});
-    }
+        observer.observe(elt, {attributeFilter: filter, attributes: true});
+    };
     self.release = function () {
         observer.disconnect();
-    }
+    };
     return Object.freeze(self);
 }
 

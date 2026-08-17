@@ -1,12 +1,21 @@
+/*jslint browser,node*/
+/*global DOMException*/
 import utils from "./utils.js";
-
 const store = utils.jsonStorage();
 const api = new utils.ApiHandler();
 
 function getDescription(count) {
     const lang = store.getValue("_game_", "lang") ?? "en";
-    let res = count > 0 ? utils.dict.earned : utils.dict.not_earned;
-    res = res[lang].replace("{x}", count).replace("{y}", count > 1 ? "s" : "");
+    let res = (
+        count > 0
+        ? utils.dict.earned
+        : utils.dict.not_earned
+    );
+    res = res[lang].replace("{x}", count).replace("{y}", (
+        count > 1
+        ? "s"
+        : ""
+    ));
     return res;
 }
 
@@ -16,7 +25,6 @@ async function getBadges(emitter) {
     let showDialog = dialogHandler(emitter);
     if (!res.ok) {
         console.error("failed to retrieve badges ");
-        //TODO: Handle error Case in the UI
         return;
     }
     tags.forEach(function (el) {
@@ -77,8 +85,8 @@ function getAchievementDOM(evt, i) {
     const lang = store.getValue("_game_", "lang") ?? "en";
     const p = {
         date: new Date(evt.unlockedAt).toISOString(),
-        title: utils.formatDate(evt.unlockedAt, lang),
-        desc: evt.category + " - " + utils.dict.level[lang] + " " + evt.level
+        desc: evt.category + " - " + utils.dict.level[lang] + " " + evt.level,
+        title: utils.formatDate(evt.unlockedAt, lang)
     };
     return `<li class="box structured-grid card" data-variant="achievement-tile"
     aria-labelledby="log-1-date" aria-describedby="log-${i}-desc">

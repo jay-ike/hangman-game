@@ -6,13 +6,15 @@ const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
 const dateOpts = {day: "numeric", month: "short", year: "numeric"};
 const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 const dict = {
-    answer_reveal_warning: {
-        en: "You'll lose {x} points and won't earn any for this answer, but it will still count toward your progress",
-        fr: "Tu vas perdre {x} points. Cette réponse ne te rapportera pas de points, mais elle compte pour ta progression."
-    },
     answer_reveal_insufficient: {
         en: "Need {x} hearts to reveal the answer. Keep guessing!",
         fr: "Besoin de {x} points de vie pour révéler. Continue !"
+    },
+    answer_reveal_warning: {
+        en: "You'll lose {x} points and won't earn any for this answer, but " +
+        "it will still count toward your progress",
+        fr: "Tu vas perdre {x} points. Cette réponse ne te rapportera pas de " +
+        "points, mais elle compte pour ta progression."
     },
     badge_earned: {
         en: "Badge Earned",
@@ -20,17 +22,22 @@ const dict = {
     },
     earned: {en: "Earned {x} time{y}", fr: "Obtenu {x} fois"},
     letter_reveal_warning: {
-        en: "Revealing a letter will use up {x} of your hearts. Once it's shown, you can't hide it again but sometimes a little help goes a long way. Ready to do it?",
-        fr: "Dévoiler une lettre te coûtera {x} cœurs. Une fois affichée, tu ne pourras plus la cacher — mais parfois, un petit coup de pouce peut faire la différence. Prêt à le faire ?"
+        en: "Revealing a letter will use up {x} of your hearts. Once it's " +
+        "shown, you can't hide it again but sometimes a little help goes a " +
+        "long way. Ready to do it?",
+        fr: "Dévoiler une lettre te coûtera {x} cœurs. Une fois affichée, tu " +
+        "ne pourras plus la cacher — mais parfois, un petit coup de pouce " +
+        "peut faire la différence. Prêt à le faire ?"
     },
     level: {en: "Level", fr: "Niveau"},
+    level_up_desc: {
+        en: "You've uncovered {x} of {y} answers. {z} more to master level {a}",
+        fr: "Tu as deviné {x} réponses sur {y}. Encore {z} pour maîtriser " +
+        "le niveau {a}"
+    },
     level_up_title: {
         en: "You unlocked level {x} of category {y}",
         fr: "Niveau {x} débloqué en {y}."
-    },
-    level_up_desc: {
-        en: "You've uncovered {x} of {y} answers. {z} more to master level {a}",
-        fr: "Tu as deviné {x} réponses sur {y}. Encore {z} pour maîtriser le niveau {a}"
     },
     locked: {
         en: "Guess 3 answers in Level {x} to unlock",
@@ -49,8 +56,10 @@ const dict = {
         fr: "Toutes les réponses ont été devinées à la perfection !"
     },
     progress_level_desc: {
-        en: "You've guessed {x} of {y} answers. {z} more to unlock the next level !",
-        fr: "Tu as deviné {x} réponses sur {y}. Encore {z} pour débloquer le prochain niveau !"
+        en: "You've guessed {x} of {y} answers. {z} more to unlock the " +
+        "next level !",
+        fr: "Tu as deviné {x} réponses sur {y}. Encore {z} pour débloquer " +
+        "le prochain niveau !"
     },
     unlocked: {
         en: "You've guessed {x} of {y} answers - keep it up!",
@@ -95,9 +104,9 @@ function getListeners(target, fn) {
     if (typeof fn !== "function") {
         throw new Error("you should pass a callback function !!!");
     }
-    return Array.from(
-        target.querySelectorAll("[data-listen]:not(:scope[data-emit] [data-emit] *)")
-    ).reduce(function (acc, element) {
+    return Array.from(target.querySelectorAll(
+        "[data-listen]:not(:scope[data-emit] [data-emit] *)"
+    )).reduce(function (acc, element) {
         const {listen} = element.dataset;
         if (acc[listen] === undefined) {
             acc[listen] = [fn(element)];
@@ -237,13 +246,13 @@ function getRandomLetter(sentence, foundLetters) {
     let tmp;
     let occurrences = letterOccurrences(word, foundLetters);
     tmp = Object.entries(occurrences).sort((a, b) => a[1] - b[1])[0];
-    return {letter: tmp[0], indexes: getIndexes(word, tmp[0])};
+    return {indexes: getIndexes(word, tmp[0]), letter: tmp[0]};
 }
 function getAllLetters(sentence, foundLetters) {
     const word = getWords(sentence).join("").toLowerCase();
     const tmp = letterOccurrences(word, foundLetters);
     return Object.entries(tmp).map(function (entry) {
-        return {letter: entry[0], indexes: getIndexes(word, entry[0])};
+        return {indexes: getIndexes(word, entry[0]), letter: entry[0]};
     });
 }
 function letterTemplate(index) {
@@ -377,7 +386,7 @@ function ApiHandler() {
     const headers = {
         get: {headers: defaultHeaders, method: "GET"},
         post: function (body) {
-            const val= JSON.stringify(body);
+            const val = JSON.stringify(body);
             return {body: val, headers: defaultHeaders, method: "POST"};
         }
     };
@@ -388,7 +397,11 @@ function ApiHandler() {
         let res = await fetch(path, headers.get);
         opts.ok = res.ok;
         res = await res.json();
-        opts.data = typeof fn === "function" ? fn(res): res;
+        opts.data = (
+            typeof fn === "function"
+            ? fn(res)
+            : res
+        );
         return opts;
     }
     async function post(path, body, fn) {
@@ -396,7 +409,11 @@ function ApiHandler() {
         let res = await fetch(path, headers.post(body));
         opts.ok = res.ok;
         res = await res.json();
-        opts.data = typeof fn === "function" ? fn(res): res;
+        opts.data = (
+            typeof fn === "function"
+            ? fn(res)
+            : res
+        );
         return opts;
     }
     self.getProgress = function (cat, level) {
@@ -405,7 +422,7 @@ function ApiHandler() {
             url += `&level=${level}`;
         }
         return get(url, (r) => r.result);
-    }
+    };
     self.getBadges = (l) => get(`/api/badges?lang=${l}`, (r) => r.badges);
     self.getHearts = () => get(`/api/hearts`, (r) => r.hearts);
     self.markFound = (b) => post(`/api/found`, b, (r) => r.progress);
@@ -425,7 +442,13 @@ function removeAccents(val) {
 */
 function eventData(status, data) {
     let res = {action: "replay", status};
-    const {category, lang, level: lev, progress: p, puzzleReq} = data;
+    const {
+        category,
+        lang,
+        level: lev,
+        progress: p,
+        puzzleReq
+    } = data;
     let tmp = {y: puzzleReq, z: puzzleReq - p.uncovered};
     res.levStyle = `view-transition-name: level${lev};`;
     res.levelLink = `/${lang}/levels#${encodeURIComponent(category)}`;
@@ -446,10 +469,10 @@ function eventData(status, data) {
         ).replace("{y}", tmp.y).replace("{z}", tmp.z);
     }
     res.description = tmp.desc;
-    res.progress = Array.from({length: puzzleReq}, (_, i) => i).reduce(
+    res.progress = Array.from({length: puzzleReq}, (ignore, i) => i).reduce(
         function (acc, v) {
             if (p.uncovered > v) {
-                acc[`level${v+1}`] = "";
+                acc[`level${v + 1}`] = "";
             }
             return acc;
         },
@@ -483,14 +506,16 @@ function eventData(status, data) {
         res.catTheme = "nil";
         res.description = dict.mastered[lang].replace("{x}", category);
     }
-    if (status ==="paused") {
+    if (status === "paused") {
         res.action = "continue";
         res.contentLabel = "won";
     } else {
         res.contentLabel = res.status;
     }
     if (Array.isArray(data.badges) && data.badges?.length > 0) {
-        res.description += `\n${dict.badge_earned[data.lang]}: ${data.badges.map(
+        res.description += `\n${
+            dict.badge_earned[data.lang]
+        }: ${data.badges.map(
             (b) => "\n- " + b.title + " (+" + b.points + ") hearts"
         ).join("\n")}`;
     }
@@ -502,8 +527,8 @@ export default Object.freeze({
     EventDispatcher,
     createDOMSentence,
     dict,
-    formatDate,
     eventData,
+    formatDate,
     getAllLetters,
     getFallBack,
     getFocusableChildren,

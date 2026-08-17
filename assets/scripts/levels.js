@@ -1,3 +1,5 @@
+/*jslint browser, this*/
+/*global console*/
 import utils from "./utils.js";
 
 const store = utils.jsonStorage();
@@ -8,7 +10,6 @@ async function getProgress() {
     tmp = await api.getProgress(encodeURI(tmp));
     if (!tmp.ok) {
         console.error("failed to retrieve progress ");
-        //TODO: Handle error Case in the UI
         return;
     }
     tmp.data.forEach(function (res) {
@@ -19,7 +20,11 @@ async function getProgress() {
         if (res.status === "unlocked") {
             props.x = res.uncovered;
             props.y = res.totalWords;
-            props.z = `${res.uncovered > 1 ? "s": ""}`;
+            props.z = `${(
+                res.uncovered > 1
+                ? "s"
+                : ""
+            )}`;
         }
         if (res.status === "locked") {
             props.x = res.level - 1;
@@ -47,4 +52,4 @@ async function getProgress() {
     window.history.replaceState(null, "", tmp.pathname);
     tmp = document.querySelector(".heading > a");
     tmp.style.viewTransitionName = utils.removeAccents(opts.category);
-}())
+}());
