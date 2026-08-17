@@ -27,10 +27,10 @@ function isMinifiable(file) {
     return file.isFile() && path.extname(file.name) === ".js" && notMinified;
 }
 async function minifyJs(file) {
-    const path = `${file.path}/${file.name}`;
-    let blob = await fs.readFile(path);
+    const entry = path.normalize(`${file.parentPath}/${file.name}`);
+    let blob = await fs.readFile(entry);
     blob = jsmin(blob.toString(), 3);
-    await fs.WriteFile(path, blob)
+    await fs.WriteFile(entry, blob)
 }
 async function minifyScripts(dir) {
     const jsDirs = [`${dir.output}/assets/scripts`, `${dir.output}`];

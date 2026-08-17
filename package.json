@@ -1,6 +1,6 @@
 {
   "name": "hangman-game",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "An implementation of the hangman game in the web",
   "scripts": {
     "build": "eleventy",
