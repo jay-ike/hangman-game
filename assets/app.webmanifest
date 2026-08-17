@@ -56,6 +56,20 @@
         },
         {
             "form_factor": "narrow",
+            "label": "Uncover Hidden Answers",
+            "src": "/assets/images/screenshots/mobile/en/play.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Pick Your Challenge",
+            "src": "/assets/images/screenshots/mobile/en/levels.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
             "label": "Free Word Guessing Game",
             "src": "/assets/images/screenshots/mobile/en/home-page.webp",
             "sizes": "375x771",
@@ -70,26 +84,12 @@
         },
         {
             "form_factor": "narrow",
-            "label": "Pick Your Challenge",
-            "src": "/assets/images/screenshots/mobile/en/levels.webp",
-            "sizes": "375x771",
-            "type": "image/webp"
-        },
-        {
-            "form_factor": "narrow",
-            "label": "Uncover Hidden Answers",
-            "src": "/assets/images/screenshots/mobile/en/play.webp",
-            "sizes": "375x771",
-            "type": "image/webp"
-        },
-        {
-            "form_factor": "narrow",
             "label": "Earn Badges",
             "src": "/assets/images/screenshots/mobile/en/achievements.webp",
             "sizes": "375x771",
             "type": "image/webp"
         }
     ],
-    "start_url": "/",
+    "start_url": "/en",
     "theme_color": "#2463ff"
 }

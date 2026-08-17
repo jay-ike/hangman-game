@@ -276,11 +276,10 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
         );
         let res;
         if (ctx.hearts < 1) {
-            setTimeout(async function () {
-                showDialog(eventData("lost", ctx));
-                await setHearts(minHearts);
-                setStreak(0);
-            }, 2000);
+            await utils.wait(2000);
+            showDialog(eventData("lost", ctx));
+            await setHearts(minHearts);
+            setStreak(0);
         }
         if (wordLetters === found) {
             res = Object.assign({}, ctx);
@@ -290,10 +289,9 @@ function Engine(rootElement, dispatcher, minHearts = 9) {
                 await updateHearts((heart) => heart + res.points)
             }
             context.progress = res.progress;
-            setTimeout(function () {
-                showDialog(eventData("won", Object.assign(res, ctx)));
-                setStreak((ctx.streak + 1) % 3); /** The streak reinitialize at 3 */
-            }, 2000)
+            await utils.wait(2000);
+            showDialog(eventData("won", Object.assign(res, ctx)));
+            setStreak((ctx.streak + 1) % 3); /** The streak reinitialize at 3 */
         }
     }
     function handleRevealVisibility() {

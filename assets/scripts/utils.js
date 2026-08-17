@@ -4,6 +4,7 @@ const {Element} = window;
 const syntax = /\{([^{}:\s]+)\}/g;
 const isButton = (t) => window.HTMLButtonElement.prototype.isPrototypeOf(t);
 const dateOpts = {day: "numeric", month: "short", year: "numeric"};
+const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 const dict = {
     answer_reveal_warning: {
         en: "You'll lose {x} points and won't earn any for this answer, but it will still count toward your progress",
@@ -512,5 +513,6 @@ export default Object.freeze({
     isButton,
     jsonStorage,
     removeAccents,
-    trapFocus
+    trapFocus,
+    wait
 });

@@ -56,6 +56,20 @@
         },
         {
             "form_factor": "narrow",
+            "label": "Découvre les réponses cachées",
+            "src": "/assets/images/screenshots/mobile/fr/play.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
+            "label": "Choisis ton défi",
+            "src": "/assets/images/screenshots/mobile/fr/levels.webp",
+            "sizes": "375x771",
+            "type": "image/webp"
+        },
+        {
+            "form_factor": "narrow",
             "label": "Jeu de devinettes gratuit",
             "src": "/assets/images/screenshots/mobile/fr/home-page.webp",
             "sizes": "375x771",
@@ -70,26 +84,12 @@
         },
         {
             "form_factor": "narrow",
-            "label": "Choisis ton défi",
-            "src": "/assets/images/screenshots/mobile/fr/levels.webp",
-            "sizes": "375x771",
-            "type": "image/webp"
-        },
-        {
-            "form_factor": "narrow",
-            "label": "Découvre les réponses cachées",
-            "src": "/assets/images/screenshots/mobile/fr/play.webp",
-            "sizes": "375x771",
-            "type": "image/webp"
-        },
-        {
-            "form_factor": "narrow",
             "label": "Gagne des badges",
             "src": "/assets/images/screenshots/mobile/fr/achievements.webp",
             "sizes": "375x771",
             "type": "image/webp"
         }
     ],
-    "start_url": "/",
+    "start_url": "/fr",
     "theme_color": "#2463ff"
 }

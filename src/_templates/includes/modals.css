@@ -52,9 +52,9 @@ svg:where(input[type="checkbox"] + *) {
 
 .modal:where([data-variant="menu"]) {
     --alignment: center;
-    --modal-padding: min(10dvb, 2rem) min(10lvi, 2rem) 1.5em;
+    --modal-padding: min(7vmin, 2rem) min(7vmin, 2rem) 1.5em;
     --radius: calc(min(15vi, 4rem) / 2);
-    --c-space: 2rem;
+    --c-space: min(2.5vmin, 2rem);
     --link-text-align: center;
 }
 
@@ -156,7 +156,7 @@ div:has(> .check-wrapper) {
     background: transparent;
     overflow: clip auto;
     overflow: clip / auto; /* for safari */
-    max-block-size: min(75lvb, 480px);
+    max-block-size: min(80dvb, 512px);
 
     &, &::backdrop {
         transition: display .35s allow-discrete,

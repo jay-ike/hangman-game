@@ -108,11 +108,12 @@ button[data-tooltip="answer-reveal-tooltip"] {
 
 .tooltip:where([data-position="bottom"]) {
     --tt-clip: polygon(0 0, 0 100%, 100% 100%, 100% 0, min(100%, 50% + 1em) 0, 50% -1em, max(0%, 50% - 1em) 0);
-    --tt-inset-block: calc(100 + 1em) auto;
+    --tt-inset-block: calc(100% + 1em) auto;
+    --tt-inset-inline: calc(-50% - 1em) auto;
 }
 
 [aria-disabled="true"]:focus~.tooltip {
-    font-size: 0.85em;
+    font-size: 0.75em;
     text-wrap: pretty;
     letter-spacing: 0.1em;
     text-transform: capitalize;
@@ -123,11 +124,12 @@ button[data-tooltip="answer-reveal-tooltip"] {
     inset-inline: var(--tt-inset-inline, -50% auto);
     margin-inline: auto;
     padding: 0.5em;
-    min-inline-size: var(--tt-inline-size, 8em);
+    min-inline-size: var(--tt-inline-size, min(10vmin, 8em));
     max-block-size: 100lvb;
     clip-path: var(--tt-clip, polygon(0 100%, 0 0, 100% 0, 100% 100%,
             min(100%, 50% + 1em) 100%, 50% calc(100% + 1em), max(0%, 50% - 1em) 100%));
     border-image: var(--tt-img, var(--pinky-gradient)) fill 1/auto/1em;
+    z-index: 2;
 }
 
 @supports (anchor-name: --btn) {
@@ -144,8 +146,8 @@ button[data-tooltip="answer-reveal-tooltip"] {
 
     [aria-disabled="true"]:focus ~ .tooltip {
         --tt-inset-block: var(--tt-anchored-block, auto calc(anchor(top) + 1em));
-        --tt-inset-inline: var(--tt-anchored-inline, auto);
-        --tt-inline-size: calc(anchor-size(width) + min(20vi, 8em));
+        --tt-inset-inline: var(--tt-anchored-inline, calc(anchor(left) - (anchor-size(width)/2) - 1em) auto);
+        --tt-inline-size: calc(anchor-size(width) + min(15vmin, 8em));
 
         position-anchor: --btn;
         position-area: var(--tt-anchored-area, block-start center);
@@ -171,7 +173,7 @@ button[data-tooltip="answer-reveal-tooltip"] {
 }
 
 [data-size="md"] {
-    --min-padding: min(6vi, 1.5em);
+    --min-padding: min(4.5vmin, 1.5em);
 }
 
 [data-size="sm"] {
